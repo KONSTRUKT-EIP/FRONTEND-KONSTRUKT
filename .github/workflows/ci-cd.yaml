@@ -1,27 +1,23 @@
-name: coding-style
+name: ESLint Frontend Web
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   pull_request:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: "npm"
 
       - name: Install dependencies
@@ -29,6 +25,6 @@ jobs:
 
       - name: Run ESLint
         run: |
-          npx eslint . \
-          --ext .ts,.tsx \
-          --max-warnings=0
+          npx eslint ./src ./vite.config.js ./eslint.config.js \
+            --ext .js,.jsx,.ts,.tsx \
+            --max-warnings=0
