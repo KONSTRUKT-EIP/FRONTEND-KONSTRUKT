@@ -25,6 +25,6 @@ jobs:
 
       - name: Run ESLint
         run: |
-          npx eslint ./src ./vite.config.js ./eslint.config.js \
+          npx eslint ./src ./vite.config.js ./eslint.config.ts \
             --ext .js,.jsx,.ts,.tsx \
             --max-warnings=0
