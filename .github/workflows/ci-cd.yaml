@@ -1,5 +1,4 @@
 name: Coding-Style Frontend Web
-
 on:
   push:
     branches: [main, dev]
@@ -9,7 +8,9 @@ on:
 jobs:
   Coding-Style:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: my-react-app
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,8 +19,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install dependencies
-        run: npm install   # instead of npm ci
+        run: npm install
 
       - name: Run ESLint
         run: |
