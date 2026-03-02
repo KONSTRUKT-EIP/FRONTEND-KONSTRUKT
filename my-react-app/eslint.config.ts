@@ -1,24 +1,38 @@
-import { defineConfig } from 'eslint-define-config'
+import js from '@eslint/js'
 import globals from 'globals'
+import tseslint from 'typescript-eslint'
+import reactPlugin from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
 
-export default defineConfig({
-  root: true,
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    ecmaFeatures: { jsx: true },
-  },
-  env: { browser: true, es2021: true },
-  plugins: ['@typescript-eslint', 'react', 'react-hooks'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-  ],
-  settings: { react: { version: 'detect' } },
-  rules: {
-    'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-  },
-})
+export default tseslint.config(
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+    ],
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': reactHooks,
+    },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+      },
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    settings: {
+      react: { version: 'detect' },
+    },
+    rules: {
+      ...reactPlugin.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  }
+)
