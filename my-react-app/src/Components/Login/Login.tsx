@@ -54,7 +54,19 @@ const Login: React.FC = () => {
            type="submit"
            className="w-full p-3 bg-orange-500 text-white rounded-md font-semibold hover:bg-orange-600 transition"
         >
-          Login
+          Sign in
+        </button>
+        <div className="flex items-center">
+          <div className="flex-grow h-px bg-gray-300" />
+          <span className="mx-4 text-gray-400 font-medium">or</span>
+          <div className="flex-grow h-px bg-gray-300" />
+        </div>
+        <button
+          type="button"
+          className="w-full flex items-center justify-center gap-2 p-3 mt-0 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition"
+        >
+          <img src='../../assets/google.png' alt="Google" className="w-6 h-6" />
+          <span className="ml-2 text-gray-700 font-medium">Se connecter avec Google</span>
         </button>
       </form>
     </div>
