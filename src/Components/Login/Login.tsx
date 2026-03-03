@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -75,6 +76,10 @@ const Login: React.FC = () => {
           <img src='../../assets/microsoft.png' alt="Microsoft" className="w-6 h-6" />
           <span className="ml-2 text-gray-700 font-medium">Se connecter avec Microsoft</span>
         </button>
+        <div className="text-center">
+          <span className="text-gray-600 text-sm">New to KONSTRUKT ? </span>
+          <Link to="/signup" className="text-orange-500 hover:underline text-sm font-medium">Create an account</Link>
+        </div>
       </form>
     </div>
   );
