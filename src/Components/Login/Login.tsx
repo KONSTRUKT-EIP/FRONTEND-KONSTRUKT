@@ -65,7 +65,7 @@ const Login: React.FC = () => {
           type="button"
           className="w-full flex items-center justify-center gap-2 p-3 mt-0 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition"
         >
-          <img src='../../assets/google.png' alt="Google" className="w-6 h-6" />
+          <img src='assets/google.png' alt="Google" className="w-6 h-6" />
           <span className="ml-2 text-gray-700 font-medium">Se connecter avec Google</span>
         </button>
       </form>
