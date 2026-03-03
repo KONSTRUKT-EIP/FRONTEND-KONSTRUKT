@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
         className="flex flex-col gap-6 w-full max-w-md p-8 bg-white rounded-xl shadow-lg border"
         onSubmit={handleSubmit}
@@ -44,7 +44,7 @@ const Login: React.FC = () => {
             />
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-500 text-sm focus:outline-none"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-500 text-xl focus:outline-none"
               onClick={() => setShowPassword((prev) => !prev)}
             >
               {showPassword ? "🙈" : "👁️"}
@@ -53,13 +53,13 @@ const Login: React.FC = () => {
         </div>
         <button
            type="submit"
-           className="w-full p-3 bg-orange-500 text-white rounded-md font-semibold hover:bg-orange-600 transition"
+           className="w-full p-3 bg-orange-700 text-white rounded-md font-semibold hover:bg-orange-600 transition"
         >
           Sign in
         </button>
         <div className="flex items-center">
           <div className="flex-grow h-px bg-gray-300" />
-          <span className="mx-4 text-gray-400 font-medium">or</span>
+          <span className="mx-4 text-gray-500 font-medium">or</span>
           <div className="flex-grow h-px bg-gray-300" />
         </div>
         <button
@@ -78,10 +78,10 @@ const Login: React.FC = () => {
         </button>
         <div className="text-center">
           <span className="text-gray-600 text-sm">New to KONSTRUKT ? </span>
-          <Link to="/signup" className="text-orange-500 hover:underline text-sm font-medium">Create an account</Link>
+          <Link to="/signup" className="text-orange-650 hover:underline text-sm font-medium">Sign up</Link>
         </div>
       </form>
-    </div>
+    </main>
   );
 };
 
