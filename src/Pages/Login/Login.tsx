@@ -1,32 +1,33 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  // const [error, setError] = useState('');
-  // const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // setError('');
-    // try {
-    //   const response = await fetch('/auth/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email, password }),
-    //   });
-    //   if (!response.ok) {
-    //     const data = await response.json();
-    //     setError(data.message || 'Invalid credentials.');
-    //     return;
-    //   }
-    //   navigate('/');
-    // } catch {
-    //   setError('An error occurred. Please try again.');
-    // }
+    setError('');
+    try {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        localStorage.setItem('access_token', data.access_token);
+        navigate('/');
+      } else {
+        setError(data.message || 'Invalid credentials.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    }
   };
 
   return (
