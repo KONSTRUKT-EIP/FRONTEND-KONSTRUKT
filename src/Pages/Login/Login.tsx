@@ -67,14 +67,14 @@ const Login: React.FC = () => {
           className="w-full flex items-center justify-center gap-2 p-3 mt-0 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition"
         >
           <img src='assets/google.png' alt="Google" className="w-6 h-6" />
-          <span className="ml-2 text-gray-700 font-medium">Se connecter avec Google</span>
+          <span className="ml-2 text-gray-700 font-medium">Sign in with Google</span>
         </button>
         <button
           type="button"
           className="w-full flex items-center justify-center gap-2 p-3 mt-0 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition"
         >
-          <img src='../../assets/microsoft.png' alt="Microsoft" className="w-6 h-6" />
-          <span className="ml-2 text-gray-700 font-medium">Se connecter avec Microsoft</span>
+          <img src='assets/microsoft.png' alt="Microsoft" className="w-6 h-6" />
+          <span className="ml-2 text-gray-700 font-medium">Sign in with Microsoft</span>
         </button>
         <div className="text-center">
           <span className="text-gray-600 text-sm">New to KONSTRUKT ? </span>

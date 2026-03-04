@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Meteo: React.FC = () => {
+const Worksites: React.FC = () => {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold text-gray-800">Météo &amp; Alertes</h1>
+      <h1 className="text-3xl font-bold text-gray-800">Worksites</h1>
     </main>
   );
 };
 
-export default Meteo;
+export default Worksites;

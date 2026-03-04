@@ -7,15 +7,15 @@ const Navbar: React.FC = () => {
     <nav className="w-full flex items-center justify-between bg-gray-100 px-8 py-3.5 shadow-sm min-h-[66px]">
       <div className="flex items-center gap-8">
         <Link to="/">
-          <img src="../../assets/Konstrukt_logo-removebg-preview.png" alt="Konstrukt Logo" className="h-14 w-auto" />
+          <img src="assets/Konstrukt_logo-removebg-preview.png" alt="Konstrukt Logo" className="h-14 w-auto" />
         </Link>
         <ul className="flex items-center gap-8 text-[1.08rem] font-semibold">
-          <NavLinkItem label="Tableau de bord" to="/dashboard" />
-          <NavLinkItem label="Commandes" to="/commandes" />
-          <NavLinkItem label="Météo & Alertes" to="/meteo" />
-          <NavLinkItem label="Chantiers" to="/chantiers" />
+          <NavLinkItem label="Dashboard" to="/dashboard" />
+          <NavLinkItem label="Orders" to="/orders" />
+          <NavLinkItem label="Weather & Alerts" to="/weather" />
+          <NavLinkItem label="Worksites" to="/worksites" />
           <NavLinkItem label="Planning" to="/planning" />
-          <NavLinkItem label="Paramètres" to="/parametres" />
+          <NavLinkItem label="Settings" to="/settings" />
         </ul>
       </div>
       <div className="flex items-center gap-3">

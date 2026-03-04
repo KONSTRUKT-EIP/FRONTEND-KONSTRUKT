@@ -2,23 +2,23 @@ import { Routes, Route } from "react-router-dom";
 import React from 'react';
 import Login from './Pages/Login/Login';
 import SignUp from './Pages/Signup/Signup';
-// import HomePage from './Pages/HomePage/HomePage';
-import Commandes from './Pages/Commandes/Commandes';
-import Meteo from './Pages/Meteo/Meteo';
-import Chantiers from './Pages/Chantiers/Chantiers';
+// import Dashboard from './Pages/HomePage/HomePage';
+import Orders from './Pages/Orders/Orders';
+import Weather from './Pages/Weather/Weather';
+import Worksites from './Pages/Worksites/Worksites';
 import Planning from './Pages/Planning/Planning';
-import Parametres from './Pages/Parametres/Parametres';
+import Settings from './Pages/Settings/Settings';
 
 const App: React.FC = () => (
   <Routes>
     <Route path="/" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
-    {/* <Route path="/dashboard" element={<HomePage />} /> */}
-    <Route path="/commandes" element={<Commandes />} />
-    <Route path="/meteo" element={<Meteo />} />
-    <Route path="/chantiers" element={<Chantiers />} />
+    {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+    <Route path="/orders" element={<Orders />} />
+    <Route path="/weather" element={<Weather />} />
+    <Route path="/worksites" element={<Worksites />} />
     <Route path="/planning" element={<Planning />} />
-    <Route path="/parametres" element={<Parametres />} />
+    <Route path="/settings" element={<Settings />} />
   </Routes>
 );
 
