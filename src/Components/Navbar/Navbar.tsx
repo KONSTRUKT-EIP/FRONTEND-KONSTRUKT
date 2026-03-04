@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
         </ul>
       </div>
       <div className="flex items-center gap-3">
-        <Link to="/" className="px-5 py-2 text-[1.08rem] font-medium text-gray-800 hover:text-orange-500 border border-gray-300 rounded-full hover:border-orange-400 transition">
+        <Link to="/signin" className="px-5 py-2 text-[1.08rem] font-medium text-gray-800 hover:text-orange-500 border border-gray-300 rounded-full hover:border-orange-400 transition">
           Sign in
         </Link>
         <Link to="/signup" className="px-5 py-2 text-[1.08rem] font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600 transition">
