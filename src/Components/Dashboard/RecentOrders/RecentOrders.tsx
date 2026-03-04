@@ -1,19 +1,12 @@
 import OrderRow, { Order } from "./OrderRow";
 
-const defaultOrders: Order[] = [
-  { id: "#876364", productName: "Voiles",    price: 98,  totalOrder: 325, total: 32000 },
-  { id: "#876368", productName: "Planchers", price: 471, totalOrder: 53,  total: 25000 },
-  { id: "#876412", productName: "Poutres",   price: 163, totalOrder: 78,  total: 12750 },
-  { id: "#876621", productName: "Acier",     price: 200, totalOrder: 10,  total: 2000  },
-];
-
 const columns = ["nb commande", "Nom du produit", "prix", "Total Order", "Total"];
 
 interface RecentOrdersProps {
-  orders?: Order[];
+  orders: Order[];
 }
 
-export default function RecentOrders({ orders = defaultOrders }: RecentOrdersProps) {
+export default function RecentOrders({ orders }: RecentOrdersProps) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
       {/* Header */}
@@ -21,11 +14,6 @@ export default function RecentOrders({ orders = defaultOrders }: RecentOrdersPro
         <span className="text-sm font-semibold text-gray-900 tracking-tight">
           Commande Recents
         </span>
-        <button className="flex gap-1 p-1 rounded-md hover:bg-gray-100 transition-colors">
-          {[0, 1, 2].map((i) => (
-            <span key={i} className="block w-1 h-1 rounded-full bg-gray-400" />
-          ))}
-        </button>
       </div>
 
       {/* Table */}

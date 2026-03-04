@@ -12,15 +12,9 @@ interface ViewFiltersProps {
   onChange?: (id: string, checked: boolean) => void;
 }
 
-const defaultFilters: Filter[] = [
-  { id: "voiles",         label: "Voiles",         color: "#4F46E5" },
-  { id: "planchers",      label: "Planchers",      color: "#6366F1" },
-  { id: "poutres",        label: "Poutres",        color: "#818CF8" },
-  { id: "superstructure", label: "Superstructure", color: "#D1D5DB" },
-];
 
 export default function ViewFilters({
-  filters = defaultFilters,
+  filters = [],
   onChange,
 }: ViewFiltersProps) {
 
@@ -40,11 +34,6 @@ export default function ViewFilters({
     <div className="vf-card">
       <div className="vf-header">
         <span className="vf-title">Filtres de vue</span>
-        <button className="vf-menu-btn">
-          {[0, 1, 2].map((i) => (
-            <span key={i} className="vf-dot" />
-          ))}
-        </button>
       </div>
 
       <ul className="vf-list">
