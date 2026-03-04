@@ -1,38 +1,39 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  // const [error, setError] = useState('');
-  // const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // setError('');
-    // try {
-    //   const response = await fetch('/auth/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email, password }),
-    //   });
-    //   if (!response.ok) {
-    //     const data = await response.json();
-    //     setError(data.message || 'Invalid credentials.');
-    //     return;
-    //   }
-    //   navigate('/');
-    // } catch {
-    //   setError('An error occurred. Please try again.');
-    // }
+    setError('');
+    try {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        localStorage.setItem('access_token', data.access_token);
+        navigate('/');
+      } else {
+        setError(data.message || 'Invalid credentials.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    }
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+    <main className="min-h-screen flex items-start justify-center pt-32 bg-gray-100">
       <form
-        className="flex flex-col gap-6 w-full max-w-md p-8 bg-white rounded-xl shadow-lg border"
+        className="flex flex-col gap-6 w-full max-w-xl p-8 bg-white rounded-xl shadow-lg border"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-semibold text-center mb-4">Connexion</h2>
@@ -69,6 +70,7 @@ const Login: React.FC = () => {
             </button>
           </div>
         </div>
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <button
            type="submit"
            className="w-full p-3 bg-orange-700 text-white rounded-md font-semibold hover:bg-orange-600 transition"
