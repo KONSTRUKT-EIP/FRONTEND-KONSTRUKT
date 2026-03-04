@@ -31,9 +31,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+    <main className="min-h-screen flex items-start justify-center pt-32 bg-gray-100">
       <form
-        className="flex flex-col gap-6 w-full max-w-md p-8 bg-white rounded-xl shadow-lg border"
+        className="flex flex-col gap-6 w-full max-w-xl p-8 bg-white rounded-xl shadow-lg border"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-semibold text-center mb-4">Connexion</h2>
@@ -70,6 +70,7 @@ const Login: React.FC = () => {
             </button>
           </div>
         </div>
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <button
            type="submit"
            className="w-full p-3 bg-orange-700 text-white rounded-md font-semibold hover:bg-orange-600 transition"
