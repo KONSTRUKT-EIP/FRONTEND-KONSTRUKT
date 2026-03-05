@@ -6,7 +6,7 @@ interface ChantierCardProps {
   location: string;
   responsible: string;
   photo?: string;
-  onPhotoChange: (id: string, url: string) => void;
+  // onPhotoChange: (id: string, url: string) => void;
   onClick: () => void;
 }
 
@@ -16,7 +16,7 @@ export default function ChantierCard({
   location,
   responsible,
   photo,
-  onPhotoChange,
+  // onPhotoChange,
   onClick,
 }: ChantierCardProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +25,7 @@ export default function ChantierCard({
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    onPhotoChange(id, url);
+    // onPhotoChange(id, url);
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {
