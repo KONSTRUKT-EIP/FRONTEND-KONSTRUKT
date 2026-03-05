@@ -11,7 +11,7 @@ interface ChantierCardProps {
 }
 
 export default function ChantierCard({
-  id: _id,
+  // id: _id,
   name,
   location,
   responsible,
