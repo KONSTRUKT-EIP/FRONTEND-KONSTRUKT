@@ -13,7 +13,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await fetch('/auth/login', {
+      const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
         className="flex flex-col gap-6 w-full max-w-xl p-8 bg-white rounded-xl shadow-lg border"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-semibold text-center mb-4">Connexion</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">Sign in</h2>
         <div className="w-full flex flex-col gap-2 mb-2">
           <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
           <input
