@@ -22,13 +22,13 @@ const initialChantiers: Chantier[] = [
 
 export default function JobsitList() {
   const navigate = useNavigate();
-  const [chantiers, _setChantiers] = useState<Chantier[]>(initialChantiers);
+  const [chantiers, setChantiers] = useState<Chantier[]>(initialChantiers);
 
-  // const handlePhotoChange = (id: string, url: string) => {
-  //   setChantiers((prev) =>
-  //     prev.map((c) => (c.id === id ? { ...c, photo: url } : c))
-  //   );
-  // };
+  const handlePhotoChange = (id: string, url: string) => {
+    setChantiers((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, photo: url } : c))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
