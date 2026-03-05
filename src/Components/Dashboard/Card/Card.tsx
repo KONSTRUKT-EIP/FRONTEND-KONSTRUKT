@@ -4,12 +4,12 @@ interface CardProps {
 icon: ReactNode
 iconBg: string
 iconColor: string
-label: string
+name: string
 percentage: number
 spent: number
 }
 
-export function Card ({icon, iconBg, iconColor, label, percentage, spent}:CardProps){
+export function Card ({icon, iconBg, iconColor, name, percentage, spent}: CardProps){
 
     const formattedSpent = new Intl.NumberFormat("fr-FR").format(spent);
     return (
@@ -24,7 +24,7 @@ export function Card ({icon, iconBg, iconColor, label, percentage, spent}:CardPr
       {/* Content */}
       <div className="flex flex-col">
         <span className="text-xs text-gray-400 font-medium tracking-wide uppercase">
-          {label}
+          {name}
         </span>
         <span className="text-2xl font-bold text-gray-800 leading-tight">
           {percentage}%

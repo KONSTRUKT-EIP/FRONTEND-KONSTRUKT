@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
 import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+
 const chartData = [
   { time: "10am", voiles: 58, planchers: 30 },
   { time: "11am", voiles: 42, planchers: 45 },
@@ -21,12 +22,6 @@ const chartSeries: ChartSerie[] = [
   { key: "planchers", color: "#C084FC", label: "Planchers" },
 ];
 
-const orders: Order[] = [
-  { id: "#876364", productName: "Voiles",    price: 98,  totalOrder: 325, total: 32000 },
-  { id: "#876368", productName: "Planchers", price: 471, totalOrder: 53,  total: 25000 },
-  { id: "#876412", productName: "Poutres",   price: 163, totalOrder: 78,  total: 12750 },
-  { id: "#876621", productName: "Acier",     price: 200, totalOrder: 10,  total: 2000  },
-];
 
 const filters: Filter[] = [
   { id: "voiles",         label: "Voiles",         color: "#818CF8" },
@@ -35,17 +30,79 @@ const filters: Filter[] = [
   { id: "superstructure", label: "Superstructure", color: "#D1D5DB" },
 ];
 
-const kpis = [
-  { icon: "🏗️", iconBg: "bg-indigo-50",  iconColor: "text-indigo-500", label: "Avancement global", percentage: 72, spent: 67200 },
-  { icon: "🪟", iconBg: "bg-yellow-50",  iconColor: "text-yellow-500", label: "Voiles",             percentage: 80, spent: 32000 },
-  { icon: "🧱", iconBg: "bg-red-50",     iconColor: "text-red-400",    label: "Planchers",          percentage: 60, spent: 25000 },
-  { icon: "🔩", iconBg: "bg-purple-50",  iconColor: "text-purple-500", label: "Poutres",            percentage: 75, spent: 12750 },
-];
+const categoryConfig: Record<string, { icon: string; iconBg: string; iconColor: string }> = {
+  1: { icon: "🏗️", iconBg: "bg-indigo-50", iconColor: "text-indigo-500" },
+  2: { icon: "🪟", iconBg: "bg-yellow-50", iconColor: "text-yellow-500" },
+  3: { icon: "🧱", iconBg: "bg-red-50", iconColor: "text-red-400" },
+  4: { icon: "🔩", iconBg: "bg-purple-50", iconColor: "text-purple-500" },
+};
+// const orders: Order[] = [
+//   { id: "#876364", productName: "Voiles",    price: 98,  totalOrder: 325, total: 32000 },
+//   { id: "#876368", productName: "Planchers", price: 471, totalOrder: 53,  total: 25000 },
+//   { id: "#876412", productName: "Poutres",   price: 163, totalOrder: 78,  total: 12750 },
+//   { id: "#876621", productName: "Acier",     price: 200, totalOrder: 10,  total: 2000  },
+// ];
+
+
+  interface ApiCategory {
+  id: number;
+  name: string;
+  progress: number;
+  spent: number;
+}
+
+interface ApiRes {
+  globalProgress: number;
+  globalSpent: number;
+  categories: ApiCategory[];
+}
 
 export default function DashboardArmature() {
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>(
     Object.fromEntries(filters.map((f) => [f.id, f.id !== "superstructure"]))
   );
+  const [summaryData, setSummaryData] = useState<ApiRes | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState("2025-12-22");
+  const [endDate, setEndDate] = useState("2026-02-11");
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({ startDate, endDate });
+        const [summaryRes, ordersRes] = await Promise.all([
+          fetch(`http://localhost:3000/dashboard/armature/summary?${params}`),
+          fetch(`http://localhost:3000/dashboard/armature/orders/recent?${params}`),
+        ]);
+        if (!summaryRes.ok)
+          throw new Error(`Erreur ${summaryRes.status}`);
+        if (!ordersRes.ok)
+          throw new Error(`Erreur ${ordersRes.status}`);
+        const dataSummary: ApiRes = await summaryRes.json();
+        const ordersData: { orders: Order[] } = await ordersRes.json();
+        setSummaryData(dataSummary);
+        setOrders(ordersData.orders);
+      } catch (err: any) {
+        setError(err.message ?? "Unknown Error")
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+
+  }, [startDate, endDate]);
+
+  const cards = summaryData?
+      summaryData.categories.map((cat) => ({
+        ...(categoryConfig[cat.id]),
+        name: cat.name,
+        percentage: cat.progress,
+        spent: cat.spent,
+      })): [];
 
   const handleFilterChange = (id: string, checked: boolean) => {
     setActiveFilters((prev) => ({ ...prev, [id]: checked }));
@@ -72,11 +129,28 @@ export default function DashboardArmature() {
       </div>
 
       {/* Cards */}
-      <div className="flex gap-4 mb-6">
-        {kpis.map((kpi) => (
-          <Card key={kpi.label} {...kpi} />
-        ))}
-      </div>
+      {loading && (
+        <div className="flex gap-4 mb-6">
+          {[0,1,2,3].map((i) => (
+            <div key={i} className="flex-1 bg-white rounded-2xl p-6 shadow-sm animate-pulse h-24" />
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+          Impossible de charger les données : {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="flex gap-4 mb-6">
+          {cards.map((card) => (
+            <Card key={card.name} {...card} />
+          ))}
+        </div>
+      )}
+
 
       {/* Middle row: Graph + Filters */}
       <div className="grid grid-cols-3 gap-4 mb-4">
