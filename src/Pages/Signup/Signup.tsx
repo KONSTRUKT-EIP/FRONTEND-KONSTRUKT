@@ -1,25 +1,75 @@
 import React, { useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // ...signup logic...
+    setError('');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    try {
+      const response = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
+      const data = await response.json();
+      if (response.status === 201) {
+        localStorage.setItem('access_token', data.access_token);
+        navigate('/');
+      } else {
+        setError(data.message || 'Registration failed.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    }
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+    <main className="min-h-screen flex items-start justify-center pt-16 bg-gray-100">
       <form
-        className="flex flex-col gap-6 w-full max-w-md p-8 bg-white rounded-xl shadow-lg border"
+        className="flex flex-col gap-6 w-full max-w-xl p-8 bg-white rounded-xl shadow-lg border"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-semibold text-center mb-4">Sign up</h2>
+        <div className="w-full flex gap-4">
+          <div className="flex flex-col gap-2 w-1/2">
+            <label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</label>
+            <input
+              id="firstName"
+              type="text"
+              className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-400"
+              placeholder="John"
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex flex-col gap-2 w-1/2">
+            <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</label>
+            <input
+              id="lastName"
+              type="text"
+              className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-400"
+              placeholder="Doe"
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              required
+            />
+          </div>
+        </div>
         <div className="w-full flex flex-col gap-2 mb-2">
           <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
           <input
@@ -74,6 +124,7 @@ const Signup: React.FC = () => {
             </button>
           </div>
         </div>
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <button
            type="submit"
            className="w-full p-3 bg-orange-700 text-white rounded-md font-semibold hover:bg-orange-600 transition"
