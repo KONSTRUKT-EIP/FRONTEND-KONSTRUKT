@@ -19,7 +19,7 @@ const Login: React.FC = () => {
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
-      if (response.status === 200) {
+      if (data.access_token) {
         localStorage.setItem('access_token', data.access_token);
         navigate('/');
       } else {
