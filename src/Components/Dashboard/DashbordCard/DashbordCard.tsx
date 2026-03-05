@@ -1,3 +1,6 @@
+import React from 'react';
+
+
 interface DashboardCardProps {
   label: string;
   description: string;

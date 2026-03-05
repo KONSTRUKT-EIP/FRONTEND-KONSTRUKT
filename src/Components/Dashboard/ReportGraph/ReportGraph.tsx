@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid} from "recharts";
+import React from 'react';
 
 export interface ChartDataPoint {
   time: string;
