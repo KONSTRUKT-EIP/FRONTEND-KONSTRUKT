@@ -1,10 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
 import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
-// ── Chart data ───────────────────────────────────────────────
 const chartData = [
   { time: "10am", voiles: 58, planchers: 30 },
   { time: "11am", voiles: 42, planchers: 45 },

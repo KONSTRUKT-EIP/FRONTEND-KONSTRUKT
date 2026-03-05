@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardCard from "../../Components/Dashboard/DashbordCard/DashbordCard";
+import React from 'react';
 
 const dashboards = [
   { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
