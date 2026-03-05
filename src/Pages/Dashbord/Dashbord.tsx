@@ -64,8 +64,10 @@ export default function DashboardArmature() {
   const [summaryData, setSummaryData] = useState<ApiRes | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [startDate, _setStartDate] = useState("2025-12-22");
-  const [endDate, _setEndDate] = useState("2026-02-11");
+  // const [startDate, _setStartDate] = useState("2025-12-22");
+  // const [endDate, _setEndDate] = useState("2026-02-11");
+  const startDate = "2025-12-22";
+  const endDate = "2026-02-11";
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
