@@ -1,6 +1,6 @@
+// ViewFilters
 import { useState } from "react";
 import "./ViewFilters.css";
-import React from 'react';
 
 export interface Filter {
   id: string;
