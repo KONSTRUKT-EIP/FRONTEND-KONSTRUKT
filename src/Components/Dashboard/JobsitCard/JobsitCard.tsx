@@ -11,7 +11,7 @@ interface ChantierCardProps {
 }
 
 export default function ChantierCard({
-  id,
+  id: _id,
   name,
   location,
   responsible,
@@ -23,8 +23,9 @@ export default function ChantierCard({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
+    if (!file)
+      return;
+    // const url = URL.createObjectURL(file);
     // onPhotoChange(id, url);
   };
 

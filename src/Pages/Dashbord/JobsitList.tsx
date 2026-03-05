@@ -22,7 +22,7 @@ const initialChantiers: Chantier[] = [
 
 export default function JobsitList() {
   const navigate = useNavigate();
-  const [chantiers, setChantiers] = useState<Chantier[]>(initialChantiers);
+  const [chantiers, _setChantiers] = useState<Chantier[]>(initialChantiers);
 
   // const handlePhotoChange = (id: string, url: string) => {
   //   setChantiers((prev) =>

@@ -11,13 +11,13 @@ export interface Filter {
 
 interface ViewFiltersProps {
   filters?: Filter[];
-  onChange?: (id: string, checked: boolean) => void;
+  // onChange?: (id: string, checked: boolean) => void;
 }
 
 
 export default function ViewFilters({
   filters = [],
-  onChange,
+  // onChange,
 }: ViewFiltersProps) {
 
     const [checked, setChecked] = useState<Record<string, boolean>>(
@@ -29,7 +29,7 @@ export default function ViewFilters({
   const toggle = (id: string) => {
     const next = !checked[id];
     setChecked((prev) => ({ ...prev, [id]: next }));
-    onChange?.(id, next);
+    // onChange?.(id, next);
   };
 
   return (

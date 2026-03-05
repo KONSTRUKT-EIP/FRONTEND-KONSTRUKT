@@ -11,6 +11,10 @@ export interface ChartSerie {
   color: string;
   // label: string;
 }
+interface TooltipProps {
+  active?: boolean;
+  payload?: { value: number }[];
+}
 
 interface ReportsChartProps {
   data: ChartDataPoint[];
@@ -18,7 +22,7 @@ interface ReportsChartProps {
   activeFilters: Record<string, boolean>;
 }
 
-function OverInGraph({ active, payload, label }: any) {
+function OverInGraph({ active, payload }: TooltipProps) {
   if (!active || !payload?.length)
     return null;
   return (

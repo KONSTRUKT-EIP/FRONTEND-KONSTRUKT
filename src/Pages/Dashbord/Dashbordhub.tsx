@@ -22,7 +22,7 @@ const chantierNames: Record<string, string> = {
 
 // test
 
-export default function jobsiteHub() {
+export default function JobsiteHub() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
