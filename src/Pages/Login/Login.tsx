@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../../Context/AuthContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +9,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,7 +23,8 @@ const Login: React.FC = () => {
       const data = await response.json();
       if (data.access_token) {
         localStorage.setItem('access_token', data.access_token);
-        navigate('/');
+        login();
+        navigate('/dashboard');
       } else {
         setError(data.message || 'Invalid credentials.');
       }
