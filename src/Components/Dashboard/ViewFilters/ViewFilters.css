@@ -1,0 +1,102 @@
+.vf-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 24px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  width: 260px;
+  box-sizing: border-box;
+  font-family: "DM Sans", sans-serif;
+}
+
+.vf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.vf-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: -0.2px;
+}
+
+.vf-menu-btn {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.vf-menu-btn:hover {
+  background: #f3f4f6;
+}
+
+.vf-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #9ca3af;
+}
+
+.vf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vf-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.vf-row:hover {
+  background: #f9fafb;
+}
+
+.vf-checkbox {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: #e5e7eb;
+}
+
+.vf-checkbox--checked {
+  /* background et box-shadow restent en inline car dynamiques (couleur par filtre) */
+}
+
+.vf-label {
+  font-size: 14px;
+  flex: 1;
+  transition: color 0.2s;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.vf-label--checked {
+  color: #111827;
+  font-weight: 500;
+}
