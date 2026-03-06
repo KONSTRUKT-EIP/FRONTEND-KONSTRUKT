@@ -70,6 +70,23 @@ export default function DashboardArmature() {
   const endDate = "2026-02-11";
   const [orders, setOrders] = useState<Order[]>([]);
 
+  const handleCreateOrder = async (payload: Omit<Order, "id">) => {
+    try {
+      const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      console.log("send");
+      if (!res.ok)
+        throw new Error(`Erreur ${res.status}`);
+      const newOrder: Order = await res.json();
+      setOrders((prev) => [...prev, newOrder]);
+    } catch (err: unknown) {
+      console.error("Erreur création commande :", err);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -168,8 +185,7 @@ export default function DashboardArmature() {
       {/* Bottom row: Orders */}
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
-
-          <RecentOrders orders={orders} />
+          <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
           <span className="text-sm text-gray-400">Analytics (à venir)</span>
