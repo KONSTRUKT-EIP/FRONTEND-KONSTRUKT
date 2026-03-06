@@ -16,9 +16,9 @@ export default function RecentOrders({ orders, onCreateOrder }: RecentOrdersProp
       <CreateOrderModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSubmit={async (payload) => {
-            console.log("payload reçu :", payload);
-            await onCreateOrder?.(payload);
+          onSubmit={async (_payload) => {
+            console.log("payload reçu :", _payload);
+            await onCreateOrder?.(_payload);
           }}
         />
 

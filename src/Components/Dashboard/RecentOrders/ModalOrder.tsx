@@ -5,7 +5,7 @@ import { Field } from "../../Tools/Input/Input";
 interface CreateOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (payload: Omit<Order, "id">) => void;
+  onSubmit: (_payload: Omit<Order, "id">) => void;
 }
 
 const emptyForm = {
