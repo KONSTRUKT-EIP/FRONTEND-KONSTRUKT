@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
     <nav className="w-full flex items-center justify-between bg-gray-100 px-8 py-3.5 shadow-sm min-h-[66px]">
       <div className="flex items-center gap-8">
         <Link to="/">
-          <img src="assets/Konstrukt_logo-removebg-preview.png" alt="Konstrukt Logo" className="h-17 w-auto" />
+          <img src="/assets/Konstrukt_logo-removebg-preview.png" alt="Konstrukt Logo" className="h-17 w-auto" />
         </Link>
         <ul className="flex items-center gap-10 text-[1.08rem] font-semibold">
           {isLoggedIn ? (
