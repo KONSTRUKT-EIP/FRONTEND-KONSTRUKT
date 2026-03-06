@@ -150,7 +150,7 @@ export default function DashboardArmature() {
         spent: cat.spent,
       })): [];
 
-  const handleFilterChange = (id: string, checked: boolean) => {
+  const _handleFilterChange = (id: string, checked: boolean) => {
     setActiveFilters((prev) => ({ ...prev, [id]: checked }));
   };
 
