@@ -28,7 +28,7 @@ const Signup: React.FC = () => {
       const data = await response.json();
       if (response.status === 201) {
         localStorage.setItem('access_token', data.access_token);
-        navigate('/');
+        navigate('/signin');
       } else {
         setError(data.message || 'Registration failed.');
       }

@@ -11,6 +11,8 @@ import Settings from './Pages/Settings/Settings';
 import DashboardArmature from './Pages/Dashbord/Dashbord'
 import JobsitList from "./Pages/Dashbord/JobsitList";
 import JobsitHub from "./Pages/Dashbord/Dashbordhub";
+import About from './Pages/About/About';
+import Pricing from './Pages/Pricing/Pricing';
 
 const App: React.FC = () => (
   <Routes>
@@ -26,6 +28,8 @@ const App: React.FC = () => (
     <Route path="/worksites" element={<Worksites />} />
     <Route path="/planning" element={<Planning />} />
     <Route path="/settings" element={<Settings />} />
+    <Route path="/about" element={<About />} />
+    <Route path="/pricing" element={<Pricing />} />
   </Routes>
 );
 
