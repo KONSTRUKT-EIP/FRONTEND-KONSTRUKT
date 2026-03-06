@@ -100,7 +100,11 @@ export default function DashboardArmature() {
   const toggleWorkerCheck = (wid: number) => {
     setWorkerChecked(prev => {
       const next = new Set(prev);
-      next.has(wid) ? next.delete(wid) : next.add(wid);
+      if (next.has(wid)) {
+        next.delete(wid);
+      } else {
+        next.add(wid);
+      }
       return next;
     });
   };
@@ -129,7 +133,7 @@ export default function DashboardArmature() {
         setSummaryData(dataSummary);
         setOrders(ordersData.orders);
       } catch (err: unknown) {
-        setError(err.message ?? "Unknown Error")
+        setError((err as Error).message ?? "Unknown Error")
       } finally {
         setLoading(false);
       }
@@ -209,7 +213,7 @@ export default function DashboardArmature() {
         </div>
 
         <div className="col-span-1">
-          <ViewFilters filters={filters} onChange={handleFilterChange} />
+          <ViewFilters filters={filters} />
         </div>
       </div>
 
