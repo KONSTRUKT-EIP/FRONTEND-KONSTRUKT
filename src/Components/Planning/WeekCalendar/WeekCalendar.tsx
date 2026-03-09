@@ -126,7 +126,7 @@ export default function WeekCalendar({ tasks, weather = [] } : WeekCalendarCard)
           onClick={now}
           className="px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-600"
         >
-          Aujourd'hui
+          Aujourd hui
         </button>
       </div>
         {/* Grid */}
