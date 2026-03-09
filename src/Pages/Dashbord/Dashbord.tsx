@@ -5,18 +5,6 @@ import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/View
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
 import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
-import WorkerRow, { Worker } from "../../Components/Dashboard/WorkforceTable/WorkerRow";
-
-const defaultWorkers: Worker[] = [
-  { id: 1, specialite: 'Menuisier',  name: 'Arrora Gaur',     email: 'arroragaur@gmail.com',     dateDebut: '12 Dec, 2025', status: 'En attente', starred: true,  initials: 'AG', color: '#f97316' },
-  { id: 2, specialite: 'Menuisier',  name: 'James Mullican',  email: 'jamesmullican@gmail.com',  dateDebut: '10 Dec, 2025', status: 'En attente', starred: false, initials: 'JM', color: '#6366f1' },
-  { id: 3, specialite: 'Architecte', name: 'Robert Bacins',   email: 'robertbacins@gmail.com',   dateDebut: '09 Dec, 2025', status: 'Complete',   starred: false, initials: 'RB', color: '#10b981' },
-  { id: 4, specialite: 'Carreleur',  name: 'Bethany Jackson', email: 'bethanyjackson@gmail.com', dateDebut: '09 Dec, 2025', status: 'Annulé',     starred: false, initials: 'BJ', color: '#f43f5e' },
-  { id: 5, specialite: 'Carreleur',  name: 'Anne Jacob',      email: 'annejacob@gmail.com',      dateDebut: '10 Dec, 2025', status: 'Complete',   starred: false, initials: 'AJ', color: '#8b5cf6' },
-  { id: 6, specialite: 'Plombier',   name: 'Bethany Jackson', email: 'bethanyjackson@gmail.com', dateDebut: '10 Dec, 2025', status: 'En attente', starred: true,  initials: 'BJ', color: '#f43f5e' },
-  { id: 7, specialite: 'Ma\u00e7on',      name: 'James Mullican',  email: 'jamesmullican@gmail.com',  dateDebut: '10 Dec, 2025', status: 'En cours',   starred: false, initials: 'JM', color: '#6366f1' },
-  { id: 8, specialite: 'Ma\u00e7on',      name: 'Jhon Deo',        email: 'jhondeo32@gmail.com',      dateDebut: '10 Dec, 2025', status: 'En cours',   starred: true,  initials: 'JD', color: '#0ea5e9' },
-];
 
 const chantierNames: Record<string, string> = {
   "1": "Tour Horizon",
@@ -94,25 +82,6 @@ export default function DashboardArmature() {
   const startDate = "2025-12-22";
   const endDate = "2026-02-11";
   const [orders, setOrders] = useState<Order[]>([]);
-  const [workerChecked, setWorkerChecked] = useState<Set<number>>(new Set([3, 4, 6]));
-  const [workerSearch, setWorkerSearch] = useState('');
-
-  const toggleWorkerCheck = (wid: number) => {
-    setWorkerChecked(prev => {
-      const next = new Set(prev);
-      if (next.has(wid)) {
-        next.delete(wid);
-      } else {
-        next.add(wid);
-      }
-      return next;
-    });
-  };
-
-  const filteredWorkers = defaultWorkers.filter(w =>
-    w.name.toLowerCase().includes(workerSearch.toLowerCase()) ||
-    w.specialite.toLowerCase().includes(workerSearch.toLowerCase())
-  );
 
   const handleCreateOrder = async (payload: Omit<Order, "id">) => {
     try {
