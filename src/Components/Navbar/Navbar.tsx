@@ -10,8 +10,16 @@ const Navbar: React.FC = () => {
   return (
     <nav aria-label="Navigation principale" className="w-full flex items-center justify-between bg-gray-100 px-8 py-3.5 shadow-sm min-h-[66px]">
       <div className="flex items-center gap-8">
-        <Link to="/" aria-label="KONSTRUKT – Accueil">
-          <img src="/assets/Konstrukt_logo-removebg-preview.png" alt="" className="h-17 w-auto" />
+        <Link to="/">
+          <img
+            src="/assets/konstrukt_logo.svg"
+            alt="Konstrukt Logo"
+            width="93"
+            height="55"
+            className="h-[55px] w-[93px]"
+            fetchPriority="high"
+            loading="eager"
+          />
         </Link>
         <ul role="list" className="flex items-center gap-10 text-[1.08rem] font-semibold">
           {isLoggedIn ? (

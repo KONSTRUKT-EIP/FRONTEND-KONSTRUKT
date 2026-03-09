@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import ChantierCard from "../../Components/Dashboard/JobsitCard/JobsitCard";
 import React from 'react';
@@ -31,7 +31,7 @@ export default function JobsitList() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-gray-100" role="main" aria-label="Liste des chantiers">
       {/* Banner */}
       <div className="w-full bg-gradient-to-r from-indigo-600 to-indigo-400 px-8 py-10">
         <div className="max-w-5xl mx-auto">
@@ -50,16 +50,18 @@ export default function JobsitList() {
       {/* Card */}
       <div className="w-full px-20 py-8">
         <div className="grid grid-cols-4 gap-7">
-          {chantiers.map((chantier) => (
-            <ChantierCard
-              key={chantier.id}
-              {...chantier}
-              onPhotoChange={handlePhotoChange}
-              onClick={() => navigate(`/dashboard/${chantier.id}`)}
-            />
-          ))}
+          <Suspense fallback={<div>Chargement...</div>}>
+            {chantiers.map((chantier) => (
+              <ChantierCard
+                key={chantier.id}
+                {...chantier}
+                onPhotoChange={handlePhotoChange}
+                onClick={() => navigate(`/dashboard/${chantier.id}`)}
+              />
+            ))}
+          </Suspense>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

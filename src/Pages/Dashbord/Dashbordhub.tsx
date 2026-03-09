@@ -37,7 +37,7 @@ const StatCircle: React.FC<{ percentage: number; color: string; label: string; s
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
   return (
-    <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2">
       <div className="relative w-24 h-24">
         <svg width="96" height="96" className="-rotate-90" viewBox="0 0 96 96">
           <circle cx="48" cy="48" r={radius} fill="none" stroke="#f3f4f6" strokeWidth="10" />
@@ -51,18 +51,18 @@ const StatCircle: React.FC<{ percentage: number; color: string; label: string; s
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-bold text-gray-800">{percentage}%</span>
+              <span className="text-lg font-bold text-gray-900">{percentage}%</span>
         </div>
       </div>
-      <span className="text-sm font-semibold text-gray-700 text-center">{label}</span>
-      {sublabel && <span className="text-xs text-gray-400 text-center">{sublabel}</span>}
+          <span className="text-sm font-semibold text-gray-900 text-center">{label}</span>
+      {sublabel && <span className="text-xs text-gray-900 text-center font-semibold">{sublabel}</span>}
     </div>
   );
 };
 
 export default function JobsiteHub() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
   const total = defaultWorkers.length;
   const complete = defaultWorkers.filter(w => w.status === 'Complete').length;
@@ -75,17 +75,23 @@ export default function JobsiteHub() {
   const pctEnCours = Math.round((enCours / total) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-8" role="main">
       {/* Header */}
       <div className="mb-8">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="text-XL text-gray-400 hover:text-gray-600 mb-3 flex items-center gap-1 transition-colors"
-        >
-          ← Tous les chantiers
-        </button>
+        <nav className="mb-3 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+          <span>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            >
+              Tous les chantiers
+            </button>
+          </span>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-900 font-semibold">{chantierName}</span>
+        </nav>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{chantierName}</h1>
-        <p className="text-sm text-gray-400 mt-1">Sélectionne un dashboard</p>
+        <p className="text-sm text-gray-700 mt-1">Sélectionne un dashboard</p>
       </div>
 
       <div className="flex gap-8 items-start">
@@ -99,9 +105,9 @@ export default function JobsiteHub() {
           ))}
         </div>
 
-        <div className="flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-6">
+          <div className="flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-200 flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800">Statistiques / {chantierName}</h2>
+              <h2 className="text-xl font-bold text-gray-900">Statistiques / {chantierName}</h2>
             <button
               onClick={() => navigate(`/dashboard/${id}/equipe`)}
               title="Voir le tableau des effectifs"
@@ -141,30 +147,30 @@ export default function JobsiteHub() {
 
           {/* Summary bars */}
           <div className="border-t border-gray-100 pt-4">
-            <h3 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-widest">Résumé des statuts</h3>
+            <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-widest">Résumé des statuts</h3>
             <div className="flex flex-col gap-3">
               {[
                 { label: 'Complet',    count: complete,  color: 'bg-indigo-500' },
                 { label: 'En cours',   count: enCours,   color: 'bg-orange-400' },
-                { label: 'En attente', count: enAttente, color: 'bg-gray-400'   },
+                { label: 'En attente', count: enAttente, color: 'bg-gray-700'   },
                 { label: 'Annulé',     count: annule,    color: 'bg-red-400'    },
               ].map(item => (
                 <div key={item.label} className="flex items-center gap-3">
                   <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.color}`}></span>
-                  <span className="text-sm text-gray-600 w-24 flex-shrink-0">{item.label}</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-2">
+                  <span className="text-sm text-gray-900 w-24 flex-shrink-0">{item.label}</span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full ${item.color}`}
                       style={{ width: `${Math.round((item.count / total) * 100)}%`, transition: 'width 0.6s ease' }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-gray-600 w-12 text-right">{item.count} / {total}</span>
+                  <span className="text-sm font-medium text-gray-900 w-12 text-right">{item.count} / {total}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

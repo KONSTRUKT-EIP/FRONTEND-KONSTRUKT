@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
-import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+import { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+import ReportsChart from "../../Components/Dashboard/ReportGraph/ReportGraph";
 
 const chantierNames: Record<string, string> = {
   "1": "Tour Horizon",
@@ -141,16 +142,31 @@ export default function DashboardArmature() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-8" role="main">
       {/* Page header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <button
-            onClick={() => navigate(`/dashboard/${id}`)}
-            className="text-gray-400 hover:text-gray-600 mb-2 flex items-center gap-1 transition-colors text-sm"
-          >
-            \u2190 {chantierName}
-          </button>
+          <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+            <span>
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+              >
+                Tous les chantiers
+              </button>
+            </span>
+            <span className="text-gray-400">/</span>
+            <span>
+              <button
+                onClick={() => navigate(`/dashboard/${id}`)}
+                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+              >
+                {chantierName}
+              </button>
+            </span>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-900 font-semibold">Armature</span>
+          </nav>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
             Dashboard / Armature
           </h1>
@@ -178,38 +194,46 @@ export default function DashboardArmature() {
       )}
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+        <div className="mb-6 bg-red-500 border border-red-300 text-white text-base font-semibold rounded-xl px-4 py-3">
           Impossible de charger les données : {error}
         </div>
       )}
 
       {!loading && !error && (
-        <div className="flex gap-4 mb-6">
-          {cards.map((card) => (
-            <Card key={card.name} {...card} />
-          ))}
-        </div>
+        <Suspense fallback={<div>Chargement...</div>}>
+          <div className="flex gap-4 mb-6">
+            {cards.map((card) => (
+              <Card key={card.name} {...card} />
+            ))}
+          </div>
+        </Suspense>
       )}
 
 
       {/* Middle row: Graph + Filters */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="col-span-2">
-          <ReportsChart data={chartData} series={chartSeries} activeFilters={activeFilters}/>
+          <Suspense fallback={<div>Chargement du graphique...</div>}>
+            <ReportsChart data={chartData} series={chartSeries} activeFilters={activeFilters}/>
+          </Suspense>
         </div>
 
         <div className="col-span-1">
-          <ViewFilters filters={filters} />
+          <Suspense fallback={<div>Chargement des filtres...</div>}>
+            <ViewFilters filters={filters} />
+          </Suspense>
         </div>
       </div>
 
       {/* Bottom row: Orders */}
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
-          <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
+          <Suspense fallback={<div>Chargement des commandes...</div>}>
+            <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
+          </Suspense>
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
-          <span className="text-sm text-gray-400">Analytics (\u00e0 venir)</span>
+          <span className="text-sm text-gray-800">Analytics (à venir)</span>
         </div>
       </div>
     </div>

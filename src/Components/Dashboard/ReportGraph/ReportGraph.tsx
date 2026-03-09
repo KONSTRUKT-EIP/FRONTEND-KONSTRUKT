@@ -61,22 +61,22 @@ export default function ReportsChart({data, series, activeFilters}: ReportsChart
         <LineChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#F3F4F6"
+            stroke="#000000"
             vertical={false}
           />
           <XAxis
             dataKey="time"
-            tick={{ fontSize: 11, fill: "#9CA3AF" }}
+            tick={{ fontSize: 11, fill: "#000000" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={[0, 100]}
-            tick={{ fontSize: 11, fill: "#9CA3AF" }}
+            tick={{ fontSize: 11, fill: "#000000" }}
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<OverInGraph />} cursor={{ stroke: "#E5E7EB", strokeDasharray: "4 4" }} />
+          <Tooltip content={<OverInGraph />} cursor={{ stroke: "#000000", strokeDasharray: "4 4" }} />
 
           {activeSeries.map((serie) => (
             <Line
