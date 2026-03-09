@@ -53,7 +53,7 @@ const Pricing: React.FC = () => {
           {/* Enterprise */}
           <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-200 flex flex-col items-center justify-between hover:scale-105 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 cursor-pointer">
             <span className="text-sm font-semibold text-orange-400 uppercase tracking-widest mb-3">Enterprise</span>
-            <p className="text-6xl font-extrabold text-gray-900 mb-1">Sur mesure</p>
+            <p className="text-6xl font-extrabold text-gray-900 mb-1">Custom</p>
             <p className="text-gray-400 text-base mb-8">Adapté aux grandes entreprises</p>
             <ul className="text-gray-600 text-base space-y-3 mb-10 w-full">
               <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Tout ce qui est dans Pro</li>

@@ -99,16 +99,14 @@ export default function JobsiteHub() {
           ))}
         </div>
 
-        <div className="flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-6">
+        <div
+          className="flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-6 cursor-pointer hover:shadow-lg hover:border-orange-200 transition-all duration-200"
+          onClick={() => navigate(`/dashboard/${id}/equipe`)}
+          role="button"
+          aria-label={`Voir les statistiques de l'équipe – ${chantierName}`}
+        >
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-800">Statistiques / {chantierName}</h2>
-            <button
-              onClick={() => navigate(`/dashboard/${id}/equipe`)}
-              title="Voir le tableau des effectifs"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-orange-100 text-gray-400 hover:text-orange-500 transition text-base font-bold"
-            >
-              →
-            </button>
           </div>
 
           {/* Donut circles */}

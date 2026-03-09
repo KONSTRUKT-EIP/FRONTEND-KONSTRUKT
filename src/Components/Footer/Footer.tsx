@@ -2,17 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import FooterColumn from './FooterColumn';
 import FooterSocials from './FooterSocials';
+import { useAuth } from '../../Context/AuthContext';
+
+const produitLinks = [
+  { label: 'Tableau de bord', to: '/dashboard'  },
+  { label: 'Planification',   to: '/planning'   },
+  { label: 'Météo & Alertes', to: '/weather'    },
+  { label: 'Commandes',       to: '/orders'     },
+];
 
 const columns = [
-  {
-    title: 'Produit',
-    links: [
-      { label: 'Tableau de bord', to: '/dashboard'  },
-      { label: 'Planification',   to: '/planning'   },
-      { label: 'Météo & Alertes', to: '/weather'    },
-      { label: 'Commandes',       to: '/orders'     },
-    ],
-  },
   {
     title: 'Entreprise',
     links: [
@@ -30,7 +29,10 @@ const columns = [
   },
 ];
 
-const Footer: React.FC = () => (
+const Footer: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+
+  return (
   <footer className="w-full bg-gray-900 text-white mt-auto">
     <div className="max-w-7xl mx-auto px-10 pt-14 pb-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
@@ -48,6 +50,10 @@ const Footer: React.FC = () => (
           <FooterSocials />
         </div>
 
+        {isLoggedIn && (
+          <FooterColumn title="Produit" links={produitLinks} />
+        )}
+
         {columns.map(col => (
           <FooterColumn key={col.title} title={col.title} links={col.links} />
         ))}
@@ -63,6 +69,7 @@ const Footer: React.FC = () => (
 
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;
