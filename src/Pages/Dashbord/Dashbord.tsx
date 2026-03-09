@@ -94,8 +94,8 @@ export default function DashboardArmature() {
       console.log("send");
       if (!res.ok)
         throw new Error(`Erreur ${res.status}`);
-      const newOrder: Order = await res.json();
-      setOrders((prev) => [...prev, newOrder]);
+      const { orders: newOrders }: { orders: Order[] } = await res.json();
+      setOrders((prev) => [...prev, ...newOrders]);
     } catch (err: unknown) {
       console.error("Erreur création commande :", err);
     }

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Order } from "./OrderRow";
 import { Field } from "../../Tools/Input/Input";
 
+export type CreateOrderPayload = Omit<Order, "id">;
+
 interface CreateOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
