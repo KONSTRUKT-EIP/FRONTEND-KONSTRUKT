@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-8">
         <Link to="/">
           <img
-            src="/assets/konstrukt_logo.webp"
+            src="/assets/konstrukt_logo.svg"
             alt="Konstrukt Logo"
             width="93"
             height="55"
