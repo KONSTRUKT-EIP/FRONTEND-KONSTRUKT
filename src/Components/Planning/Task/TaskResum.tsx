@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface CardResumProps {
   icon: string;
   iconBg: string;
