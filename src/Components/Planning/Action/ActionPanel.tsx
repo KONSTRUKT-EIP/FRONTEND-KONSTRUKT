@@ -1,5 +1,6 @@
 
 import ActionItem, { Action } from "./ActionItem";
+import React from 'react';
 
 interface ActionsPanelProps {
   actions: Action[];
