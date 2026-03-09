@@ -243,54 +243,6 @@ export default function DashboardArmature() {
           <span className="text-sm text-gray-400">Analytics (\u00e0 venir)</span>
         </div>
       </div>
-
-      {/* Workforce Table */}
-      <div className="mt-4 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">\u00c9quipe / {chantierName}</h2>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
-              <span className="text-gray-400 text-sm">\ud83d\udd0d</span>
-              <input
-                type="text"
-                placeholder="Chercher"
-                value={workerSearch}
-                onChange={e => setWorkerSearch(e.target.value)}
-                className="bg-transparent text-sm outline-none text-gray-600 w-28"
-              />
-            </div>
-            <button className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full hover:bg-orange-600 transition">
-              + Nouveau
-            </button>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="py-2 px-3 w-8"></th>
-                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Sp\u00e9cialit\u00e9 \u25be</th>
-                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Name \u25be</th>
-                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Email \u25be</th>
-                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Date de d\u00e9but \u25be</th>
-                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Status \u25be</th>
-                <th className="py-2 px-3 w-8"></th>
-                <th className="py-2 px-3 w-8 text-gray-300"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredWorkers.map(worker => (
-                <WorkerRow
-                  key={worker.id}
-                  worker={worker}
-                  checked={workerChecked.has(worker.id)}
-                  onCheck={() => toggleWorkerCheck(worker.id)}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }
