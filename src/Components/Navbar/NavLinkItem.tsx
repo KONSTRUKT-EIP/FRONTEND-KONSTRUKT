@@ -14,6 +14,7 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ label, to }) => {
     <li>
       <Link
         to={to}
+        aria-current={active ? 'page' : undefined}
         className={
           active
             ? 'bg-orange-100 text-orange-500 font-semibold rounded-full px-6 py-2 text-[1.08rem]'

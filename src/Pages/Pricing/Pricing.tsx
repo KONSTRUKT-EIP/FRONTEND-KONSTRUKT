@@ -23,10 +23,10 @@ const Pricing: React.FC = () => {
             <p className="text-6xl font-extrabold text-gray-900 mb-1">Free</p>
             <p className="text-gray-400 text-base mb-8">Perfect to get started</p>
             <ul className="text-gray-600 text-base space-y-3 mb-10 w-full">
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>1 worksite</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Basic planning</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Weather alerts</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Up to 3 users</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>1 worksite</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Basic planning</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Weather alerts</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Up to 3 users</li>
             </ul>
             <button className="w-full mt-auto py-3 text-lg bg-orange-100 text-orange-600 font-semibold rounded-full hover:bg-orange-200 transition">Get started for free</button>
           </div>
@@ -40,12 +40,12 @@ const Pricing: React.FC = () => {
             </div>
             <p className="text-orange-100 text-base mb-8">Best for growing teams</p>
             <ul className="text-white text-base space-y-3 mb-10 w-full">
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Unlimited worksites</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Advanced planning</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Weather alerts</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Order management</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Up to 20 users</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Priority support</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Unlimited worksites</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Advanced planning</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Weather alerts</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Order management</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Up to 20 users</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Priority support</li>
             </ul>
             <button className="w-full py-3 text-lg bg-white text-orange-500 font-semibold rounded-full hover:bg-orange-50 transition">Start Pro plan</button>
           </div>
@@ -56,12 +56,12 @@ const Pricing: React.FC = () => {
             <p className="text-6xl font-extrabold text-gray-900 mb-1">Custom</p>
             <p className="text-gray-400 text-base mb-8">Tailored for large companies</p>
             <ul className="text-gray-600 text-base space-y-3 mb-10 w-full">
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Everything in Pro</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Unlimited users</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Custom integrations</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Dedicated account manager</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>SLA guarantee</li>
-              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>On-site training</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Everything in Pro</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Unlimited users</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Custom integrations</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Dedicated account manager</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>SLA guarantee</li>
+              <li className="flex items-center gap-3"><span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>On-site training</li>
             </ul>
             <button className="w-full py-3 text-lg bg-orange-100 text-orange-600 font-semibold rounded-full hover:bg-orange-200 transition">Contact us</button>
           </div>

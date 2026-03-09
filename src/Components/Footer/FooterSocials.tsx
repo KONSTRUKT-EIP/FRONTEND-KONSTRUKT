@@ -31,18 +31,21 @@ const socials = [
 ];
 
 const FooterSocials: React.FC = () => (
-  <div className="flex items-center gap-4">
-    {socials.map(s => (
-      <a
-        key={s.label}
-        href={s.href}
-        aria-label={s.label}
-        className="text-gray-400 hover:text-orange-400 transition-colors"
-      >
-        {s.icon}
-      </a>
-    ))}
-  </div>
+  <nav aria-label="Réseaux sociaux">
+    <ul role="list" className="flex items-center gap-4">
+      {socials.map(s => (
+        <li key={s.label}>
+          <a
+            href={s.href}
+            aria-label={s.label}
+            className="text-gray-400 hover:text-orange-400 transition-colors"
+          >
+            <span aria-hidden="true">{s.icon}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
 );
 
 export default FooterSocials;
