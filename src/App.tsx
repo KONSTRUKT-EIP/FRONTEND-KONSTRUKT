@@ -10,6 +10,7 @@ const Worksites = lazy(() => import('./Pages/Worksites/Worksites'));
 const Planning = lazy(() => import('./Pages/Planning/Planning'));
 const Settings = lazy(() => import('./Pages/Settings/Settings'));
 const DashboardArmature = lazy(() => import('./Pages/Dashbord/Dashbord'));
+const DashboardDetail = lazy(() => import('./Pages/Dashbord/DashboardDetail'));
 const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
 const JobsitHub = lazy(() => import("./Pages/Dashbord/Dashbordhub"));
 const About = lazy(() => import('./Pages/About/About'));
@@ -34,6 +35,7 @@ const App: React.FC = () => (
       <Route path="/dashboard" element={<JobsitList />} />
       <Route path="/dashboard/:id" element={<JobsitHub />} />
       <Route path="/dashboard/:id/armature" element={<DashboardArmature />} />
+      <Route path="/dashboard/:id/:dbId" element={<DashboardDetail />} />
       <Route path="/orders" element={<Orders />} />
       <Route path="/weather" element={<Weather />} />
       <Route path="/worksites" element={<Worksites />} />
