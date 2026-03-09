@@ -194,7 +194,7 @@ export default function DashboardArmature() {
       )}
 
       {error && (
-        <div className="mb-6 bg-red-500 border border-red-300 text-white text-base font-semibold rounded-xl px-4 py-3">
+        <div className="mb-6 bg-red-600 border border-red-300 text-white text-base font-semibold rounded-xl px-4 py-3">
           Impossible de charger les données : {error}
         </div>
       )}

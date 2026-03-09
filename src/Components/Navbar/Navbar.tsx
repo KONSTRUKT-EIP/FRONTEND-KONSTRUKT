@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-3">
         {isLoggedIn ? (
           <Link to='/'
-            className="px-5 py-2 text-[1.08rem] font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600 transition"
+            className="px-5 py-2 text-[1.08rem] font-semibold text-white bg-orange-700 rounded-full hover:bg-orange-600 transition"
             onClick={() => {
               logout();
               navigate('/');
@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
             <Link to="/signin" className="px-5 py-2 text-[1.08rem] font-medium text-gray-800 hover:text-orange-500 border border-gray-300 rounded-full hover:border-orange-400 transition">
               Se connecter
             </Link>
-            <Link to="/signup" className="px-5 py-2 text-[1.08rem] font-semibold text-white bg-orange-500 rounded-full hover:bg-orange-600 transition">
+            <Link to="/signup" className="px-5 py-2 text-[1.08rem] font-semibold text-white bg-orange-700 rounded-full hover:bg-orange-600 transition">
               S&apos;inscrire
             </Link>
           </>
