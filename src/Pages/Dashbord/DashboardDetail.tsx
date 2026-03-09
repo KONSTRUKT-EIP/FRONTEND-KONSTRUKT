@@ -116,10 +116,10 @@ export default function DashboardDetail() {
               <tr className="border-b border-gray-100">
                 <th className="py-2 px-3 w-8"></th>
                 <th className="py-2 px-3 text-xs text-gray-400 font-medium">Spécialité ▾</th>
-                <th className="py-2 pl-12 text-xs text-gray-400 font-medium">Name ▾</th>
+                <th className="py-2 pl-12 text-xs text-gray-400 font-medium">Nom ▾</th>
                 <th className="py-2 pl-8 text-xs text-gray-400 font-medium">Email ▾</th>
                 <th className="py-2 px-3 text-xs text-gray-400 font-medium">Date de début ▾</th>
-                <th className="py-2 pl-6 text-xs text-gray-400 font-medium">Status ▾</th>
+                <th className="py-2 pl-6 text-xs text-gray-400 font-medium">Statut ▾</th>
                 <th className="py-2 px-3 w-8"></th>
                 <th className="py-2 px-3 w-8 text-gray-300"></th>
               </tr>

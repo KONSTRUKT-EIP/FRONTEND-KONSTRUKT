@@ -16,7 +16,7 @@ const Signup: React.FC = () => {
     e.preventDefault();
     setError('');
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError('Les mots de passe ne correspondent pas.');
       return;
     }
     try {
@@ -30,10 +30,10 @@ const Signup: React.FC = () => {
         localStorage.setItem('access_token', data.access_token);
         navigate('/signin');
       } else {
-        setError(data.message || 'Registration failed.');
+        setError(data.message || 'Inscription échouée.');
       }
     } catch {
-      setError('Network error. Please try again.');
+      setError('Erreur réseau. Veuillez réessayer.');
     }
   };
 
@@ -43,27 +43,27 @@ const Signup: React.FC = () => {
         className="flex flex-col gap-6 w-full max-w-xl p-8 bg-white rounded-xl shadow-lg border"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-semibold text-center mb-4">Sign up</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">Inscription</h2>
         <div className="w-full flex gap-4">
           <div className="flex flex-col gap-2 w-1/2">
-            <label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</label>
+            <label htmlFor="firstName" className="text-sm font-medium text-gray-700">Prénom</label>
             <input
               id="firstName"
               type="text"
               className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-400"
-              placeholder="John"
+              placeholder="Jean"
               value={firstName}
               onChange={e => setFirstName(e.target.value)}
               required
             />
           </div>
           <div className="flex flex-col gap-2 w-1/2">
-            <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</label>
+            <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Nom</label>
             <input
               id="lastName"
               type="text"
               className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-400"
-              placeholder="Doe"
+              placeholder="Dupont"
               value={lastName}
               onChange={e => setLastName(e.target.value)}
               required
@@ -83,13 +83,13 @@ const Signup: React.FC = () => {
           />
         </div>
         <div className="w-full flex flex-col gap-2 mb-2">
-          <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">Mot de passe</label>
           <div className="relative w-full">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
               className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-400 pr-10"
-              placeholder="Password"
+              placeholder="Mot de passe"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -104,13 +104,13 @@ const Signup: React.FC = () => {
           </div>
         </div>
         <div className="w-full flex flex-col gap-2 mb-2">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</label>
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
           <div className="relative w-full">
             <input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-400 pr-10"
-              placeholder="Confirm Password"
+              placeholder="Confirmer le mot de passe"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               required
@@ -129,11 +129,11 @@ const Signup: React.FC = () => {
            type="submit"
            className="w-full p-3 bg-orange-700 text-white rounded-md font-semibold hover:bg-orange-600 transition"
         >
-          Sign up
+          S&apos;inscrire
         </button>
         <div className="flex items-center">
           <div className="flex-grow h-px bg-gray-300" />
-          <span className="mx-4 text-gray-500 font-medium">or</span>
+          <span className="mx-4 text-gray-500 font-medium">ou</span>
           <div className="flex-grow h-px bg-gray-300" />
         </div>
         <button
@@ -141,18 +141,18 @@ const Signup: React.FC = () => {
           className="w-full flex items-center justify-center gap-2 p-3 mt-0 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition"
         >
           <img src='assets/google.png' alt="Google" className="w-6 h-6" />
-          <span className="ml-2 text-gray-700 font-medium">Sign up with Google</span>
+          <span className="ml-2 text-gray-700 font-medium">S&apos;inscrire avec Google</span>
         </button>
         <button
           type="button"
           className="w-full flex items-center justify-center gap-2 p-3 mt-0 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition"
         >
           <img src='assets/microsoft.png' alt="Microsoft" className="w-6 h-6" />
-          <span className="ml-2 text-gray-700 font-medium">Sign up with Microsoft</span>
+          <span className="ml-2 text-gray-700 font-medium">S&apos;inscrire avec Microsoft</span>
         </button>
         <div className="text-center">
-          <span className="text-gray-600 text-sm">Already have an account ? </span>
-          <Link to="/signin" className="text-orange-650 hover:underline text-sm font-medium">Sign in</Link>
+          <span className="text-gray-600 text-sm">Déjà un compte ? </span>
+          <Link to="/signin" className="text-orange-650 hover:underline text-sm font-medium">Se connecter</Link>
         </div>
       </form>
     </main>

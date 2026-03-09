@@ -10,6 +10,7 @@ const Worksites = lazy(() => import('./Pages/Worksites/Worksites'));
 const Planning = lazy(() => import('./Pages/Planning/Planning'));
 const Settings = lazy(() => import('./Pages/Settings/Settings'));
 const DashboardArmature = lazy(() => import('./Pages/Dashbord/Dashbord'));
+const DashboardDetail = lazy(() => import('./Pages/Dashbord/DashboardDetail'));
 const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
 const JobsitHub = lazy(() => import("./Pages/Dashbord/Dashbordhub"));
 const About = lazy(() => import('./Pages/About/About'));
@@ -19,29 +20,30 @@ const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
     <div className="text-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-      <p className="text-gray-600">Loading...</p>
+      <p className="text-gray-600">Chargement...</p>
     </div>
   </div>
 );
 
 const App: React.FC = () => (
   <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signin" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<JobsitList />} />
-          <Route path="/dashboard/:id" element={<JobsitHub />} />
-          <Route path="/dashboard/:id/armature" element={<DashboardArmature />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/weather" element={<Weather />} />
-          <Route path="/worksites" element={<Worksites />} />
-          <Route path="/planning" element={<Planning />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/pricing" element={<Pricing />} />
-        </Routes>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/signin" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<JobsitList />} />
+      <Route path="/dashboard/:id" element={<JobsitHub />} />
+      <Route path="/dashboard/:id/armature" element={<DashboardArmature />} />
+      <Route path="/dashboard/:id/:dbId" element={<DashboardDetail />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="/weather" element={<Weather />} />
+      <Route path="/worksites" element={<Worksites />} />
+      <Route path="/planning" element={<Planning />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/pricing" element={<Pricing />} />
+    </Routes>
   </Suspense>
 );
 
