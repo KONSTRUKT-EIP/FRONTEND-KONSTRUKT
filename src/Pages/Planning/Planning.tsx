@@ -3,6 +3,7 @@ import WeekCalendar from "../../Components/Planning/WeekCalendar/WeekCalendar";
 import ActionsPanel from "../../Components/Planning/Action/ActionPanel";
 import { Task } from "../../Components/Planning/WeekCalendar/TaskCard";
 import { Action } from "../../Components/Planning/Action/ActionItem";
+import React from 'react';
 
 const stats = [
   { icon: "📋", iconBg: "bg-gray-100",  label: "Tâches cette semaine", value: 14 },
