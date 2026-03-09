@@ -64,6 +64,11 @@ const CurrentWeather = ({ data }: CurrentWeatherProps) => {
             <div className="text-white/90 text-xl">Ressenti {current.feelsLike ?? 'N/A'}°C</div>
           </div>
         </div>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+          <div className="text-green-600 text-4xl mb-2" aria-label="Humidité">💧</div>
+          <div className="text-base text-gray-600 mb-2">Humidité</div>
+          <div className="text-4xl font-bold text-gray-800">{current.humidity ?? 'N/A'}%</div>
+        </div>
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
           <div className="text-blue-600 text-4xl mb-2">🌬️</div>
           <div className="text-base text-gray-600 mb-2">Vent</div>

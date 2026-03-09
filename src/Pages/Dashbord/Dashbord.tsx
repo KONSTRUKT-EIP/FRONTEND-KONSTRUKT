@@ -4,7 +4,6 @@ import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
-import { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
 import ReportsChart from "../../Components/Dashboard/ReportGraph/ReportGraph";
 

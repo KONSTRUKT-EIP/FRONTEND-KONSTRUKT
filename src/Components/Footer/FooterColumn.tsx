@@ -12,12 +12,12 @@ interface FooterColumnProps {
 }
 
 const FooterColumn: React.FC<FooterColumnProps> = ({ title, links }) => (
-  <div className="flex flex-col gap-3">
+  <div className="flex flex-col gap-3 min-w-[140px]">
     <h2 className="text-lg font-bold text-gray-200 uppercase tracking-widest mb-1" id={`footer-col-${title}`}>{title}</h2>
     <nav aria-labelledby={`footer-col-${title}`}>
       <ul role="list" className="flex flex-col gap-3">
         {links.map(link => (
-          <li key={link.to}>
+          <li key={link.to + '-' + link.label}>
             <Link
               to={link.to}
               className="text-lg text-gray-400 hover:text-orange-400 transition-colors"
