@@ -1,9 +1,31 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
 import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+import WorkerRow, { Worker } from "../../Components/Dashboard/WorkforceTable/WorkerRow";
+
+const defaultWorkers: Worker[] = [
+  { id: 1, specialite: 'Menuisier',  name: 'Arrora Gaur',     email: 'arroragaur@gmail.com',     dateDebut: '12 Dec, 2025', status: 'En attente', starred: true,  initials: 'AG', color: '#f97316' },
+  { id: 2, specialite: 'Menuisier',  name: 'James Mullican',  email: 'jamesmullican@gmail.com',  dateDebut: '10 Dec, 2025', status: 'En attente', starred: false, initials: 'JM', color: '#6366f1' },
+  { id: 3, specialite: 'Architecte', name: 'Robert Bacins',   email: 'robertbacins@gmail.com',   dateDebut: '09 Dec, 2025', status: 'Complete',   starred: false, initials: 'RB', color: '#10b981' },
+  { id: 4, specialite: 'Carreleur',  name: 'Bethany Jackson', email: 'bethanyjackson@gmail.com', dateDebut: '09 Dec, 2025', status: 'Annulé',     starred: false, initials: 'BJ', color: '#f43f5e' },
+  { id: 5, specialite: 'Carreleur',  name: 'Anne Jacob',      email: 'annejacob@gmail.com',      dateDebut: '10 Dec, 2025', status: 'Complete',   starred: false, initials: 'AJ', color: '#8b5cf6' },
+  { id: 6, specialite: 'Plombier',   name: 'Bethany Jackson', email: 'bethanyjackson@gmail.com', dateDebut: '10 Dec, 2025', status: 'En attente', starred: true,  initials: 'BJ', color: '#f43f5e' },
+  { id: 7, specialite: 'Ma\u00e7on',      name: 'James Mullican',  email: 'jamesmullican@gmail.com',  dateDebut: '10 Dec, 2025', status: 'En cours',   starred: false, initials: 'JM', color: '#6366f1' },
+  { id: 8, specialite: 'Ma\u00e7on',      name: 'Jhon Deo',        email: 'jhondeo32@gmail.com',      dateDebut: '10 Dec, 2025', status: 'En cours',   starred: true,  initials: 'JD', color: '#0ea5e9' },
+];
+
+const chantierNames: Record<string, string> = {
+  "1": "Tour Horizon",
+  "2": "R\u00e9sidence Les Pins",
+  "3": "Pont Sud",
+  "4": "Centre Commercial",
+  "5": "Immeuble Lumi\u00e8re",
+  "6": "Stade Municipal",
+};
 
 const chartData = [
   { time: "10am", voiles: 58, planchers: 30 },
@@ -58,6 +80,9 @@ interface ApiRes {
 }
 
 export default function DashboardArmature() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const chantierName = chantierNames[id ?? ""] ?? "Chantier";
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>(
     Object.fromEntries(filters.map((f) => [f.id, f.id !== "superstructure"]))
   );
@@ -69,6 +94,25 @@ export default function DashboardArmature() {
   const startDate = "2025-12-22";
   const endDate = "2026-02-11";
   const [orders, setOrders] = useState<Order[]>([]);
+  const [workerChecked, setWorkerChecked] = useState<Set<number>>(new Set([3, 4, 6]));
+  const [workerSearch, setWorkerSearch] = useState('');
+
+  const toggleWorkerCheck = (wid: number) => {
+    setWorkerChecked(prev => {
+      const next = new Set(prev);
+      if (next.has(wid)) {
+        next.delete(wid);
+      } else {
+        next.add(wid);
+      }
+      return next;
+    });
+  };
+
+  const filteredWorkers = defaultWorkers.filter(w =>
+    w.name.toLowerCase().includes(workerSearch.toLowerCase()) ||
+    w.specialite.toLowerCase().includes(workerSearch.toLowerCase())
+  );
 
   const handleCreateOrder = async (payload: Omit<Order, "id">) => {
     try {
@@ -106,7 +150,7 @@ export default function DashboardArmature() {
         setSummaryData(dataSummary);
         setOrders(ordersData.orders);
       } catch (err: unknown) {
-        setError(err.message ?? "Unknown Error")
+        setError((err as Error).message ?? "Unknown Error")
       } finally {
         setLoading(false);
       }
@@ -123,7 +167,7 @@ export default function DashboardArmature() {
         spent: cat.spent,
       })): [];
 
-  const handleFilterChange = (id: string, checked: boolean) => {
+  const _handleFilterChange = (id: string, checked: boolean) => {
     setActiveFilters((prev) => ({ ...prev, [id]: checked }));
   };
 
@@ -131,9 +175,17 @@ export default function DashboardArmature() {
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Page header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Dashboard/Armature
-        </h1>
+        <div>
+          <button
+            onClick={() => navigate(`/dashboard/${id}`)}
+            className="text-gray-400 hover:text-gray-600 mb-2 flex items-center gap-1 transition-colors text-sm"
+          >
+            \u2190 {chantierName}
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Dashboard / Armature
+          </h1>
+        </div>
         <div className="flex items-center gap-3">
           {["12-22-2025", "02-11-2026"].map((date) => (
             <button
@@ -178,7 +230,7 @@ export default function DashboardArmature() {
         </div>
 
         <div className="col-span-1">
-          <ViewFilters filters={filters} onChange={handleFilterChange} />
+          <ViewFilters filters={filters} />
         </div>
       </div>
 
@@ -188,7 +240,55 @@ export default function DashboardArmature() {
           <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
-          <span className="text-sm text-gray-400">Analytics (à venir)</span>
+          <span className="text-sm text-gray-400">Analytics (\u00e0 venir)</span>
+        </div>
+      </div>
+
+      {/* Workforce Table */}
+      <div className="mt-4 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-800">\u00c9quipe / {chantierName}</h2>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+              <span className="text-gray-400 text-sm">\ud83d\udd0d</span>
+              <input
+                type="text"
+                placeholder="Chercher"
+                value={workerSearch}
+                onChange={e => setWorkerSearch(e.target.value)}
+                className="bg-transparent text-sm outline-none text-gray-600 w-28"
+              />
+            </div>
+            <button className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full hover:bg-orange-600 transition">
+              + Nouveau
+            </button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="py-2 px-3 w-8"></th>
+                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Sp\u00e9cialit\u00e9 \u25be</th>
+                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Name \u25be</th>
+                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Email \u25be</th>
+                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Date de d\u00e9but \u25be</th>
+                <th className="py-2 px-3 text-xs text-gray-400 font-medium">Status \u25be</th>
+                <th className="py-2 px-3 w-8"></th>
+                <th className="py-2 px-3 w-8 text-gray-300"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredWorkers.map(worker => (
+                <WorkerRow
+                  key={worker.id}
+                  worker={worker}
+                  checked={workerChecked.has(worker.id)}
+                  onCheck={() => toggleWorkerCheck(worker.id)}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
