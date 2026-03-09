@@ -65,22 +65,22 @@ export default function ChantierCard({
       </div>
 
       {/* Infos */}
-      <div className="p-20 flex flex-col gap-3 flex-1">
+      <div className="px-6 py-8 flex flex-col gap-3 flex-1">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
-          <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900">{name}</h2>
+          <p className="text-lg text-gray-900 flex items-center gap-1 mt-1 font-semibold">
             <span>📍</span> {location}
           </p>
         </div>
 
         {/* Responsible */}
-        <div className="flex items-center gap-2 mt-auto pt-3 border-t border-gray-100">
-          <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-            <span className="text-xs font-semibold text-indigo-600">
+        <div className="flex items-center gap-3 mt-auto pt-3 border-t border-gray-100">
+          <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+            <span className="text-lg font-semibold text-indigo-600">
               {responsible.split(" ").map((n) => n[0]).join("").slice(0, 2)}
             </span>
           </div>
-          <span className="text-xs text-gray-500">{responsible}</span>
+          <span className="text-lg text-gray-900 font-bold">{responsible}</span>
         </div>
       </div>
     </div>

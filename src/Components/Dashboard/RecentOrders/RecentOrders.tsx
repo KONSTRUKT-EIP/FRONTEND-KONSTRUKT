@@ -40,8 +40,8 @@ export default function RecentOrders({ orders, onCreateOrder }: RecentOrdersProp
           <thead>
             <tr>
               {columns.map((col) => (
-                <th key={col} className="text-left pb-3 px-3 border-b border-gray-100">
-                  <button className="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
+                <th key={col} className="text-left pb-3 px-3 border-b border-gray-300">
+                  <button className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-800 transition-colors">
                     {col}
                     <span className="text-[10px]">▼</span>
                   </button>

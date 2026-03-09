@@ -16,17 +16,17 @@ export default function DashboardCard({ label, description, progress = 0, onClic
     >
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-semibold text-gray-900">{label}</h3>
-        <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+        <h2 className="text-sm font-semibold text-gray-900">{label}</h2>
+        <p className="text-xs text-gray-900 mt-0.5 font-semibold">{description}</p>
       </div>
 
       {/* Progress bar */}
       <div className="w-48 shrink-0">
         <div className="flex justify-between mb-1">
-          <span className="text-xs text-gray-400">Avancement</span>
+          <span className="text-xs text-gray-900 font-semibold">Avancement</span>
           <span className="text-xs font-semibold text-indigo-600">{progress}%</span>
         </div>
-        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-gray-300 rounded-full overflow-hidden">
           <div
             className="h-full bg-indigo-400 rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -34,7 +34,7 @@ export default function DashboardCard({ label, description, progress = 0, onClic
         </div>
       </div>
 
-      <span className="text-gray-300 text-lg shrink-0">›</span>
+      <span className="text-gray-700 text-lg shrink-0">›</span>
     </button>
   );
 }
