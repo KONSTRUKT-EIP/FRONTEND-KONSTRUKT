@@ -31,7 +31,7 @@ export default function JobsitList() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-gray-100" role="main" aria-label="Liste des chantiers">
       {/* Banner */}
       <div className="w-full bg-gradient-to-r from-indigo-600 to-indigo-400 px-8 py-10">
         <div className="max-w-5xl mx-auto">
@@ -60,6 +60,6 @@ export default function JobsitList() {
           ))}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

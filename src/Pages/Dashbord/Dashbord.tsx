@@ -141,16 +141,31 @@ export default function DashboardArmature() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-8" role="main">
       {/* Page header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <button
-            onClick={() => navigate(`/dashboard/${id}`)}
-            className="text-gray-400 hover:text-gray-600 mb-2 flex items-center gap-1 transition-colors text-sm"
-          >
-            \u2190 {chantierName}
-          </button>
+          <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+            <span>
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+              >
+                Tous les chantiers
+              </button>
+            </span>
+            <span className="text-gray-400">/</span>
+            <span>
+              <button
+                onClick={() => navigate(`/dashboard/${id}`)}
+                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+              >
+                {chantierName}
+              </button>
+            </span>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-900 font-semibold">Armature</span>
+          </nav>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
             Dashboard / Armature
           </h1>
@@ -178,7 +193,7 @@ export default function DashboardArmature() {
       )}
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+        <div className="mb-6 bg-red-500 border border-red-300 text-white text-base font-semibold rounded-xl px-4 py-3">
           Impossible de charger les données : {error}
         </div>
       )}
@@ -209,7 +224,7 @@ export default function DashboardArmature() {
           <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
-          <span className="text-sm text-gray-400">Analytics (\u00e0 venir)</span>
+          <span className="text-sm text-gray-800">Analytics (à venir)</span>
         </div>
       </div>
     </div>

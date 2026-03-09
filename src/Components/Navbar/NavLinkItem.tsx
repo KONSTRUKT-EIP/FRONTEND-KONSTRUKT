@@ -8,7 +8,7 @@ interface NavLinkItemProps {
 
 const NavLinkItem: React.FC<NavLinkItemProps> = ({ label, to }) => {
   const location = useLocation();
-  const active = location.pathname === to;
+  const active = location.pathname === to || (label === "Dashboard" && location.pathname.startsWith("/dashboard"));
 
   return (
     <li>
@@ -16,8 +16,8 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ label, to }) => {
         to={to}
         className={
           active
-            ? 'bg-orange-100 text-orange-500 font-semibold rounded-full px-6 py-2 text-[1.08rem]'
-            : 'text-gray-800 font-medium hover:text-orange-500 text-[1.08rem]'
+            ? 'bg-orange-500 text-white font-semibold rounded-full px-6 py-2 text-[1.08rem] hover:bg-orange-600 transition-colors'
+            : 'text-gray-900 font-medium hover:text-orange-700 text-[1.08rem]'
         }
       >
         {label}
