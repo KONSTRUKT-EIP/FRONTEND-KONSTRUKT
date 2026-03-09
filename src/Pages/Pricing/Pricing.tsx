@@ -18,23 +18,21 @@ const Pricing: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full max-w-6xl mx-auto">
 
           {/* Starter */}
-          <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-200 flex flex-col items-center">
+          <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-200 flex flex-col items-center hover:scale-105 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 cursor-pointer">
             <span className="text-sm font-semibold text-orange-400 uppercase tracking-widest mb-3">Starter</span>
             <p className="text-6xl font-extrabold text-gray-900 mb-1">Free</p>
             <p className="text-gray-400 text-base mb-8">Perfect to get started</p>
             <ul className="text-gray-600 text-base space-y-3 mb-10 w-full">
-              <li className="flex items-center gap-2">✅ 1 worksite</li>
-              <li className="flex items-center gap-2">✅ Basic planning</li>
-              <li className="flex items-center gap-2">✅ Weather alerts</li>
-              <li className="flex items-center gap-2">✅ Up to 3 users</li>
-              <li className="flex items-center gap-2 text-gray-300">❌ Order management</li>
-              <li className="flex items-center gap-2 text-gray-300">❌ Priority support</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>1 worksite</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Basic planning</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Weather alerts</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Up to 3 users</li>
             </ul>
-            <button className="w-full py-3 text-lg bg-orange-100 text-orange-600 font-semibold rounded-full hover:bg-orange-200 transition">Get started for free</button>
+            <button className="w-full mt-auto py-3 text-lg bg-orange-100 text-orange-600 font-semibold rounded-full hover:bg-orange-200 transition">Get started for free</button>
           </div>
 
           {/* Pro */}
-          <div className="bg-orange-500 rounded-3xl shadow-2xl p-10 border border-orange-400 flex flex-col items-center scale-105">
+          <div className="bg-orange-500 rounded-3xl shadow-2xl p-10 border border-orange-400 flex flex-col items-center justify-between hover:scale-105 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 cursor-pointer">
             <span className="text-sm font-semibold text-white uppercase tracking-widest mb-3">Pro</span>
             <div className="flex items-end gap-1 mb-1">
               <p className="text-6xl font-extrabold text-white">€49</p>
@@ -42,28 +40,28 @@ const Pricing: React.FC = () => {
             </div>
             <p className="text-orange-100 text-base mb-8">Best for growing teams</p>
             <ul className="text-white text-base space-y-3 mb-10 w-full">
-              <li className="flex items-center gap-2">✅ Unlimited worksites</li>
-              <li className="flex items-center gap-2">✅ Advanced planning</li>
-              <li className="flex items-center gap-2">✅ Weather alerts</li>
-              <li className="flex items-center gap-2">✅ Order management</li>
-              <li className="flex items-center gap-2">✅ Up to 20 users</li>
-              <li className="flex items-center gap-2">✅ Priority support</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Unlimited worksites</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Advanced planning</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Weather alerts</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Order management</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Up to 20 users</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-white flex-shrink-0"></span>Priority support</li>
             </ul>
             <button className="w-full py-3 text-lg bg-white text-orange-500 font-semibold rounded-full hover:bg-orange-50 transition">Start Pro plan</button>
           </div>
 
           {/* Enterprise */}
-          <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-200 flex flex-col items-center">
+          <div className="bg-white rounded-3xl shadow-lg p-10 border border-gray-200 flex flex-col items-center justify-between hover:scale-105 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 cursor-pointer">
             <span className="text-sm font-semibold text-orange-400 uppercase tracking-widest mb-3">Enterprise</span>
             <p className="text-6xl font-extrabold text-gray-900 mb-1">Custom</p>
             <p className="text-gray-400 text-base mb-8">Tailored for large companies</p>
             <ul className="text-gray-600 text-base space-y-3 mb-10 w-full">
-              <li className="flex items-center gap-2">✅ Everything in Pro</li>
-              <li className="flex items-center gap-2">✅ Unlimited users</li>
-              <li className="flex items-center gap-2">✅ Custom integrations</li>
-              <li className="flex items-center gap-2">✅ Dedicated account manager</li>
-              <li className="flex items-center gap-2">✅ SLA guarantee</li>
-              <li className="flex items-center gap-2">✅ On-site training</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Everything in Pro</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Unlimited users</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Custom integrations</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>Dedicated account manager</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>SLA guarantee</li>
+              <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"></span>On-site training</li>
             </ul>
             <button className="w-full py-3 text-lg bg-orange-100 text-orange-600 font-semibold rounded-full hover:bg-orange-200 transition">Contact us</button>
           </div>

@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
 import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+
+const chantierNames: Record<string, string> = {
+  "1": "Tour Horizon",
+  "2": "R\u00e9sidence Les Pins",
+  "3": "Pont Sud",
+  "4": "Centre Commercial",
+  "5": "Immeuble Lumi\u00e8re",
+  "6": "Stade Municipal",
+};
 
 const chartData = [
   { time: "10am", voiles: 58, planchers: 30 },
@@ -58,6 +68,9 @@ interface ApiRes {
 }
 
 export default function DashboardArmature() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const chantierName = chantierNames[id ?? ""] ?? "Chantier";
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>(
     Object.fromEntries(filters.map((f) => [f.id, f.id !== "superstructure"]))
   );
@@ -106,7 +119,7 @@ export default function DashboardArmature() {
         setSummaryData(dataSummary);
         setOrders(ordersData.orders);
       } catch (err: unknown) {
-        setError(err.message ?? "Unknown Error")
+        setError((err as Error).message ?? "Unknown Error")
       } finally {
         setLoading(false);
       }
@@ -123,7 +136,7 @@ export default function DashboardArmature() {
         spent: cat.spent,
       })): [];
 
-  const handleFilterChange = (id: string, checked: boolean) => {
+  const _handleFilterChange = (id: string, checked: boolean) => {
     setActiveFilters((prev) => ({ ...prev, [id]: checked }));
   };
 
@@ -131,9 +144,17 @@ export default function DashboardArmature() {
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Page header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Dashboard/Armature
-        </h1>
+        <div>
+          <button
+            onClick={() => navigate(`/dashboard/${id}`)}
+            className="text-gray-400 hover:text-gray-600 mb-2 flex items-center gap-1 transition-colors text-sm"
+          >
+            \u2190 {chantierName}
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Dashboard / Armature
+          </h1>
+        </div>
         <div className="flex items-center gap-3">
           {["12-22-2025", "02-11-2026"].map((date) => (
             <button
@@ -178,7 +199,7 @@ export default function DashboardArmature() {
         </div>
 
         <div className="col-span-1">
-          <ViewFilters filters={filters} onChange={handleFilterChange} />
+          <ViewFilters filters={filters} />
         </div>
       </div>
 
@@ -188,7 +209,7 @@ export default function DashboardArmature() {
           <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
-          <span className="text-sm text-gray-400">Analytics (à venir)</span>
+          <span className="text-sm text-gray-400">Analytics (\u00e0 venir)</span>
         </div>
       </div>
     </div>

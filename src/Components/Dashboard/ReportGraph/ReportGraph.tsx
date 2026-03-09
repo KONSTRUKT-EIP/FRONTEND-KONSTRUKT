@@ -9,7 +9,7 @@ export interface ChartDataPoint {
 export interface ChartSerie {
   key: string;
   color: string;
-  // label: string;
+  label?: string;
 }
 interface TooltipProps {
   active?: boolean;
