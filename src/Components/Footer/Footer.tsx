@@ -36,16 +36,20 @@ const Footer: React.FC = () => {
   <footer className="w-full bg-gray-900 text-white mt-auto min-h-[220px]">
     <div className="max-w-7xl mx-auto px-10 pt-14 pb-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
-        <div className="lg:col-span-2 flex flex-col gap-4">
+        <div className="lg:col-span-2 flex flex-col gap-4 min-h-[120px]">
           <Link to="/" aria-label="KONSTRUKT – Accueil">
-            <img
-              src="/assets/Konstrukt_logo-removebg-preview.png"
-              alt=""
-              className="h-20 w-auto brightness-0 invert"
-              width="120"
-              height="80"
-              style={{ minHeight: 80, minWidth: 120, display: 'block' }}
-            />
+            <div style={{ width: 120, height: 80, minWidth: 120, minHeight: 80, display: 'block' }}>
+              <img
+                src="/assets/konstrukt_logo.svg"
+                alt="Logo KONSTRUKT"
+                className="h-20 w-auto brightness-0 invert"
+                width="120"
+                height="80"
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                loading="eager"
+                decoding="async"
+              />
+            </div>
           </Link>
           <p className="text-lg text-gray-400 max-w-xs leading-relaxed">
             La plateforme tout-en-un pour gérer vos chantiers, équipes, commandes et plannings.
