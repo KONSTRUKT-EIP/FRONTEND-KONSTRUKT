@@ -30,7 +30,7 @@ export default function RecentOrders({ orders, onCreateOrder }: RecentOrdersProp
           </span>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+            className="flex items-center gap-1.5 bg-orange-700 hover:bg-orange-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
             + Créer une commande
           </button>
         </div>
