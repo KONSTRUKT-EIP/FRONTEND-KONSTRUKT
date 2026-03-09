@@ -26,22 +26,22 @@ const LoadingFallback = () => (
 
 const App: React.FC = () => (
   <Suspense fallback={<LoadingFallback />}>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/signin" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<JobsitList />} />
-      <Route path="/dashboard/:id" element={<JobsitHub />} />
-      <Route path="/dashboard/:id/armature" element={<DashboardArmature />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/weather" element={<Weather />} />
-      <Route path="/worksites" element={<Worksites />} />
-      <Route path="/planning" element={<Planning />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/pricing" element={<Pricing />} />
-    </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signin" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<JobsitList />} />
+          <Route path="/dashboard/:id" element={<JobsitHub />} />
+          <Route path="/dashboard/:id/armature" element={<DashboardArmature />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/weather" element={<Weather />} />
+          <Route path="/worksites" element={<Worksites />} />
+          <Route path="/planning" element={<Planning />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/pricing" element={<Pricing />} />
+        </Routes>
   </Suspense>
 );
 

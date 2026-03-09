@@ -62,7 +62,7 @@ const StatCircle: React.FC<{ percentage: number; color: string; label: string; s
 
 export default function JobsiteHub() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
   const total = defaultWorkers.length;
   const complete = defaultWorkers.filter(w => w.status === 'Complete').length;

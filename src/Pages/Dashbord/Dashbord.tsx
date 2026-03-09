@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
-import ReportsChart, { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+import { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
+import { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
+import ReportsChart from "../../Components/Dashboard/ReportGraph/ReportGraph";
 
 const chantierNames: Record<string, string> = {
   "1": "Tour Horizon",
@@ -199,29 +201,37 @@ export default function DashboardArmature() {
       )}
 
       {!loading && !error && (
-        <div className="flex gap-4 mb-6">
-          {cards.map((card) => (
-            <Card key={card.name} {...card} />
-          ))}
-        </div>
+        <Suspense fallback={<div>Chargement...</div>}>
+          <div className="flex gap-4 mb-6">
+            {cards.map((card) => (
+              <Card key={card.name} {...card} />
+            ))}
+          </div>
+        </Suspense>
       )}
 
 
       {/* Middle row: Graph + Filters */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="col-span-2">
-          <ReportsChart data={chartData} series={chartSeries} activeFilters={activeFilters}/>
+          <Suspense fallback={<div>Chargement du graphique...</div>}>
+            <ReportsChart data={chartData} series={chartSeries} activeFilters={activeFilters}/>
+          </Suspense>
         </div>
 
         <div className="col-span-1">
-          <ViewFilters filters={filters} />
+          <Suspense fallback={<div>Chargement des filtres...</div>}>
+            <ViewFilters filters={filters} />
+          </Suspense>
         </div>
       </div>
 
       {/* Bottom row: Orders */}
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
-          <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
+          <Suspense fallback={<div>Chargement des commandes...</div>}>
+            <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
+          </Suspense>
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
           <span className="text-sm text-gray-800">Analytics (à venir)</span>

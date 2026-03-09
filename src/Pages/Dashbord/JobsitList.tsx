@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import ChantierCard from "../../Components/Dashboard/JobsitCard/JobsitCard";
 import React from 'react';
@@ -50,14 +50,16 @@ export default function JobsitList() {
       {/* Card */}
       <div className="w-full px-20 py-8">
         <div className="grid grid-cols-4 gap-7">
-          {chantiers.map((chantier) => (
-            <ChantierCard
-              key={chantier.id}
-              {...chantier}
-              onPhotoChange={handlePhotoChange}
-              onClick={() => navigate(`/dashboard/${chantier.id}`)}
-            />
-          ))}
+          <Suspense fallback={<div>Chargement...</div>}>
+            {chantiers.map((chantier) => (
+              <ChantierCard
+                key={chantier.id}
+                {...chantier}
+                onPhotoChange={handlePhotoChange}
+                onClick={() => navigate(`/dashboard/${chantier.id}`)}
+              />
+            ))}
+          </Suspense>
         </div>
       </div>
     </main>
