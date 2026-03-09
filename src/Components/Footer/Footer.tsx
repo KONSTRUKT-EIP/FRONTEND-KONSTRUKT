@@ -7,7 +7,7 @@ const columns = [
   {
     title: 'Produit',
     links: [
-      { label: 'Dashboard',       to: '/dashboard'  },
+      { label: 'Tableau de bord', to: '/dashboard'  },
       { label: 'Planification',   to: '/planning'   },
       { label: 'Météo & Alertes', to: '/weather'    },
       { label: 'Commandes',       to: '/orders'     },
