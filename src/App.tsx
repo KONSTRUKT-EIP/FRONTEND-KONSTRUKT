@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import React, { lazy, Suspense } from 'react';
+import ProtectedRoute from './Components/ProtectedRoute';
 
 const Login = lazy(() => import('./Pages/Login/Login'));
 const SignUp = lazy(() => import('./Pages/Signup/Signup'));
@@ -28,21 +29,25 @@ const LoadingFallback = () => (
 const App: React.FC = () => (
   <Suspense fallback={<LoadingFallback />}>
     <Routes>
+      {/* Routes publiques */}
       <Route path="/" element={<Home />} />
       <Route path="/signin" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<JobsitList />} />
-      <Route path="/dashboard/:id" element={<JobsitHub />} />
-      <Route path="/dashboard/:id/armature" element={<DashboardArmature />} />
-      <Route path="/dashboard/:id/:dbId" element={<DashboardDetail />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/weather" element={<Weather />} />
-      <Route path="/worksites" element={<Worksites />} />
-      <Route path="/planning" element={<Planning />} />
-      <Route path="/settings" element={<Settings />} />
       <Route path="/about" element={<About />} />
       <Route path="/pricing" element={<Pricing />} />
+
+      {/* Routes protégées */}
+      <Route path="/dashboard" element={<ProtectedRoute><JobsitList /></ProtectedRoute>} />
+      <Route path="/dashboard/:id" element={<ProtectedRoute><JobsitHub /></ProtectedRoute>} />
+      <Route path="/dashboard/:id/armature" element={<ProtectedRoute><DashboardArmature /></ProtectedRoute>} />
+      <Route path="/dashboard/:id/:dbId" element={<ProtectedRoute><DashboardDetail /></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+      <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
+      <Route path="/worksites" element={<ProtectedRoute><Worksites /></ProtectedRoute>} />
+      <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </Suspense>
 );
