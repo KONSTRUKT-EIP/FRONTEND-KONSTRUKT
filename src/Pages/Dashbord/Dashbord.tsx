@@ -41,12 +41,6 @@ const filters: Filter[] = [
   { id: "superstructure", label: "Superstructure", color: "#D1D5DB" },
 ];
 
-const categoryConfig: Record<string, { icon: string; iconBg: string; iconColor: string }> = {
-  1: { icon: "🏗️", iconBg: "bg-indigo-50", iconColor: "text-indigo-500" },
-  2: { icon: "🪟", iconBg: "bg-yellow-50", iconColor: "text-yellow-500" },
-  3: { icon: "🧱", iconBg: "bg-red-50", iconColor: "text-red-400" },
-  4: { icon: "🔩", iconBg: "bg-purple-50", iconColor: "text-purple-500" },
-};
 // const orders: Order[] = [
 //   { id: "#876364", productName: "Voiles",    price: 98,  totalOrder: 325, total: 32000 },
 //   { id: "#876368", productName: "Planchers", price: 471, totalOrder: 53,  total: 25000 },
@@ -137,7 +131,6 @@ export default function DashboardArmature() {
 
   const cards = summaryData?
       summaryData.categories.map((cat) => ({
-        ...(categoryConfig[cat.id]),
         name: cat.name,
         percentage: cat.progress,
         spent: cat.spent,
@@ -176,17 +169,6 @@ export default function DashboardArmature() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
             Dashboard / Armature
           </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {["12-22-2025", "02-11-2026"].map((date) => (
-            <button
-              key={date}
-              className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-600 hover:border-gray-300 transition-colors shadow-sm"
-            >
-              {date}
-              <span className="text-gray-400 text-xs">▼</span>
-            </button>
-          ))}
         </div>
       </div>
 

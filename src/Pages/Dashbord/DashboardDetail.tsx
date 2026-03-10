@@ -38,20 +38,11 @@ const chantierNames: Record<string, string> = {
   "6": "Stade Municipal",
 };
 
-const dashboardLabels: Record<string, string> = {
-  beton:       "Béton",
-  charpente:   "Charpente",
-  electricite: "Électricité",
-  plomberie:   "Plomberie",
-  finitions:   "Finitions",
-  equipe:      "Équipe",
-};
 
 export default function DashboardDetail() {
-  const { id, dbId } = useParams<{ id: string; dbId: string }>();
+  const { id } = useParams<{ id: string}>();
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-  const dashLabel = dashboardLabels[dbId ?? ""] ?? dbId ?? "Dashboard";
 
   const [checked, setChecked] = useState<Set<number>>(new Set([3, 4, 6]));
   const [search, setSearch] = useState('');
@@ -78,16 +69,32 @@ export default function DashboardDetail() {
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Header */}
       <div className="mb-8">
-        <button
-          onClick={() => navigate(`/dashboard/${id}`)}
-          className="text-gray-400 hover:text-gray-600 mb-3 flex items-center gap-1 transition-colors"
-        >
-          ← {chantierName}
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Dashboard / {dashLabel}
-        </h1>
-        <p className="text-sm text-gray-400 mt-1">{chantierName}</p>
+        <div>
+         <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+            <span>
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+              >
+                Tous les chantiers
+              </button>
+            </span>
+            <span className="text-gray-400">/</span>
+            <span>
+              <button
+                onClick={() => navigate(`/dashboard/${id}`)}
+                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+              >
+                {chantierName}
+              </button>
+            </span>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-900 font-semibold">Équipe</span>
+          </nav>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Dashboard / Équipe
+          </h1>
+        </div>
       </div>
 
       {/* Workforce Table */}
@@ -162,7 +169,27 @@ export default function DashboardDetail() {
                 status={dayStatus}
               />
             );
-          })}
+          })}<nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+  <span>
+    <button
+      onClick={() => navigate("/dashboard")}
+      className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+    >
+      Tous les chantiers
+    </button>
+  </span>
+  <span className="text-gray-400">/</span>
+  <span>
+    <button
+      onClick={() => navigate(`/dashboard/${id}`)}
+      className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+    >
+      {chantierName}
+    </button>
+  </span>
+  <span className="text-gray-400">/</span>
+  <span className="text-gray-900 font-semibold">Armature</span>
+</nav>
         </div>
 
         {/* Day summary */}
