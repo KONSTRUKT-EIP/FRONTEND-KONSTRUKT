@@ -177,17 +177,6 @@ export default function DashboardArmature() {
             Dashboard / Armature
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-          {["12-22-2025", "02-11-2026"].map((date) => (
-            <button
-              key={date}
-              className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-600 hover:border-gray-300 transition-colors shadow-sm"
-            >
-              {date}
-              <span className="text-gray-400 text-xs">▼</span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Cards */}
