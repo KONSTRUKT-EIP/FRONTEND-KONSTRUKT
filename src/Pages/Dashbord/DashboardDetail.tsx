@@ -38,17 +38,9 @@ const chantierNames: Record<string, string> = {
   "6": "Stade Municipal",
 };
 
-const dashboardLabels: Record<string, string> = {
-  beton:       "Béton",
-  charpente:   "Charpente",
-  electricite: "Électricité",
-  plomberie:   "Plomberie",
-  finitions:   "Finitions",
-  equipe:      "Équipe",
-};
 
 export default function DashboardDetail() {
-  const { id, dbId } = useParams<{ id: string; dbId: string }>();
+  const { id } = useParams<{ id: string}>();
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
 

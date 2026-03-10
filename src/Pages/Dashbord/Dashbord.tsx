@@ -41,12 +41,6 @@ const filters: Filter[] = [
   { id: "superstructure", label: "Superstructure", color: "#D1D5DB" },
 ];
 
-const categoryConfig: Record<string, { icon: string; iconBg: string; iconColor: string }> = {
-  1: { icon: "🏗️", iconBg: "bg-indigo-50", iconColor: "text-indigo-500" },
-  2: { icon: "🪟", iconBg: "bg-yellow-50", iconColor: "text-yellow-500" },
-  3: { icon: "🧱", iconBg: "bg-red-50", iconColor: "text-red-400" },
-  4: { icon: "🔩", iconBg: "bg-purple-50", iconColor: "text-purple-500" },
-};
 // const orders: Order[] = [
 //   { id: "#876364", productName: "Voiles",    price: 98,  totalOrder: 325, total: 32000 },
 //   { id: "#876368", productName: "Planchers", price: 471, totalOrder: 53,  total: 25000 },
