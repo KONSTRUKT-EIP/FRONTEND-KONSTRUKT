@@ -21,7 +21,6 @@ function useWeather(city: string) {
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
     fetch(`http://localhost:3000/weather/forecast?city=${encodeURIComponent(city)}`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(d => { if (mounted) { setData(d.current); setLoading(false); } })
@@ -195,7 +194,7 @@ const HomePage: React.FC = () => {
             <span className="text-orange-500">depuis un seul endroit</span>
           </h1>
           <p className="text-2xl text-gray-500 max-w-3xl mx-auto mb-14 leading-relaxed">
-            KONSTRUKT simplifie la gestion de vos chantiers, commandes, équipes et plannings pour que vous puissiez vous concentrer sur l'essentiel.
+            KONSTRUKT simplifie la gestion de vos chantiers, commandes, équipes et plannings pour que vous puissiez vous concentrer sur l&apos;essentiel.
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Link
@@ -232,7 +231,7 @@ const HomePage: React.FC = () => {
             <span className="text-orange-500 text-base font-bold uppercase tracking-[0.2em]">Fonctionnalités</span>
             <h2 className="text-5xl font-extrabold text-gray-900 mt-5 mb-5">Tout ce dont vous avez besoin</h2>
             <p className="text-gray-400 max-w-3xl mx-auto text-xl">
-              Une suite d'outils pensés pour les professionnels du BTP, accessibles depuis n'importe quel appareil.
+              Une suite d&apos;outils pensés pour les professionnels du BTP, accessibles depuis n&apos;importe quel appareil.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
