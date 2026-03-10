@@ -51,7 +51,6 @@ export default function DashboardDetail() {
   const { id, dbId } = useParams<{ id: string; dbId: string }>();
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-  const dashLabel = dashboardLabels[dbId ?? ""] ?? dbId ?? "Dashboard";
 
   const [checked, setChecked] = useState<Set<number>>(new Set([3, 4, 6]));
   const [search, setSearch] = useState('');

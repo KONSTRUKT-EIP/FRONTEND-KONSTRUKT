@@ -1,15 +1,15 @@
 import React, { ReactNode } from 'react';
 
 interface CardProps {
-icon: ReactNode
-iconBg: string
-iconColor: string
+// icon: ReactNode
+// iconBg: string
+// iconColor: string
 name: string
 percentage: number
 spent: number
 }
 
-export function Card ({icon, iconBg, iconColor, name, percentage, spent}: CardProps){
+export function Card ({name, percentage, spent}: CardProps){
 
     const formattedSpent = new Intl.NumberFormat("fr-FR").format(spent);
     return (

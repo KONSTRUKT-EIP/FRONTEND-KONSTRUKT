@@ -137,7 +137,6 @@ export default function DashboardArmature() {
 
   const cards = summaryData?
       summaryData.categories.map((cat) => ({
-        ...(categoryConfig[cat.id]),
         name: cat.name,
         percentage: cat.progress,
         spent: cat.spent,
