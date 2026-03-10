@@ -15,7 +15,7 @@ export default function StatCard({ icon, iconBg, label, value }: CardResumProps)
       </div>
       <div>
         <p className="text-3xl font-bold text-gray-900">{value}</p>
-        <p className="text-sm text-gray-400 mt-0.5">{label}</p>
+        <p className="text-sm text-gray-600 mt-0.5">{label}</p>
       </div>
     </div>
   );

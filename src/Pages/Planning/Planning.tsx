@@ -3,13 +3,9 @@ import WeekCalendar from "../../Components/Planning/WeekCalendar/WeekCalendar";
 import ActionsPanel from "../../Components/Planning/Action/ActionPanel";
 import { Task } from "../../Components/Planning/WeekCalendar/TaskCard";
 import { Action } from "../../Components/Planning/Action/ActionItem";
-import React from 'react';
-
-const stats = [
-  { icon: "📋", iconBg: "bg-gray-100",  label: "Tâches cette semaine", value: 14 },
-  { icon: "⏰", iconBg: "bg-red-50",    label: "Tâches en retard",     value: 3  },
-  { icon: "⚠️", iconBg: "bg-yellow-50", label: "À risque météo",       value: 2  },
-];
+import CreateTaskModal, { CreateTaskPayload } from "../../Components/Planning/Modal/CreateTaskModal";
+import TaskDetailModal from "../../Components/Planning/Modal/TaskDetailModal";
+import React, { useState, useEffect } from 'react';
 
 const today = new Date();
 const getDateISO = (offset: number) => {
@@ -21,60 +17,163 @@ const getDateISO = (offset: number) => {
   return monday.toISOString().split("T")[0];
 };
 
-const tasks: Task[] = [
-  { id: "1", label: "Terrassement",       date: getDateISO(0), time: "MATIN",   status: "done"         },
-  { id: "2", label: "Début fondations",   date: getDateISO(0), time: "A-M",     status: "in-progress"  },
-  { id: "3", label: "Fondations validées",date: getDateISO(1), time: "MATIN",   status: "done"         },
-  { id: "4", label: "Livraison acier",    date: getDateISO(1), time: "14:00",   status: "done"         },
-  { id: "5", label: "Préparation dalle",  date: getDateISO(2), time: "MATIN",   status: "in-progress"  },
-  { id: "6", label: "Point équipe",       date: getDateISO(2), time: "15:00",   status: "in-progress"  },
-  { id: "7", label: "Livraison (à reporter)", date: getDateISO(3), time: "08:00", status: "weather-risk"},
-  { id: "8", label: "Risque intempéries", date: getDateISO(3), time: "JOURNÉE", status: "weather-risk" },
-  { id: "9", label: "Coulage dalle (retard)", date: getDateISO(4), time: "MATIN", status: "late"       },
-  { id: "10",label: "Créneau rattrapage", date: getDateISO(4), time: "A-M",     status: "in-progress"  },
-  { id: "11",label: "Équipe de réserve",  date: getDateISO(5), time: "MATIN",   status: "in-progress"  },
-];
-
+// Données météo en dur (pourra être remplacé par un appel API plus tard)
 const weather = [
   { date: getDateISO(0), label: "Beau",     icon: "☀️" },
   { date: getDateISO(1), label: "Variable", icon: "🌤️" },
   { date: getDateISO(2), label: "Nuageux",  icon: "☁️" },
   { date: getDateISO(3), label: "Pluie",    icon: "🌧️" },
-  { date: getDateISO(4), label: "Actuel",   icon: "📅" },
+  { date: getDateISO(4), label: "Variable", icon: "⛅" },
   { date: getDateISO(5), label: "Accalmie", icon: "🌥️" },
   { date: getDateISO(6), label: "Repos",    icon: "🌙" },
 ];
 
-const actions: Action[] = [
-  { id: "1", icon: "⏰", iconBg: "bg-red-50",    label: "Coulage dalle",    sublabel: "Secteur A",    sublabelIcon: "📍", badge: "En retard" },
-  { id: "2", icon: "🌧️", iconBg: "bg-blue-50",   label: "Livraison béton",  sublabel: "Prévu jeudi",  sublabelIcon: "📅", badge: "À décaler" },
-  { id: "3", icon: "💨", iconBg: "bg-orange-50", label: "Pose charpente",   sublabel: "Semaine pro.", sublabelIcon: "📅", badge: "À risque"  },
-];
-
 export default function Planning() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [actions, setActions] = useState<Action[]>([]);
+  const [stats, setStats] = useState([
+    { icon: "📋", iconBg: "bg-gray-100",  label: "Tâches cette semaine", value: 0 },
+    { icon: "⏰", iconBg: "bg-red-50",    label: "Tâches en retard",     value: 0 },
+    { icon: "⚠️", iconBg: "bg-yellow-50", label: "À risque météo",       value: 0 },
+  ]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadWeekPlanning();
+  }, []);
+
+  const loadWeekPlanning = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('access_token');
+      const monday = new Date();
+      const day = monday.getDay();
+      monday.setDate(monday.getDate() - (day === 0 ? 6 : day - 1));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const startDate = monday.toISOString().split('T')[0];
+      const endDate = sunday.toISOString().split('T')[0];
+      
+      const response = await fetch(
+        `http://localhost:3000/planning/week?startDate=${startDate}&endDate=${endDate}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to load planning data');
+      }
+
+      const data = await response.json();
+      
+      setTasks(data.tasks || []);
+      setActions(data.actions || []);
+      
+      if (data.stats) {
+        setStats([
+          { icon: "📋", iconBg: "bg-gray-100",  label: "Tâches cette semaine", value: data.stats.tasksThisWeek || 0 },
+          { icon: "⏰", iconBg: "bg-red-50",    label: "Tâches en retard",     value: data.stats.tasksLate || 0 },
+          { icon: "⚠️", iconBg: "bg-yellow-50", label: "À risque météo",       value: data.stats.tasksWeatherRisk || 0 },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error loading planning data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateTask = async (payload: CreateTaskPayload) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      
+      const response = await fetch('http://localhost:3000/planning/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to create task');
+      }
+      
+      await loadWeekPlanning();
+    } catch (error) {
+      console.error('Error in handleCreateTask:', error);
+      throw error;
+    }
+  };
+
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setIsDetailModalOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-gray-50 p-8">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Planning</h1>
       </div>
 
-      {/* Stats */}
-      <div className="flex gap-4 mb-6">
-        {stats.map((s) => (
-          <StatCard key={s.label} {...s} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-96">
+          <div className="text-gray-500">Chargement des données...</div>
+        </div>
+      ) : (
+        <>
+          {/* Stats & Actions */}
+          <div className="flex gap-4 mb-6">
+            {/* Stats - Left Side */}
+            <div className="flex flex-col gap-4 flex-1">
+              {stats.map((s) => (
+                <StatCard key={s.label} {...s} />
+              ))}
+            </div>
 
-      {/* Main content */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <WeekCalendar tasks={tasks} weather={weather} />
-        </div>
-        <div className="col-span-1">
-          <ActionsPanel actions={actions} />
-        </div>
-      </div>
-    </div>
+            {/* Actions Panel - Right Side */}
+            <div className="flex-1">
+              <ActionsPanel actions={actions} />
+            </div>
+          </div>
+
+          {/* Planning Calendar */}
+          <div>
+            <WeekCalendar 
+              tasks={tasks} 
+              weather={weather} 
+              onTaskClick={handleTaskClick}
+              onCreateTask={() => setIsCreateModalOpen(true)}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Modals */}
+      <CreateTaskModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateTask}
+      />
+      <TaskDetailModal
+        isOpen={isDetailModalOpen}
+        taskId={selectedTaskId}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedTaskId(null);
+        }}
+        onTaskUpdate={loadWeekPlanning}
+      />
+    </main>
   );
 }
