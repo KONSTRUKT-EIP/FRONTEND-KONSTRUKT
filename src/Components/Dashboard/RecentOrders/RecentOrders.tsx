@@ -1,12 +1,12 @@
 import OrderRow, { Order } from "./OrderRow";
 import React, { useState } from 'react';
-import CreateOrderModal from "./ModalOrder";
+import CreateOrderModal, { CreateOrderPayload } from "./ModalOrder";
 
-const columns = ["nb commande", "Nom du produit", "prix", "Total Order", "Total"];
+const columns = ["nb commande", "Nom du produit", "Prix unit.", "Quantité", "Total"];
 
 interface RecentOrdersProps {
   orders: Order[];
-  onCreateOrder?: (payload: Omit<Order, "id">) => void;
+  onCreateOrder?: (payload: CreateOrderPayload) => Promise<void>;
 }
 
 export default function RecentOrders({ orders, onCreateOrder }: RecentOrdersProps) {
@@ -16,9 +16,8 @@ export default function RecentOrders({ orders, onCreateOrder }: RecentOrdersProp
       <CreateOrderModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSubmit={async (_payload) => {
-            console.log("payload reçu :", _payload);
-            await onCreateOrder?.(_payload);
+          onSubmit={async (payload) => {
+            await onCreateOrder?.(payload);
           }}
         />
 

@@ -86,9 +86,13 @@ export default function DashboardArmature() {
 
   const handleCreateOrder = async (payload: Omit<Order, "id">) => {
     try {
+      const token = localStorage.getItem("access_token");
       const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
       });
       console.log("send");
@@ -107,9 +111,11 @@ export default function DashboardArmature() {
       setError(null);
       try {
         const params = new URLSearchParams({ startDate, endDate });
+        const token = localStorage.getItem("access_token");
+        const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
         const [summaryRes, ordersRes] = await Promise.all([
-          fetch(`http://localhost:3000/dashboard/armature/summary?${params}`),
-          fetch(`http://localhost:3000/dashboard/armature/orders/recent?${params}`),
+          fetch(`http://localhost:3000/dashboard/armature/summary?${params}`, { headers: authHeaders }),
+          fetch(`http://localhost:3000/dashboard/armature/orders/recent?${params}`, { headers: authHeaders }),
         ]);
         if (!summaryRes.ok)
           throw new Error(`Erreur ${summaryRes.status}`);
