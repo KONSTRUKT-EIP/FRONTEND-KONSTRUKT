@@ -103,14 +103,14 @@ const HomePage: React.FC = () => {
 
     return (
       <main className="min-h-screen bg-gray-100">
-        <section className="bg-orange-500 px-20 py-14 text-white">
+        <section className="bg-orange-700 px-20 py-14 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100 text-base font-bold uppercase tracking-[0.2em] mb-2">KONSTRUKT</p>
+              <p className="text-orange-100 text-lg font-extrabold uppercase tracking-[0.2em] mb-2">KONSTRUKT</p>
               <h1 className="text-5xl font-extrabold mb-2">{greeting}</h1>
-              <p className="text-orange-100 text-lg capitalize">{dateStr}</p>
+              <p className="text-orange-100 text-xl font-semibold capitalize">{dateStr}</p>
             </div>
-            <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-lg font-semibold px-8 py-4 rounded-xl transition">
+            <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-orange-600 text-lg font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-white">
               Voir mes chantiers →
             </Link>
           </div>
