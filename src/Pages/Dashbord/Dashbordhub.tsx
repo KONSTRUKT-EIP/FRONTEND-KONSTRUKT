@@ -1,18 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardCard from "../../Components/Dashboard/DashbordCard/DashbordCard";
-import { Worker } from "../../Components/Dashboard/WorkforceTable/WorkerRow";
-import React from 'react';
-
-const defaultWorkers: Worker[] = [
-  { id: 1, specialite: 'Menuisier',  name: 'Arrora Gaur',     email: 'arroragaur@gmail.com',     dateDebut: '12 Dec, 2025', status: 'En attente', starred: true,  initials: 'AG', color: '#f97316' },
-  { id: 2, specialite: 'Menuisier',  name: 'James Mullican',  email: 'jamesmullican@gmail.com',  dateDebut: '10 Dec, 2025', status: 'En attente', starred: false, initials: 'JM', color: '#6366f1' },
-  { id: 3, specialite: 'Architecte', name: 'Robert Bacins',   email: 'robertbacins@gmail.com',   dateDebut: '09 Dec, 2025', status: 'Complete',   starred: false, initials: 'RB', color: '#10b981' },
-  { id: 4, specialite: 'Carreleur',  name: 'Bethany Jackson', email: 'bethanyjackson@gmail.com', dateDebut: '09 Dec, 2025', status: 'Annulé',     starred: false, initials: 'BJ', color: '#f43f5e' },
-  { id: 5, specialite: 'Carreleur',  name: 'Anne Jacob',      email: 'annejacob@gmail.com',      dateDebut: '10 Dec, 2025', status: 'Complete',   starred: false, initials: 'AJ', color: '#8b5cf6' },
-  { id: 6, specialite: 'Plombier',   name: 'Bethany Jackson', email: 'bethanyjackson@gmail.com', dateDebut: '10 Dec, 2025', status: 'En attente', starred: true,  initials: 'BJ', color: '#f43f5e' },
-  { id: 7, specialite: 'Maçon',      name: 'James Mullican',  email: 'jamesmullican@gmail.com',  dateDebut: '10 Dec, 2025', status: 'En cours',   starred: false, initials: 'JM', color: '#6366f1' },
-  { id: 8, specialite: 'Maçon',      name: 'Jhon Deo',        email: 'jhondeo32@gmail.com',      dateDebut: '10 Dec, 2025', status: 'En cours',   starred: true,  initials: 'JD', color: '#0ea5e9' },
-];
+import React, { useEffect, useState } from 'react';
+import { teamService, TeamStats } from '../../services/teamService';
+import { getSiteUUID } from '../../utils/siteMapping';
 
 const dashboards = [
   { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
@@ -62,17 +52,48 @@ const StatCircle: React.FC<{ percentage: number; color: string; label: string; s
 
 export default function JobsiteHub() {
   const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-  const total = defaultWorkers.length;
-  const complete = defaultWorkers.filter(w => w.status === 'Complete').length;
-  const enCours = defaultWorkers.filter(w => w.status === 'En cours').length;
-  const enAttente = defaultWorkers.filter(w => w.status === 'En attente').length;
-  const annule = defaultWorkers.filter(w => w.status === 'Annulé').length;
-  const pctPresents = Math.round(((complete + enCours) / total) * 100);
-  const pctAbsents = Math.round(((enAttente + annule) / total) * 100);
-  const pctComplete = Math.round((complete / total) * 100);
-  const pctEnCours = Math.round((enCours / total) * 100);
+  
+  const [stats, setStats] = useState<TeamStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const siteUUID = getSiteUUID(id);
+      if (!siteUUID) {
+        setError("ID de chantier invalide");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data = await teamService.getTeamStats(siteUUID);
+        setStats(data);
+        setError(null);
+      } catch (err) {
+        console.error('Erreur lors du chargement des statistiques:', err);
+        setError("Impossible de charger les statistiques");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [id]);
+
+  // Valeurs par défaut si pas de données
+  const total = stats?.total ?? 0;
+  const complete = stats?.complete ?? 0;
+  const enCours = stats?.enCours ?? 0;
+  const enAttente = stats?.enAttente ?? 0;
+  const annule = stats?.annule ?? 0;
+  const pctPresents = stats?.pctPresents ?? 0;
+  const pctAbsents = stats?.pctAbsents ?? 0;
+  const pctComplete = stats?.pctComplete ?? 0;
+  const pctEnCours = stats?.pctEnCours ?? 0;
 
   return (
     <main className="min-h-screen bg-gray-100 p-8" role="main">
@@ -111,12 +132,30 @@ export default function JobsiteHub() {
             <button
               onClick={() => navigate(`/dashboard/${id}/equipe`)}
               title="Voir le tableau des effectifs"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-orange-100 text-gray-400 hover:text-orange-500 transition text-base font-bold"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-colors shadow-sm hover:shadow"
             >
-              →
+              <span>Voir l&apos;équipe</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </button>
           </div>
 
+          {/* Loading & Error States */}
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">Chargement des statistiques...</div>
+            </div>
+          )}
+
+          {error && (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-red-500">{error}</div>
+            </div>
+          )}
+
+          {!loading && !error && (
+          <>
           {/* Donut circles */}
           <div className="flex flex-wrap justify-around gap-6 py-2">
             <StatCircle
@@ -169,6 +208,8 @@ export default function JobsiteHub() {
               ))}
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </main>

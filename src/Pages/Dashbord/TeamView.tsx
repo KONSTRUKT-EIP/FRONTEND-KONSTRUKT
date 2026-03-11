@@ -17,23 +17,21 @@ const chantierNames: Record<string, string> = {
   "6": "Stade Municipal",
 };
 
-export default function DashboardDetail() {
-  const { id } = useParams<{ id: string}>();
+export default function TeamView() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-
+  const siteUUID = getSiteUUID(id);
   const [workers, setWorkers] = useState<TeamMember[]>([]);
   const [attendanceWeek, setAttendanceWeek] = useState<AttendanceWeek | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const [selectedDay, setSelectedDay] = useState(0);
 
   const fetchData = useCallback(async () => {
-    const siteUUID = getSiteUUID(id);
     if (!siteUUID) {
       setError("ID de chantier invalide");
       setLoading(false);
@@ -49,7 +47,6 @@ export default function DashboardDetail() {
       
       setWorkers(membersData);
       setAttendanceWeek(attendanceData);
-      // Sélectionner le dernier jour par défaut
       if (attendanceData.days.length > 0) {
         setSelectedDay(attendanceData.days.length - 1);
       }
@@ -60,14 +57,14 @@ export default function DashboardDetail() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [siteUUID]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleAddMemberSuccess = () => {
-    fetchData(); // Recharger les données après ajout
+    fetchData();
   };
 
   const toggleCheck = (wid: string) => {
@@ -243,12 +240,14 @@ export default function DashboardDetail() {
       )}
 
       {/* Add Member Modal */}
-      <AddMemberModal
-        isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
-        siteId={getSiteUUID(id) || ''}
-        onSuccess={handleAddMemberSuccess}
-      />
+      {siteUUID && (
+        <AddMemberModal
+          isOpen={isAddMemberModalOpen}
+          onClose={() => setIsAddMemberModalOpen(false)}
+          siteId={siteUUID}
+          onSuccess={handleAddMemberSuccess}
+        />
+      )}
     </div>
   );
 }
