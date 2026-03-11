@@ -49,7 +49,6 @@ export default function DashboardDetail() {
       
       setWorkers(membersData);
       setAttendanceWeek(attendanceData);
-      // Sélectionner le dernier jour par défaut
       if (attendanceData.days.length > 0) {
         setSelectedDay(attendanceData.days.length - 1);
       }
@@ -67,7 +66,7 @@ export default function DashboardDetail() {
   }, [fetchData]);
 
   const handleAddMemberSuccess = () => {
-    fetchData(); // Recharger les données après ajout
+    fetchData();
   };
 
   const toggleCheck = (wid: string) => {
@@ -139,7 +138,7 @@ export default function DashboardDetail() {
         {/* Workforce Table */}
         <div className="bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800">Équipe / {chantierName}</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Équipe / {chantierName}</h2>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
                 <input
@@ -147,12 +146,12 @@ export default function DashboardDetail() {
                   placeholder="Chercher"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="bg-transparent text-sm outline-none text-gray-600 w-28"
+                  className="bg-transparent text-base outline-none text-gray-700 w-32"
                 />
               </div>
               <button 
                 onClick={() => setIsAddMemberModalOpen(true)}
-                className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full hover:bg-orange-600 transition"
+                className="flex items-center gap-1 px-5 py-2.5 bg-orange-500 text-white text-base font-semibold rounded-full hover:bg-orange-600 transition"
               >
                 + Nouveau
               </button>
@@ -163,14 +162,14 @@ export default function DashboardDetail() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="py-2 px-3 w-8"></th>
-                  <th className="py-2 px-3 text-xs text-gray-400 font-medium">Spécialité ▾</th>
-                  <th className="py-2 pl-12 text-xs text-gray-400 font-medium">Nom ▾</th>
-                  <th className="py-2 pl-8 text-xs text-gray-400 font-medium">Email ▾</th>
-                  <th className="py-2 px-3 text-xs text-gray-400 font-medium">Date de début ▾</th>
-                  <th className="py-2 pl-6 text-xs text-gray-400 font-medium">Statut ▾</th>
-                  <th className="py-2 px-3 w-8"></th>
-                  <th className="py-2 px-3 w-8 text-gray-300"></th>
+                  <th className="py-3 px-3 w-8"></th>
+                  <th className="py-3 px-3 text-base text-gray-700 font-semibold">Spécialité ▾</th>
+                  <th className="py-3 pl-12 text-base text-gray-700 font-semibold">Nom ▾</th>
+                  <th className="py-3 pl-8 text-base text-gray-700 font-semibold">Email ▾</th>
+                  <th className="py-3 px-3 text-base text-gray-700 font-semibold">Date de début ▾</th>
+                  <th className="py-3 pl-6 text-base text-gray-700 font-semibold">Statut ▾</th>
+                  <th className="py-3 px-3 w-8"></th>
+                  <th className="py-3 px-3 w-8 text-gray-300"></th>
                 </tr>
               </thead>
               <tbody>
@@ -200,7 +199,7 @@ export default function DashboardDetail() {
         {/* Attendance Panel */}
         <div className="mt-6 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800">Présences</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Présences</h2>
             <AttendanceDaySelector
               days={attendanceDays}
               selectedDay={selectedDay}
@@ -219,6 +218,38 @@ export default function DashboardDetail() {
                   name={worker.name}
                   specialite={worker.specialite}
                   status={dayStatus}
+                  editable={true}
+                  onStatusChange={async (newStatus) => {
+                    try {
+                      const selectedDate = attendanceWeek?.dates[selectedDay];
+                      if (!selectedDate) {
+                        console.error('Date non disponible');
+                        return;
+                      }
+                      
+                      await teamService.updateAttendance(
+                        worker.teamId,
+                        worker.id,
+                        selectedDate,
+                        newStatus
+                      );
+                      setAttendanceWeek(prev => {
+                        if (!prev) return prev;
+                        return {
+                          ...prev,
+                          attendances: {
+                            ...prev.attendances,
+                            [worker.id]: prev.attendances[worker.id].map((s, i) => 
+                              i === selectedDay ? newStatus : s
+                            )
+                          }
+                        };
+                      });
+                    } catch (err) {
+                      console.error('Erreur lors de la mise à jour du statut:', err);
+                      alert('Impossible de mettre à jour le statut');
+                    }
+                  }}
                 />
               );
             })}
@@ -233,7 +264,7 @@ export default function DashboardDetail() {
               return (
                 <div key={s} className="flex items-center gap-1.5">
                   <AttendanceBadge status={s} />
-                  <span className="text-sm font-bold text-gray-700">{count}</span>
+                  <span className="text-base font-bold text-gray-800">{count}</span>
                 </div>
               );
             })}

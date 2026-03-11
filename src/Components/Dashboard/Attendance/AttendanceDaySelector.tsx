@@ -12,10 +12,10 @@ const AttendanceDaySelector: React.FC<AttendanceDaySelectorProps> = ({ days, sel
       <button
         key={day}
         onClick={() => onSelect(i)}
-        className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${
+        className={`px-4 py-2 rounded-full text-base font-semibold transition ${
           selectedDay === i
             ? 'bg-orange-500 text-white shadow'
-            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
         }`}
       >
         {day}

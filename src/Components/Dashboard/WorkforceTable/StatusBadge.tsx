@@ -16,8 +16,8 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const config = statusConfig[status] ?? { label: status, className: 'bg-gray-100 text-gray-500' };
   return (
     <span
-      className={`px-4 py-1 rounded-full text-sm font-medium inline-block text-center ${config.className}`}
-      style={{ minWidth: '6rem' }}
+      className={`px-4 py-1.5 rounded-full text-base font-semibold inline-block text-center ${config.className}`}
+      style={{ minWidth: '7rem' }}
     >
       {config.label}
     </span>

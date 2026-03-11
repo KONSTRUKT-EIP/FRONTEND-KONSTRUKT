@@ -8,7 +8,11 @@ interface NavLinkItemProps {
 
 const NavLinkItem: React.FC<NavLinkItemProps> = ({ label, to }) => {
   const location = useLocation();
-  const active = location.pathname === to;
+  let active = location.pathname === to;
+  if (to === "/dashboard") {
+    const dashboardRegex = /^\/dashboard(\/[^/]+)?(\/equipe)?$/;
+    active = dashboardRegex.test(location.pathname);
+  }
 
   return (
     <li>

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardCard from "../../Components/Dashboard/DashbordCard/DashbordCard";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { teamService, TeamStats } from '../../services/teamService';
 import { getSiteUUID } from '../../utils/siteMapping';
 
@@ -59,40 +59,51 @@ export default function JobsiteHub() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      const siteUUID = getSiteUUID(id);
-      if (!siteUUID) {
-        setError("ID de chantier invalide");
-        setLoading(false);
-        return;
-      }
+  const fetchStats = useCallback(async () => {
+    const siteUUID = getSiteUUID(id);
+    if (!siteUUID) {
+      setError("ID de chantier invalide");
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
-        const data = await teamService.getTeamStats(siteUUID);
-        setStats(data);
-        setError(null);
-      } catch (err) {
-        console.error('Erreur lors du chargement des statistiques:', err);
-        setError("Impossible de charger les statistiques");
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      const data = await teamService.getTeamStats(siteUUID);
+      setStats(data);
+      setError(null);
+    } catch (err) {
+      console.error('Erreur lors du chargement des statistiques:', err);
+      setError("Impossible de charger les statistiques");
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchStats();
       }
     };
 
-    fetchStats();
-  }, [id]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchStats]);
 
-  // Valeurs par défaut si pas de données
   const total = stats?.total ?? 0;
   const complete = stats?.complete ?? 0;
   const enCours = stats?.enCours ?? 0;
-  const enAttente = stats?.enAttente ?? 0;
+  const retards = stats?.retards ?? 0;
   const annule = stats?.annule ?? 0;
   const pctPresents = stats?.pctPresents ?? 0;
   const pctAbsents = stats?.pctAbsents ?? 0;
-  const pctComplete = stats?.pctComplete ?? 0;
   const pctEnCours = stats?.pctEnCours ?? 0;
 
   return (
@@ -129,16 +140,31 @@ export default function JobsiteHub() {
           <div className="flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-200 flex flex-col gap-6">
           <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Statistiques / {chantierName}</h2>
-            <button
-              onClick={() => navigate(`/dashboard/${id}/equipe`)}
-              title="Voir le tableau des effectifs"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-colors shadow-sm hover:shadow"
-            >
-              <span>Voir l&apos;équipe</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  fetchStats();
+                }}
+                title="Actualiser les statistiques"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors shadow-sm hover:shadow"
+                disabled={loading}
+              >
+                <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Actualiser</span>
+              </button>
+              <button
+                onClick={() => navigate(`/dashboard/${id}/equipe`)}
+                title="Voir le tableau des effectifs"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-colors shadow-sm hover:shadow"
+              >
+                <span>Voir l&apos;équipe</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Loading & Error States */}
@@ -162,50 +188,54 @@ export default function JobsiteHub() {
               percentage={pctPresents}
               color="#10b981"
               label="Présents"
-              sublabel={`${complete + enCours} / ${total} travailleurs`}
-            />
-            <StatCircle
-              percentage={pctAbsents}
-              color="#f43f5e"
-              label="Absents"
-              sublabel={`${enAttente + annule} / ${total} travailleurs`}
-            />
-            <StatCircle
-              percentage={pctComplete}
-              color="#6366f1"
-              label="Tâches complètes"
-              sublabel={`${complete} / ${total}`}
+              sublabel={`${complete} / ${total} travailleurs`}
             />
             <StatCircle
               percentage={pctEnCours}
               color="#f97316"
-              label="En cours"
-              sublabel={`${enCours} / ${total}`}
+              label="Retards"
+              sublabel={`${retards} / ${total} travailleurs`}
+            />
+            <StatCircle
+              percentage={pctAbsents}
+              color="#f43f5e"
+              label="Absents/Congés"
+              sublabel={`${annule} / ${total} travailleurs`}
+            />
+            <StatCircle
+              percentage={enCours > 0 ? Math.round((enCours / Math.max(complete, 1)) * 100) : 0}
+              color="#6366f1"
+              label="Sur site"
+              sublabel={`${enCours} / ${complete} présents`}
             />
           </div>
 
           {/* Summary bars */}
           <div className="border-t border-gray-100 pt-4">
-            <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-widest">Résumé des statuts</h3>
+            <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-widest">Présences du jour (dernier jour avec données)</h3>
             <div className="flex flex-col gap-3">
               {[
-                { label: 'Complet',    count: complete,  color: 'bg-indigo-500' },
-                { label: 'En cours',   count: enCours,   color: 'bg-orange-400' },
-                { label: 'En attente', count: enAttente, color: 'bg-gray-700'   },
-                { label: 'Annulé',     count: annule,    color: 'bg-red-400'    },
-              ].map(item => (
+                { label: 'Présents',   count: complete,  color: 'bg-green-500' },
+                { label: 'Retards',    count: retards, color: 'bg-orange-400' },
+                { label: 'Absents',    count: annule, color: 'bg-red-400' },
+                { label: 'Sur site',   count: enCours, color: 'bg-blue-500' },
+              ].map(item => {
+                const percentage = total > 0 ? Math.round((item.count / total) * 100) : 0;
+                return (
                 <div key={item.label} className="flex items-center gap-3">
                   <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.color}`}></span>
                   <span className="text-sm text-gray-900 w-24 flex-shrink-0">{item.label}</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${item.color}`}
-                      style={{ width: `${Math.round((item.count / total) * 100)}%`, transition: 'width 0.6s ease' }}
-                    />
+                    {item.count > 0 && (
+                      <div
+                        className={`h-2 rounded-full ${item.color}`}
+                        style={{ width: `${percentage}%`, transition: 'width 0.6s ease' }}
+                      />
+                    )}
                   </div>
                   <span className="text-sm font-medium text-gray-900 w-12 text-right">{item.count} / {total}</span>
                 </div>
-              ))}
+              );})}
             </div>
           </div>
           </>

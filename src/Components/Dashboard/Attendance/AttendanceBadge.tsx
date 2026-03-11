@@ -17,7 +17,7 @@ interface AttendanceBadgeProps {
 const AttendanceBadge: React.FC<AttendanceBadgeProps> = ({ status }) => {
   const { label, className } = attendanceConfig[status];
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${className}`}>
+    <span className={`px-4 py-1.5 rounded-full text-base font-semibold ${className}`}>
       {label}
     </span>
   );
