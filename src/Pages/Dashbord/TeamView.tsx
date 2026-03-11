@@ -17,23 +17,21 @@ const chantierNames: Record<string, string> = {
   "6": "Stade Municipal",
 };
 
-export default function DashboardDetail() {
-  const { id } = useParams<{ id: string}>();
+export default function TeamView() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-
+  const siteUUID = getSiteUUID(id);
   const [workers, setWorkers] = useState<TeamMember[]>([]);
   const [attendanceWeek, setAttendanceWeek] = useState<AttendanceWeek | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const [selectedDay, setSelectedDay] = useState(0);
 
   const fetchData = useCallback(async () => {
-    const siteUUID = getSiteUUID(id);
     if (!siteUUID) {
       setError("ID de chantier invalide");
       setLoading(false);
@@ -47,6 +45,9 @@ export default function DashboardDetail() {
         teamService.getAttendanceWeek(siteUUID),
       ]);
       
+      console.log('Members data:', membersData);
+      console.log('Attendance data:', attendanceData);
+      
       setWorkers(membersData);
       setAttendanceWeek(attendanceData);
       if (attendanceData.days.length > 0) {
@@ -59,7 +60,7 @@ export default function DashboardDetail() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [siteUUID]);
 
   useEffect(() => {
     fetchData();
@@ -89,7 +90,7 @@ export default function DashboardDetail() {
   const attendanceDays = attendanceWeek?.days ?? [];
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-8" aria-label="Page équipe">
       {/* Header */}
       <div className="mb-8">
         <div>
@@ -224,8 +225,23 @@ export default function DashboardDetail() {
                       const selectedDate = attendanceWeek?.dates[selectedDay];
                       if (!selectedDate) {
                         console.error('Date non disponible');
+                        alert('Date non disponible');
                         return;
                       }
+                      
+                      if (!worker.id || !worker.teamId) {
+                        console.error('Données worker invalides:', worker);
+                        alert('Erreur: données de l\'employé invalides. Veuillez recharger la page.');
+                        return;
+                      }
+                      
+                      console.log('Updating attendance:', {
+                        teamId: worker.teamId,
+                        userId: worker.id,
+                        date: selectedDate,
+                        status: newStatus,
+                        worker: worker
+                      });
                       
                       await teamService.updateAttendance(
                         worker.teamId,
@@ -233,6 +249,8 @@ export default function DashboardDetail() {
                         selectedDate,
                         newStatus
                       );
+                      
+                      // Mettre à jour l'état local
                       setAttendanceWeek(prev => {
                         if (!prev) return prev;
                         return {
@@ -274,12 +292,14 @@ export default function DashboardDetail() {
       )}
 
       {/* Add Member Modal */}
-      <AddMemberModal
-        isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
-        siteId={getSiteUUID(id) || ''}
-        onSuccess={handleAddMemberSuccess}
-      />
+      {siteUUID && (
+        <AddMemberModal
+          isOpen={isAddMemberModalOpen}
+          onClose={() => setIsAddMemberModalOpen(false)}
+          siteId={siteUUID}
+          onSuccess={handleAddMemberSuccess}
+        />
+      )}
     </div>
   );
 }

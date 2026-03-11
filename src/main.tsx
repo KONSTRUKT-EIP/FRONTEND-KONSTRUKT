@@ -18,9 +18,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           Aller au contenu principal
         </a>
         <Navbar />
-        <div id="main-content">
+        <main id="main-content">
           <App />
-        </div>
+        </main>
         <Footer />
       </AuthProvider>
     </BrowserRouter>
