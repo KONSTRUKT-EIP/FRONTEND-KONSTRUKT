@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import DashboardCard from "../../Components/Dashboard/DashbordCard/DashbordCard";
 import React, { useEffect, useState, useCallback } from 'react';
 import { teamService, TeamStats } from '../../services/teamService';
-import { getSiteUUID } from '../../utils/siteMapping';
 
 const dashboards = [
   { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
@@ -12,15 +11,6 @@ const dashboards = [
   { id: "plomberie",  label: "Plomberie",   description: "Réseaux eau, évacuations",   progress: 55 },
   { id: "finitions",  label: "Finitions",   description: "Peinture, revêtements",      progress: 10 },
 ];
-
-const chantierNames: Record<string, string> = {
-  "1": "Tour Horizon",
-  "2": "Résidence Les Pins",
-  "3": "Pont Sud",
-  "4": "Centre Commercial",
-  "5": "Immeuble Lumière",
-  "6": "Stade Municipal",
-};
 
 const StatCircle: React.FC<{ percentage: number; color: string; label: string; sublabel?: string }> = ({ percentage, color, label, sublabel }) => {
   const radius = 40;
@@ -53,15 +43,14 @@ const StatCircle: React.FC<{ percentage: number; color: string; label: string; s
 export default function JobsiteHub() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const chantierName = chantierNames[id ?? ""] ?? "Chantier";
+  const [chantierName, setChantierName] = useState<string>("Chantier");
   
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStats = useCallback(async () => {
-    const siteUUID = getSiteUUID(id);
-    if (!siteUUID) {
+    if (!id) {
       setError("ID de chantier invalide");
       setLoading(false);
       return;
@@ -69,8 +58,11 @@ export default function JobsiteHub() {
 
     try {
       setLoading(true);
-      const data = await teamService.getTeamStats(siteUUID);
+      const data = await teamService.getTeamStats(id);
       setStats(data);
+      if (data.site?.name) {
+        setChantierName(data.site.name);
+      }
       setError(null);
     } catch (err) {
       console.error('Erreur lors du chargement des statistiques:', err);

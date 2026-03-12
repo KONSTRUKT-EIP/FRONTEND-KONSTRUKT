@@ -5,23 +5,13 @@ import AttendanceBadge, { AttendanceStatus, attendanceConfig } from "../../Compo
 import AttendanceCard from "../../Components/Dashboard/Attendance/AttendanceCard";
 import AttendanceDaySelector from "../../Components/Dashboard/Attendance/AttendanceDaySelector";
 import { teamService, TeamMember, AttendanceWeek } from '../../services/teamService';
-import { getSiteUUID } from '../../utils/siteMapping';
 import AddMemberModal from '../../Components/Dashboard/Modal/AddMemberModal';
-
-const chantierNames: Record<string, string> = {
-  "1": "Tour Horizon",
-  "2": "Résidence Les Pins",
-  "3": "Pont Sud",
-  "4": "Centre Commercial",
-  "5": "Immeuble Lumière",
-  "6": "Stade Municipal",
-};
 
 export default function TeamView() {
   const { id } = useParams<{ id: string }>();
+  const siteUUID = id;
   const navigate = useNavigate();
-  const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-  const siteUUID = getSiteUUID(id);
+  const [chantierName] = useState<string>("Chantier");
   const [workers, setWorkers] = useState<TeamMember[]>([]);
   const [attendanceWeek, setAttendanceWeek] = useState<AttendanceWeek | null>(null);
   const [loading, setLoading] = useState(true);
