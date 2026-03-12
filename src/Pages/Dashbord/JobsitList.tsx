@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import ChantierCard from "../../Components/Dashboard/JobsitCard/JobsitCard";
 import React from 'react';
@@ -11,50 +11,18 @@ export interface Chantier {
   photo?: string;
 }
 
-interface SiteApi {
-  id: string | number;
-  name: string;
-  city?: string;
-  postalCode?: string;
-  address?: string;
-  responsible?: string;
-  manager?: string;
-}
+const initialChantiers: Chantier[] = [
+  { id: "1", name: "Tour Horizon",       location: "Paris, 75008",     responsible: "Jean Dupont",    photo: "/assets/2011-TOUR-HORIZON-BOULOGNE-BILLANCOURT-P-1-1000X667.jpg" },
+  { id: "2", name: "Résidence Les Pins", location: "Lyon, 69003",      responsible: "Marie Leroy",    photo: "/assets/690031968.jpg" },
+  { id: "3", name: "Pont Sud",           location: "Marseille, 13002", responsible: "Pierre Martin",  photo: "/assets/le-pont-pinede-pont-mobile-basculant-port-de-marseille-25.jpg" },
+  { id: "4", name: "Centre Commercial",  location: "Bordeaux, 33000",  responsible: "Sophie Bernard", photo: "/assets/318c1bb26c90-Photo-centre-commercial-Auchan-Bordeaux-Lac-2021-03-03T14-31-27.847Z-14-31-27.jpg" },
+  { id: "5", name: "Immeuble Lumière",   location: "Nantes, 44000",    responsible: "Lucas Petit",    photo: "/assets/Tour-360-View-Nantes-France-LAN-Architecture-Kaufman-Broad-Conception-lumiere-Nicolas-Houel-evenementiel-2017-Copyright-Vincent-Laganier-8.jpg" },
+  { id: "6", name: "Stade Municipal",    location: "Toulouse, 31000",  responsible: "Emma Moreau",    photo: "/assets/Stadium-Lory.jpg" },
+];
 
 export default function JobsitList() {
   const navigate = useNavigate();
-  const [chantiers, setChantiers] = useState<Chantier[]>([]);
-  const [fetchLoading, setFetchLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchSites = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch('http://localhost:3000/sites', {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-        const data = await response.json();
-        if (response.status === 200) {
-          const mapped: Chantier[] = (Array.isArray(data) ? data : data.sites ?? []).map((s: SiteApi) => ({
-            id: String(s.id),
-            name: s.name,
-            location: s.city ? `${s.city}${s.postalCode ? ', ' + s.postalCode : ''}` : (s.address ?? ''),
-            responsible: s.responsible ?? s.manager ?? '',
-          }));
-          setChantiers(mapped);
-        } else {
-          setFetchError(data.message || 'Impossible de charger les chantiers.');
-        }
-      } catch {
-        setFetchError('Erreur réseau. Veuillez réessayer.');
-      } finally {
-        setFetchLoading(false);
-      }
-    };
-    fetchSites();
-  }, []);
+  const [chantiers, setChantiers] = useState<Chantier[]>(initialChantiers);
 
   const handlePhotoChange = (id: string, url: string) => {
     setChantiers((prev) =>
@@ -81,30 +49,18 @@ export default function JobsitList() {
 
       {/* Card */}
       <div className="w-full px-20 py-8">
-        {fetchLoading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500 mb-4"></div>
-            <p className="text-sm">Chargement des chantiers…</p>
-          </div>
-        ) : fetchError ? (
-          <div className="flex flex-col items-center justify-center py-24 text-red-400">
-            <span className="text-5xl mb-4">⚠️</span>
-            <p className="text-lg font-semibold">{fetchError}</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-4 gap-7">
-            <Suspense fallback={<div>Chargement...</div>}>
-              {chantiers.map((chantier) => (
-                <ChantierCard
-                  key={chantier.id}
-                  {...chantier}
-                  onPhotoChange={handlePhotoChange}
-                  onClick={() => navigate(`/dashboard/${chantier.id}`)}
-                />
-              ))}
-            </Suspense>
-          </div>
-        )}
+        <div className="grid grid-cols-4 gap-7">
+          <Suspense fallback={<div>Chargement...</div>}>
+            {chantiers.map((chantier) => (
+              <ChantierCard
+                key={chantier.id}
+                {...chantier}
+                onPhotoChange={handlePhotoChange}
+                onClick={() => navigate(`/dashboard/${chantier.id}`)}
+              />
+            ))}
+          </Suspense>
+        </div>
       </div>
     </main>
   );
