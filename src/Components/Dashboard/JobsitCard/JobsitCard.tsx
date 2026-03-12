@@ -6,37 +6,48 @@ interface ChantierCardProps {
   location: string;
   responsible: string;
   photo?: string;
-  // onPhotoChange: (id: string, url: string) => void;
+  onPhotoChange: (id: string, url: string) => void;
   onClick: () => void;
 }
 
 export default function ChantierCard({
-  // id: _id,
+  id,
   name,
   location,
   responsible,
   photo,
-  // onPhotoChange,
+  onPhotoChange,
   onClick,
 }: ChantierCardProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const blockingRef = useRef(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
     const file = e.target.files?.[0];
-    if (!file)
-      return;
-    // const url = URL.createObjectURL(file);
-    // onPhotoChange(id, url);
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    onPhotoChange(id, url);
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
+    blockingRef.current = true;
     inputRef.current?.click();
+  };
+
+  const handleCardClick = () => {
+    if (blockingRef.current) {
+      blockingRef.current = false;
+      return;
+    }
+    onClick();
   };
 
   return (
     <div
-      onClick={onClick}
+      onClick={handleCardClick}
       className="bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col"
     >
       {/* Picture zone */}
@@ -61,6 +72,7 @@ export default function ChantierCard({
           accept="image/*"
           className="hidden"
           onChange={handleFileChange}
+          onClick={(e) => e.stopPropagation()}
         />
       </div>
 
