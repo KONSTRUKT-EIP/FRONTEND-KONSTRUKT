@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "../../Components/Dashboard/Card/Card";
 import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
@@ -17,20 +17,24 @@ const chantierNames: Record<string, string> = {
 };
 
 const chartData = [
-  { time: "10am", voiles: 58, planchers: 30 },
-  { time: "11am", voiles: 42, planchers: 45 },
-  { time: "12am", voiles: 60, planchers: 58 },
-  { time: "01am", voiles: 35, planchers: 38 },
-  { time: "02am", voiles: 50, planchers: 20 },
-  { time: "03am", voiles: 45, planchers: 15 },
-  { time: "04am", voiles: 30, planchers: 35 },
-  { time: "05am", voiles: 38, planchers: 38 },
-  { time: "06am", voiles: 65, planchers: 62 },
-  { time: "07am", voiles: 72, planchers: 68 },
+  { time: "Nov",  voiles:  6200, voiles_prev:  8000, planchers:  3800, planchers_prev:  5000, poutres:  2100, poutres_prev:  3000, superstructure:    0, superstructure_prev:  1500 },
+  { time: "Déc",  voiles:  9800, voiles_prev: 11000, planchers:  6200, planchers_prev:  7500, poutres:  3500, poutres_prev:  4200, superstructure:  800, superstructure_prev:  2500 },
+  { time: "Jan",  voiles: 14500, voiles_prev: 15000, planchers:  9500, planchers_prev:  9800, poutres:  5800, poutres_prev:  6000, superstructure: 1800, superstructure_prev:  3500 },
+  { time: "Fév",  voiles: 19200, voiles_prev: 19500, planchers: 13200, planchers_prev: 13500, poutres:  7900, poutres_prev:  8200, superstructure: 3200, superstructure_prev:  5000 },
+  { time: "Mar",  voiles: 24963, voiles_prev: 24000, planchers: 17400, planchers_prev: 17000, poutres: 10200, poutres_prev: 10500, superstructure: 5100, superstructure_prev:  6500 },
+  { time: "Avr",  voiles:  null, voiles_prev: 29000, planchers:   null, planchers_prev: 21000, poutres:  null, poutres_prev: 13000, superstructure:  null, superstructure_prev:  8200 },
+  { time: "Mai",  voiles:  null, voiles_prev: 35000, planchers:   null, planchers_prev: 25500, poutres:  null, poutres_prev: 16000, superstructure:  null, superstructure_prev: 10500 },
+  { time: "Jun",  voiles:  null, voiles_prev: 42000, planchers:   null, planchers_prev: 31000, poutres:  null, poutres_prev: 19500, superstructure:  null, superstructure_prev: 13000 },
 ];
 const chartSeries: ChartSerie[] = [
-  { key: "voiles",    color: "#818CF8", label: "Voiles"    },
-  { key: "planchers", color: "#C084FC", label: "Planchers" },
+  { key: "voiles",              color: "#818CF8", label: "Voiles (réel)",             filterKey: "voiles"          },
+  { key: "voiles_prev",         color: "#818CF8", label: "Voiles (prév.)",            filterKey: "voiles",         dashed: true },
+  { key: "planchers",           color: "#C084FC", label: "Planchers (réel)",          filterKey: "planchers"       },
+  { key: "planchers_prev",      color: "#C084FC", label: "Planchers (prév.)",         filterKey: "planchers",      dashed: true },
+  { key: "poutres",             color: "#60A5FA", label: "Poutres (réel)",            filterKey: "poutres"         },
+  { key: "poutres_prev",        color: "#60A5FA", label: "Poutres (prév.)",           filterKey: "poutres",        dashed: true },
+  { key: "superstructure",      color: "#9CA3AF", label: "Superstructure (réel)",     filterKey: "superstructure"  },
+  { key: "superstructure_prev", color: "#9CA3AF", label: "Superstructure (prév.)",   filterKey: "superstructure", dashed: true },
 ];
 
 
@@ -38,7 +42,6 @@ const filters: Filter[] = [
   { id: "voiles",         label: "Voiles",         color: "#818CF8" },
   { id: "planchers",      label: "Planchers",      color: "#C084FC" },
   { id: "poutres",        label: "Poutres",        color: "#60A5FA" },
-  { id: "superstructure", label: "Superstructure", color: "#D1D5DB" },
 ];
 
 // const orders: Order[] = [
@@ -62,6 +65,87 @@ interface ApiRes {
   categories: ApiCategory[];
 }
 
+const mockSummary: Record<string, ApiRes> = {
+  "1": { globalProgress: 68, globalSpent: 142000, categories: [
+    { id: 1, name: "Voiles",    progress: 72, spent: 42000 },
+    { id: 2, name: "Planchers", progress: 65, spent: 38000 },
+    { id: 3, name: "Poutres",   progress: 58, spent: 35000 },
+    { id: 4, name: "Armature",  progress: 80, spent: 27000 },
+  ]},
+  "2": { globalProgress: 45, globalSpent: 98000, categories: [
+    { id: 1, name: "Voiles",    progress: 50, spent: 28000 },
+    { id: 2, name: "Planchers", progress: 40, spent: 25000 },
+    { id: 3, name: "Poutres",   progress: 42, spent: 22000 },
+    { id: 4, name: "Armature",  progress: 48, spent: 23000 },
+  ]},
+  "3": { globalProgress: 82, globalSpent: 210000, categories: [
+    { id: 1, name: "Voiles",    progress: 88, spent: 60000 },
+    { id: 2, name: "Planchers", progress: 80, spent: 55000 },
+    { id: 3, name: "Poutres",   progress: 78, spent: 50000 },
+    { id: 4, name: "Armature",  progress: 85, spent: 45000 },
+  ]},
+  "4": { globalProgress: 30, globalSpent: 55000, categories: [
+    { id: 1, name: "Voiles",    progress: 32, spent: 15000 },
+    { id: 2, name: "Planchers", progress: 28, spent: 14000 },
+    { id: 3, name: "Poutres",   progress: 30, spent: 13000 },
+    { id: 4, name: "Armature",  progress: 35, spent: 13000 },
+  ]},
+  "5": { globalProgress: 55, globalSpent: 120000, categories: [
+    { id: 1, name: "Voiles",    progress: 60, spent: 32000 },
+    { id: 2, name: "Planchers", progress: 52, spent: 30000 },
+    { id: 3, name: "Poutres",   progress: 50, spent: 28000 },
+    { id: 4, name: "Armature",  progress: 58, spent: 30000 },
+  ]},
+  "6": { globalProgress: 90, globalSpent: 310000, categories: [
+    { id: 1, name: "Voiles",    progress: 95, spent: 85000 },
+    { id: 2, name: "Planchers", progress: 90, spent: 80000 },
+    { id: 3, name: "Poutres",   progress: 88, spent: 75000 },
+    { id: 4, name: "Armature",  progress: 92, spent: 70000 },
+  ]},
+};
+
+const mockOrders: Record<string, Order[]> = {
+  "1": [
+    { id: "#876364", productName: "Acier HA20",     price: 98,  totalOrder: 325, total: 31850 },
+    { id: "#876368", productName: "Planches coffrage", price: 471, totalOrder: 53,  total: 24963 },
+    { id: "#876412", productName: "Étriers 8mm",    price: 163, totalOrder: 78,  total: 12714 },
+    { id: "#876621", productName: "Béton B25",      price: 200, totalOrder: 10,  total: 2000  },
+    { id: "#877001", productName: "Poutrelles IPE", price: 540, totalOrder: 22,  total: 11880 },
+  ],
+  "2": [
+    { id: "#877100", productName: "Acier HA16",     price: 85,  totalOrder: 200, total: 17000 },
+    { id: "#877101", productName: "Ciment CEM II",  price: 120, totalOrder: 150, total: 18000 },
+    { id: "#877102", productName: "Gravier 20/40",  price: 45,  totalOrder: 400, total: 18000 },
+    { id: "#877103", productName: "Treillis soudé", price: 230, totalOrder: 60,  total: 13800 },
+  ],
+  "3": [
+    { id: "#877200", productName: "Câbles précon.", price: 850, totalOrder: 40,  total: 34000 },
+    { id: "#877201", productName: "Acier HA25",     price: 115, totalOrder: 500, total: 57500 },
+    { id: "#877202", productName: "Coffrages métal",price: 600, totalOrder: 30,  total: 18000 },
+    { id: "#877203", productName: "Béton B30",      price: 220, totalOrder: 80,  total: 17600 },
+    { id: "#877204", productName: "Boulons HV",     price: 12,  totalOrder: 1200,total: 14400 },
+  ],
+  "4": [
+    { id: "#877300", productName: "Parpaings",      price: 2,   totalOrder: 5000,total: 10000 },
+    { id: "#877301", productName: "Mortier sac",    price: 8,   totalOrder: 800, total: 6400  },
+    { id: "#877302", productName: "Acier HA12",     price: 72,  totalOrder: 150, total: 10800 },
+    { id: "#877303", productName: "Cornières acier",price: 95,  totalOrder: 90,  total: 8550  },
+  ],
+  "5": [
+    { id: "#877400", productName: "Acier HA20",     price: 98,  totalOrder: 250, total: 24500 },
+    { id: "#877401", productName: "Béton B25",      price: 200, totalOrder: 60,  total: 12000 },
+    { id: "#877402", productName: "Planelles",      price: 35,  totalOrder: 300, total: 10500 },
+    { id: "#877403", productName: "Étriers 10mm",   price: 185, totalOrder: 70,  total: 12950 },
+  ],
+  "6": [
+    { id: "#877500", productName: "Profilés HEA",   price: 1200,totalOrder: 50,  total: 60000 },
+    { id: "#877501", productName: "Acier HA32",     price: 145, totalOrder: 800, total: 116000},
+    { id: "#877502", productName: "Béton B35",      price: 250, totalOrder: 120, total: 30000 },
+    { id: "#877503", productName: "Boulons HV M24", price: 18,  totalOrder: 2000,total: 36000 },
+    { id: "#877504", productName: "Coffrages gradin",price: 750,totalOrder: 60,  total: 45000 },
+  ],
+};
+
 export default function DashboardArmature() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -69,75 +153,17 @@ export default function DashboardArmature() {
   const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>(
     Object.fromEntries(filters.map((f) => [f.id, f.id !== "superstructure"]))
   );
-  const [summaryData, setSummaryData] = useState<ApiRes | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  // const [startDate, _setStartDate] = useState("2025-12-22");
-  // const [endDate, _setEndDate] = useState("2026-02-11");
-  const startDate = "2025-12-22";
-  const endDate = "2026-02-11";
-  const [orders, setOrders] = useState<Order[]>([]);
 
-  const handleCreateOrder = async (payload: Omit<Order, "id">) => {
-    try {
-      const token = localStorage.getItem("access_token");
-      console.log("payload envoyé:", JSON.stringify(payload));
-      const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
+  const summaryData: ApiRes = mockSummary[id ?? ""] ?? { globalProgress: 0, globalSpent: 0, categories: [] };
+  const orders: Order[] = mockOrders[id ?? ""] ?? [];
 
-      if (!res.ok)
-        throw new Error(`Erreur ${res.status}`);
-    } catch (err: unknown) {
-      console.error("Erreur création commande :", err);
-    }
-  };
+  const cards = summaryData.categories.map((cat) => ({
+    name: cat.name,
+    percentage: cat.progress,
+    spent: cat.spent,
+  }));
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = new URLSearchParams({ startDate, endDate });
-        const token = localStorage.getItem("access_token");
-        const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-        const [summaryRes, ordersRes] = await Promise.all([
-          fetch(`http://localhost:3000/dashboard/armature/summary?${params}`, { headers: authHeaders }),
-          fetch(`http://localhost:3000/dashboard/armature/orders/recent`, { headers: authHeaders }),
-        ]);
-        if (!summaryRes.ok)
-          throw new Error(`Erreur ${summaryRes.status}`);
-        if (!ordersRes.ok)
-          throw new Error(`Erreur ${ordersRes.status}`);
-        const dataSummary: ApiRes = await summaryRes.json();
-        console.log("status orders:", ordersRes.status);
-        const ordersData: { orders: Order[] } = await ordersRes.json();
-        console.log("orders reçus:", ordersData); // ← qu'est ce que tu vois ici ?
-        setSummaryData(dataSummary);
-        setOrders(ordersData.orders);
-      } catch (err: unknown) {
-        setError((err as Error).message ?? "Unknown Error")
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-
-  }, [startDate, endDate]);
-
-  const cards = summaryData?
-      summaryData.categories.map((cat) => ({
-        name: cat.name,
-        percentage: cat.progress,
-        spent: cat.spent,
-      })): [];
-
-  const _handleFilterChange = (id: string, checked: boolean) => {
+  const handleFilterChange = (id: string, checked: boolean) => {
     setActiveFilters((prev) => ({ ...prev, [id]: checked }));
   };
 
@@ -174,29 +200,13 @@ export default function DashboardArmature() {
       </div>
 
       {/* Cards */}
-      {loading && (
+      <Suspense fallback={<div>Chargement...</div>}>
         <div className="flex gap-4 mb-6">
-          {[0,1,2,3].map((i) => (
-            <div key={i} className="flex-1 bg-white rounded-2xl p-6 shadow-sm animate-pulse h-24" />
+          {cards.map((card) => (
+            <Card key={card.name} {...card} />
           ))}
         </div>
-      )}
-
-      {error && (
-        <div className="mb-6 bg-red-600 border border-red-300 text-white text-base font-semibold rounded-xl px-4 py-3">
-          Impossible de charger les données : {error}
-        </div>
-      )}
-
-      {!loading && !error && (
-        <Suspense fallback={<div>Chargement...</div>}>
-          <div className="flex gap-4 mb-6">
-            {cards.map((card) => (
-              <Card key={card.name} {...card} />
-            ))}
-          </div>
-        </Suspense>
-      )}
+      </Suspense>
 
 
       {/* Middle row: Graph + Filters */}
@@ -209,7 +219,7 @@ export default function DashboardArmature() {
 
         <div className="col-span-1">
           <Suspense fallback={<div>Chargement des filtres...</div>}>
-            <ViewFilters filters={filters} />
+            <ViewFilters filters={filters} onChange={handleFilterChange} />
           </Suspense>
         </div>
       </div>
@@ -218,7 +228,7 @@ export default function DashboardArmature() {
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
           <Suspense fallback={<div>Chargement des commandes...</div>}>
-            <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
+            <RecentOrders orders={orders} onCreateOrder={async () => {}} />
           </Suspense>
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
