@@ -81,6 +81,7 @@ export default function DashboardArmature() {
   const handleCreateOrder = async (payload: Omit<Order, "id">) => {
     try {
       const token = localStorage.getItem("access_token");
+      console.log("payload envoyé:", JSON.stringify(payload));
       const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
         method: "POST",
         headers: {
@@ -89,11 +90,9 @@ export default function DashboardArmature() {
         },
         body: JSON.stringify(payload),
       });
-      console.log("send");
+
       if (!res.ok)
         throw new Error(`Erreur ${res.status}`);
-      const { orders: newOrders }: { orders: Order[] } = await res.json();
-      setOrders((prev) => [...prev, ...newOrders]);
     } catch (err: unknown) {
       console.error("Erreur création commande :", err);
     }
@@ -109,14 +108,16 @@ export default function DashboardArmature() {
         const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
         const [summaryRes, ordersRes] = await Promise.all([
           fetch(`http://localhost:3000/dashboard/armature/summary?${params}`, { headers: authHeaders }),
-          fetch(`http://localhost:3000/dashboard/armature/orders/recent?${params}`, { headers: authHeaders }),
+          fetch(`http://localhost:3000/dashboard/armature/orders/recent`, { headers: authHeaders }),
         ]);
         if (!summaryRes.ok)
           throw new Error(`Erreur ${summaryRes.status}`);
         if (!ordersRes.ok)
           throw new Error(`Erreur ${ordersRes.status}`);
         const dataSummary: ApiRes = await summaryRes.json();
+        console.log("status orders:", ordersRes.status);
         const ordersData: { orders: Order[] } = await ordersRes.json();
+        console.log("orders reçus:", ordersData); // ← qu'est ce que tu vois ici ?
         setSummaryData(dataSummary);
         setOrders(ordersData.orders);
       } catch (err: unknown) {

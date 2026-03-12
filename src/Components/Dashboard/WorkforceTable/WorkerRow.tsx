@@ -17,10 +17,12 @@ interface WorkerRowProps {
   worker: Worker;
   checked: boolean;
   onCheck: () => void;
+  onClick?: () => void;
 }
 
-const WorkerRow: React.FC<WorkerRowProps> = ({ worker, checked, onCheck }) => (
-  <tr className="border-b border-gray-100 hover:bg-orange-50/30 transition">
+const WorkerRow: React.FC<WorkerRowProps> = ({ worker, checked, onCheck, onClick }) => (
+  <tr className="border-b border-gray-100 hover:bg-orange-50/30 transition"
+    onClick={onClick}>
     <td className="py-3 px-3">
       <label htmlFor={`worker-check-${worker.id}`} className="sr-only">
         Sélectionner {worker.name}
