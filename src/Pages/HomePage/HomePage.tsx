@@ -3,6 +3,7 @@ import { useAuth } from '../../Context/AuthContext';
 import { Link } from 'react-router-dom';
 import StatCard from '../../Components/StatCard/StatCard';
 import ActivityItem from '../../Components/ActivityItem/ActivityItem';
+import dashboardService, { Site, DashboardStats } from '../../services/dashboardService';
 
 /* ─── Types météo ─── */
 interface WeatherCurrent {
@@ -85,7 +86,7 @@ const features = [
   { title: 'Tableaux de bord',             desc: 'Des statistiques claires pour piloter vos projets et prendre les bonnes décisions.' },
 ];
 
-const stats = [
+const marketingStats = [
   { value: '2 500+',  label: 'Chantiers gérés' },
   { value: '12 000+', label: 'Utilisateurs actifs' },
   { value: '98 %',    label: 'Taux de satisfaction' },
@@ -94,6 +95,36 @@ const stats = [
 
 const HomePage: React.FC = () => {
   const { isLoggedIn } = useAuth();
+  const [sites, setSites] = useState<Site[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    activeSites: 0,
+    totalEmployees: 0,
+    pendingOrders: 0,
+    weatherAlerts: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadDashboardData();
+    }
+  }, [isLoggedIn]);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [sitesData, statsData] = await Promise.all([
+        dashboardService.getAllSites(),
+        dashboardService.getDashboardStats(),
+      ]);
+      setSites(sitesData);
+      setStats(statsData);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (isLoggedIn) {
     const today = new Date();
@@ -123,14 +154,20 @@ const HomePage: React.FC = () => {
               <WeatherWidget />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: 'Chantiers actifs',   value: '6',  color: 'text-orange-500' },
-                { label: 'Employés présents',  value: '24', color: 'text-green-500' },
-                { label: 'Commandes en cours', value: '3',  color: 'text-blue-500' },
-                { label: 'Alertes météo',      value: '1',  color: 'text-yellow-500' },
-              ].map(({ label, value, color }) => (
-                <StatCard key={label} label={label} value={value} color={color} />
-              ))}
+              {loading ? (
+                <div className="col-span-2 flex items-center justify-center p-8">
+                  <span className="text-gray-400">Chargement...</span>
+                </div>
+              ) : (
+                [
+                  { label: 'Chantiers actifs',   value: stats.activeSites.toString(),  color: 'text-orange-500' },
+                  { label: 'Employés',  value: stats.totalEmployees.toString(), color: 'text-green-500' },
+                  { label: 'Commandes en cours', value: stats.pendingOrders.toString(),  color: 'text-blue-500' },
+                  { label: 'Alertes météo',      value: stats.weatherAlerts.toString(),  color: 'text-yellow-500' },
+                ].map(({ label, value, color }) => (
+                  <StatCard key={label} label={label} value={value} color={color} />
+                ))
+              )}
             </div>
           </div>
 
@@ -139,27 +176,33 @@ const HomePage: React.FC = () => {
               <p className="text-base font-bold text-gray-400 uppercase tracking-[0.15em]">Chantiers récents</p>
               <Link to="/dashboard" className="text-base text-orange-500 font-semibold hover:underline">Voir tout →</Link>
             </div>
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-100">
-              {[
-                { name: 'Tour Horizon',        location: 'Paris 15e',   progress: 72, status: 'En cours' },
-                { name: 'Résidence Les Pins',  location: 'Lyon',        progress: 45, status: 'En cours' },
-                { name: 'Pont Sud',            location: 'Bordeaux',    progress: 60, status: 'En cours' },
-              ].map(({ name, location, progress, status }) => (
-                <Link to="/dashboard" key={name} className="flex items-center gap-5 px-6 py-5 hover:bg-gray-50 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-lg font-bold text-gray-800 truncate">{name}</p>
-                    <p className="text-base text-gray-400">{location}</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-40 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-orange-400 rounded-full" style={{ width: `${progress}%` }} />
+            {loading ? (
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
+                <span className="text-gray-400">Chargement des chantiers...</span>
+              </div>
+            ) : sites.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
+                <span className="text-gray-400">Aucun chantier disponible</span>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm divide-y divide-gray-100">
+                {sites.slice(0, 3).map((site) => (
+                  <Link to="/dashboard" key={site.id} className="flex items-center gap-5 px-6 py-5 hover:bg-gray-50 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-lg font-bold text-gray-800 truncate">{site.name}</p>
+                      <p className="text-base text-gray-400">{site.location}</p>
                     </div>
-                    <span className="text-base font-bold text-gray-500 w-12 text-right">{progress}%</span>
-                  </div>
-                  <span className="text-base font-semibold text-green-600 bg-green-50 px-4 py-2 rounded-full shrink-0">{status}</span>
-                </Link>
-              ))}
-            </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-40 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-orange-400 rounded-full" style={{ width: `${site.progress || 0}%` }} />
+                      </div>
+                      <span className="text-base font-bold text-gray-500 w-12 text-right">{site.progress || 0}%</span>
+                    </div>
+                    <span className="text-base font-semibold text-green-600 bg-green-50 px-4 py-2 rounded-full shrink-0">{site.status}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -215,7 +258,7 @@ const HomePage: React.FC = () => {
 
       <section className="bg-orange-500 px-20 py-16">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-12 text-center">
-          {stats.map(({ value, label }) => (
+          {marketingStats.map(({ value, label }) => (
             <div key={label}>
               <p className="text-5xl font-extrabold text-white mb-3">{value}</p>
               <p className="text-orange-100 text-lg">{label}</p>
