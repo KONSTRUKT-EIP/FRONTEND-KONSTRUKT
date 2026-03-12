@@ -7,6 +7,8 @@ import AttendanceDaySelector from "../../Components/Dashboard/Attendance/Attenda
 import { teamService, TeamMember, AttendanceWeek } from '../../services/teamService';
 import { getSiteUUID } from '../../utils/siteMapping';
 import AddMemberModal from '../../Components/Dashboard/Modal/AddMemberModal';
+import InputCard from "../../Components/Team/InputCard";
+import ModalHoursTeam from "../Team/ModalHours";
 
 const chantierNames: Record<string, string> = {
   "1": "Tour Horizon",
@@ -27,8 +29,10 @@ export default function DashboardDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  
+
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
   const [search, setSearch] = useState('');
   const [selectedDay, setSelectedDay] = useState(0);
 
@@ -46,7 +50,7 @@ export default function DashboardDetail() {
         teamService.getTeamMembersDetails(siteUUID),
         teamService.getAttendanceWeek(siteUUID),
       ]);
-      
+
       setWorkers(membersData);
       setAttendanceWeek(attendanceData);
       if (attendanceData.days.length > 0) {
@@ -68,7 +72,10 @@ export default function DashboardDetail() {
   const handleAddMemberSuccess = () => {
     fetchData();
   };
-
+  const handleWorkerClick = (worker: Worker) => {
+    setSelectedWorker(worker);
+    setOpenModal(true);
+  };
   const toggleCheck = (wid: string) => {
     setChecked(prev => {
       const next = new Set(prev);
@@ -149,7 +156,7 @@ export default function DashboardDetail() {
                   className="bg-transparent text-base outline-none text-gray-700 w-32"
                 />
               </div>
-              <button 
+              <button
                 onClick={() => setIsAddMemberModalOpen(true)}
                 className="flex items-center gap-1 px-5 py-2.5 bg-orange-500 text-white text-base font-semibold rounded-full hover:bg-orange-600 transition"
               >
@@ -219,6 +226,10 @@ export default function DashboardDetail() {
                   specialite={worker.specialite}
                   status={dayStatus}
                   editable={true}
+                  // worker={worker}
+                  // checked={checked.has(worker.id)}
+                  // onCheck={() => toggleCheck(worker.id)}
+                  // onClick={() => handleWorkerClick(worker)}
                   onStatusChange={async (newStatus) => {
                     try {
                       const selectedDate = attendanceWeek?.dates[selectedDay];
@@ -226,7 +237,7 @@ export default function DashboardDetail() {
                         console.error('Date non disponible');
                         return;
                       }
-                      
+
                       await teamService.updateAttendance(
                         worker.teamId,
                         worker.id,
@@ -239,7 +250,7 @@ export default function DashboardDetail() {
                           ...prev,
                           attendances: {
                             ...prev.attendances,
-                            [worker.id]: prev.attendances[worker.id].map((s, i) => 
+                            [worker.id]: prev.attendances[worker.id].map((s, i) =>
                               i === selectedDay ? newStatus : s
                             )
                           }
@@ -280,6 +291,12 @@ export default function DashboardDetail() {
         siteId={getSiteUUID(id) || ''}
         onSuccess={handleAddMemberSuccess}
       />
+      {openModal && (
+      <ModalHoursTeam
+        worker={selectedWorker}
+        onClose={() => setOpenModal(false)}
+      />
+    )}
     </div>
   );
 }

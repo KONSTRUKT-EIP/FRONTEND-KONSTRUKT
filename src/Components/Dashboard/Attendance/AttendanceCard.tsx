@@ -1,6 +1,7 @@
 import React from 'react';
 import AttendanceStatusSelector from './AttendanceStatusSelector';
-import { AttendanceStatus } from './AttendanceBadge';
+import AttendanceBadge, { AttendanceStatus } from './AttendanceBadge';
+import AttendanceHours from './AttendanceHours';
 
 interface AttendanceCardProps {
   initials: string;
@@ -8,20 +9,23 @@ interface AttendanceCardProps {
   name: string;
   specialite: string;
   status: AttendanceStatus;
+  onClick?: () => void;
   onStatusChange?: (status: AttendanceStatus) => void;
   editable?: boolean;
 }
 
-const AttendanceCard: React.FC<AttendanceCardProps> = ({ 
-  initials, 
-  color, 
-  name, 
-  specialite, 
+const AttendanceCard: React.FC<AttendanceCardProps> = ({
+  initials,
+  color,
+  name,
+  specialite,
   status,
   onStatusChange,
   editable = true,
 }) => (
-  <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition">
+  <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition"
+  onClick={onClick}
+  >
     <div
       className="w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
       style={{ background: color }}
@@ -52,6 +56,10 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
          'En attente'}
       </span>
     )}
+    {/* <div className="flex-7 flex justify-center">
+      <AttendanceHours hours={5} overtime={10} />
+    </div> */}
+    <AttendanceBadge status={status} />
   </div>
 );
 

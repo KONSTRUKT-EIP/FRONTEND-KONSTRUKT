@@ -55,7 +55,7 @@ export default function ChantierCard({
         {photo ? (
           <img src={photo} alt={name} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-5xl opacity-30">🏗️</span>
+          <span className="text-5xl opacity-30"></span>
         )}
 
         {/* Upload button */}
