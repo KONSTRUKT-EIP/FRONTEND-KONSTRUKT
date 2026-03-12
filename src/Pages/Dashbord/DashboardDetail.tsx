@@ -4,10 +4,6 @@ import React, { useState } from 'react';
 import AttendanceBadge, { AttendanceStatus, attendanceConfig } from "../../Components/Dashboard/Attendance/AttendanceBadge";
 import AttendanceCard from "../../Components/Dashboard/Attendance/AttendanceCard";
 import AttendanceDaySelector from "../../Components/Dashboard/Attendance/AttendanceDaySelector";
-import { teamService, TeamMember, AttendanceWeek } from '../../services/teamService';
-import { getSiteUUID } from '../../utils/siteMapping';
-import AddMemberModal from '../../Components/Dashboard/Modal/AddMemberModal';
-import InputCard from "../../Components/Team/InputCard";
 import ModalHoursTeam from "../Team/ModalHours";
 
 const chantierNames: Record<string, string> = {
@@ -167,58 +163,25 @@ export default function DashboardDetail() {
   const navigate = useNavigate();
   const chantierName = chantierNames[id ?? ""] ?? "Chantier";
 
-  const [workers, setWorkers] = useState<TeamMember[]>([]);
-  const [attendanceWeek, setAttendanceWeek] = useState<AttendanceWeek | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const workers: MockWorker[] = mockWorkers[id ?? ""] ?? [];
+  const [attendanceWeek, setAttendanceWeek] = useState<MockAttendanceWeek>(
+    () => mockAttendanceData[id ?? ""] ?? { days: [], dates: [], attendances: {} }
+  );
 
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [openModal, setOpenModal] = useState(false);
-  const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
+  const [selectedWorker, setSelectedWorker] = useState<MockWorker | null>(null);
   const [search, setSearch] = useState('');
-  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(() => {
+    const days = mockAttendanceData[id ?? ""]?.days ?? [];
+    return days.length > 0 ? days.length - 1 : 0;
+  });
 
-  const fetchData = useCallback(async () => {
-    const siteUUID = getSiteUUID(id);
-    if (!siteUUID) {
-      setError("ID de chantier invalide");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const [membersData, attendanceData] = await Promise.all([
-        teamService.getTeamMembersDetails(siteUUID),
-        teamService.getAttendanceWeek(siteUUID),
-      ]);
-
-      setWorkers(membersData);
-      setAttendanceWeek(attendanceData);
-      if (attendanceData.days.length > 0) {
-        setSelectedDay(attendanceData.days.length - 1);
-      }
-      setError(null);
-    } catch (err) {
-      console.error('Erreur lors du chargement des données:', err);
-      setError("Impossible de charger les données de l'équipe");
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleAddMemberSuccess = () => {
-    fetchData();
-  };
-  const handleWorkerClick = (worker: Worker) => {
+  const handleWorkerClick = (worker: MockWorker) => {
     setSelectedWorker(worker);
     setOpenModal(true);
   };
+
   const toggleCheck = (wid: string) => {
     setChecked(prev => {
       const next = new Set(prev);
@@ -240,7 +203,7 @@ export default function DashboardDetail() {
       {/* Header */}
       <div className="mb-8">
         <div>
-         <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+          <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
             <span>
               <button
                 onClick={() => navigate("/dashboard")}
@@ -267,42 +230,18 @@ export default function DashboardDetail() {
         </div>
       </div>
 
-      {/* Loading & Error States */}
-      {loading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">Chargement...</div>
-        </div>
-      )}
-
-      {error && (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-red-500">{error}</div>
-        </div>
-      )}
-
-      {!loading && !error && (
-      <>
-        {/* Workforce Table */}
-        <div className="bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800">Équipe / {chantierName}</h2>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
-                <input
-                  type="text"
-                  placeholder="Chercher"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="bg-transparent text-base outline-none text-gray-700 w-32"
-                />
-              </div>
-              <button
-                onClick={() => setIsAddMemberModalOpen(true)}
-                className="flex items-center gap-1 px-5 py-2.5 bg-orange-500 text-white text-base font-semibold rounded-full hover:bg-orange-600 transition"
-              >
-                + Nouveau
-              </button>
-            </div>
+      {/* Workforce Table */}
+      <div className="bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-800">Équipe / {chantierName}</h2>
+          <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+            <input
+              type="text"
+              placeholder="Chercher"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="bg-transparent text-base outline-none text-gray-700 w-32"
+            />
           </div>
         </div>
 
@@ -324,46 +263,16 @@ export default function DashboardDetail() {
               {filtered.map(worker => (
                 <WorkerRow
                   key={worker.id}
-                  initials={worker.initials}
-                  color={worker.color}
-                  name={worker.name}
-                  specialite={worker.specialite}
-                  status={dayStatus}
-                  editable={true}
-                  // worker={worker}
-                  // checked={checked.has(worker.id)}
-                  // onCheck={() => toggleCheck(worker.id)}
-                  // onClick={() => handleWorkerClick(worker)}
-                  onStatusChange={async (newStatus) => {
-                    try {
-                      const selectedDate = attendanceWeek?.dates[selectedDay];
-                      if (!selectedDate) {
-                        console.error('Date non disponible');
-                        return;
-                      }
-
-                      await teamService.updateAttendance(
-                        worker.teamId,
-                        worker.id,
-                        selectedDate,
-                        newStatus
-                      );
-                      setAttendanceWeek(prev => {
-                        if (!prev) return prev;
-                        return {
-                          ...prev,
-                          attendances: {
-                            ...prev.attendances,
-                            [worker.id]: prev.attendances[worker.id].map((s, i) =>
-                              i === selectedDay ? newStatus : s
-                            )
-                          }
-                        };
-                      });
-                    } catch (err) {
-                      console.error('Erreur lors de la mise à jour du statut:', err);
-                      alert('Impossible de mettre à jour le statut');
-                    }
+                  worker={{
+                    id: worker.id as unknown as number,
+                    specialite: worker.specialite,
+                    name: worker.name,
+                    email: worker.email,
+                    dateDebut: worker.dateDebut,
+                    status: worker.status,
+                    starred: worker.starred,
+                    initials: worker.initials,
+                    color: worker.color,
                   }}
                   checked={checked.has(worker.id)}
                   onCheck={() => toggleCheck(worker.id)}
@@ -385,19 +294,57 @@ export default function DashboardDetail() {
           />
         </div>
 
-      {/* Add Member Modal */}
-      <AddMemberModal
-        isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
-        siteId={getSiteUUID(id) || ''}
-        onSuccess={handleAddMemberSuccess}
-      />
-      {openModal && (
-      <ModalHoursTeam
-        worker={selectedWorker}
-        onClose={() => setOpenModal(false)}
-      />
-    )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {workers.map(worker => {
+            const dayStatus = (attendanceWeek.attendances[worker.id]?.[selectedDay] ?? 'absent') as AttendanceStatus;
+            return (
+              <AttendanceCard
+                key={worker.id}
+                initials={worker.initials}
+                color={worker.color}
+                name={worker.name}
+                specialite={worker.specialite}
+                status={dayStatus}
+                editable={true}
+                onClick={() => handleWorkerClick(worker)}
+                onStatusChange={(newStatus) => {
+                  setAttendanceWeek(prev => ({
+                    ...prev,
+                    attendances: {
+                      ...prev.attendances,
+                      [worker.id]: (prev.attendances[worker.id] ?? []).map((s: AttendanceStatus, i: number) =>
+                        i === selectedDay ? newStatus : s
+                      ),
+                    },
+                  }));
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* Day summary */}
+        <div className="flex gap-4 pt-2 border-t border-gray-100">
+          {(Object.keys(attendanceConfig) as AttendanceStatus[]).map(s => {
+            const count = workers.filter(w =>
+              (attendanceWeek.attendances[w.id]?.[selectedDay] ?? 'absent') === s
+            ).length;
+            return (
+              <div key={s} className="flex items-center gap-1.5">
+                <AttendanceBadge status={s} />
+                <span className="text-base font-bold text-gray-800">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {openModal && selectedWorker && (
+        <ModalHoursTeam
+          worker={selectedWorker}
+          onClose={() => setOpenModal(false)}
+        />
+      )}
     </div>
   );
 }

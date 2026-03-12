@@ -20,11 +20,12 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
   name,
   specialite,
   status,
+  onClick,
   onStatusChange,
   editable = true,
 }) => (
   <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition"
-  onClick={onClick}
+    onClick={onClick}
   >
     <div
       className="w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
@@ -56,10 +57,6 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
          'En attente'}
       </span>
     )}
-    {/* <div className="flex-7 flex justify-center">
-      <AttendanceHours hours={5} overtime={10} />
-    </div> */}
-    <AttendanceBadge status={status} />
   </div>
 );
 

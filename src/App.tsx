@@ -11,7 +11,7 @@ const Worksites = lazy(() => import('./Pages/Worksites/Worksites'));
 const Planning = lazy(() => import('./Pages/Planning/Planning'));
 const Settings = lazy(() => import('./Pages/Settings/Settings'));
 const DashboardArmature = lazy(() => import('./Pages/Dashbord/Dashbord'));
-const TeamView = lazy(() => import('./Pages/Dashbord/TeamView'));
+const DashboardDetail = lazy(() => import('./Pages/Dashbord/DashboardDetail'));
 const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
 const JobsitHub = lazy(() => import("./Pages/Dashbord/Dashbordhub"));
 const About = lazy(() => import('./Pages/About/About'));
@@ -39,7 +39,7 @@ const App: React.FC = () => (
       {/* Routes protégées */}
       <Route path="/dashboard" element={<ProtectedRoute><JobsitList /></ProtectedRoute>} />
       <Route path="/dashboard/:id" element={<ProtectedRoute><JobsitHub /></ProtectedRoute>} />
-      <Route path="/dashboard/:id/equipe" element={<ProtectedRoute><TeamView /></ProtectedRoute>} />
+      <Route path="/dashboard/:id/equipe" element={<ProtectedRoute><DashboardDetail /></ProtectedRoute>} />
       <Route path="/dashboard/:id/:dbId" element={<ProtectedRoute><DashboardArmature /></ProtectedRoute>} />
       <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
