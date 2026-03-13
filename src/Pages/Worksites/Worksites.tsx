@@ -1,19 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChantierCard from '../../Components/Dashboard/JobsitCard/JobsitCard';
 import type { Chantier } from '../Dashbord/JobsitList';
+import { initialChantiers } from '../Dashbord/JobsitList';
 
 const ORGANIZATION_ID = '00000000-0000-0000-0000-000000000001';
-
-interface SiteApi {
-  id: string | number;
-  name: string;
-  city?: string;
-  postalCode?: string;
-  address?: string;
-  responsible?: string;
-  manager?: string;
-}
 
 const emptyForm = {
   name: '',
@@ -28,43 +19,12 @@ const emptyForm = {
 
 const Worksites: React.FC = () => {
   const navigate = useNavigate();
-  const [chantiers, setChantiers] = useState<Chantier[]>([]);
-  const [fetchLoading, setFetchLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [chantiers, setChantiers] = useState<Chantier[]>(initialChantiers);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchSites = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch('http://localhost:3000/sites', {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-        const data = await response.json();
-        if (response.status === 200) {
-          const mapped: Chantier[] = (Array.isArray(data) ? data : data.sites ?? []).map((s: SiteApi) => ({
-            id: String(s.id),
-            name: s.name,
-            location: s.city ? `${s.city}${s.postalCode ? ', ' + s.postalCode : ''}` : (s.address ?? ''),
-            responsible: s.responsible ?? s.manager ?? '',
-          }));
-          setChantiers(mapped);
-        } else {
-          setFetchError(data.message || 'Impossible de charger les chantiers.');
-        }
-      } catch {
-        setFetchError('Erreur réseau. Veuillez réessayer.');
-      } finally {
-        setFetchLoading(false);
-      }
-    };
-    fetchSites();
-  }, []);
 
   const handlePhotoChange = (id: string, url: string) => {
     setChantiers(prev => prev.map(c => c.id === id ? { ...c, photo: url } : c));
@@ -153,17 +113,7 @@ const Worksites: React.FC = () => {
 
       {/* Grid */}
       <div className="px-20 py-6">
-        {fetchLoading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500 mb-4"></div>
-            <p className="text-sm">Chargement des chantiers…</p>
-          </div>
-        ) : fetchError ? (
-          <div className="flex flex-col items-center justify-center py-24 text-red-400">
-            <span className="text-5xl mb-4">⚠️</span>
-            <p className="text-lg font-semibold">{fetchError}</p>
-          </div>
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-gray-400">
             <span className="text-6xl mb-4">🏗️</span>
             <p className="text-lg font-semibold">Aucun chantier trouvé</p>

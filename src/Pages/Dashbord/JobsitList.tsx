@@ -11,7 +11,7 @@ export interface Chantier {
   photo?: string;
 }
 
-const initialChantiers: Chantier[] = [
+export const initialChantiers: Chantier[] = [
   { id: "1", name: "Tour Horizon",       location: "Paris, 75008",     responsible: "Jean Dupont",    photo: "/assets/2011-TOUR-HORIZON-BOULOGNE-BILLANCOURT-P-1-1000X667.jpg" },
   { id: "2", name: "Résidence Les Pins", location: "Lyon, 69003",      responsible: "Marie Leroy",    photo: "/assets/690031968.jpg" },
   { id: "3", name: "Pont Sud",           location: "Marseille, 13002", responsible: "Pierre Martin",  photo: "/assets/le-pont-pinede-pont-mobile-basculant-port-de-marseille-25.jpg" },
