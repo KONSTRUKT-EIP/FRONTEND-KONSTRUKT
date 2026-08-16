@@ -1,5 +1,3 @@
-+29Lines changed: 29 additions & 0 deletions
-Original file line number	Diff line number	Diff line change
 import React from 'react';
 interface HoursCard {
     title: string;
