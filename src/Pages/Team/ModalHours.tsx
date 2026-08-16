@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import InputCard from '../../Components/Team/InputCard'
 import TeamHours from '../../Components/Team/HoursCard'
+interface Worker {
+  id: string;
+  name: string;
+  // A voir
+}
 
 interface ModalHoursTeamProps {
-  worker: any;
+  worker: Worker;
   onClose: () => void;
 }
 
-export default function ModalHoursTeam({ worker, onClose }: ModalHoursTeamProps) {
+export default function ModalHoursTeam({ worker: _worker, onClose }: ModalHoursTeamProps) {
   const [heuresJour, setHeuresJour] = useState();
   const [heuresSup, setHeuresSup] = useState();
 
