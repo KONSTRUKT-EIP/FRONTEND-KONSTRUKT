@@ -130,7 +130,7 @@ export default function DashboardArmature() {
     };
     fetchData();
 
-  }, [startDate, endDate]);
+  }, [startDate, endDate, id]);
 
   const cards = summaryData?
       summaryData.categories.map((cat) => ({

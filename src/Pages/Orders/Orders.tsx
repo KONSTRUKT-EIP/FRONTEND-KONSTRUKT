@@ -29,7 +29,10 @@ const Orders: React.FC = () => {
         const data: { orders: Order[] } = await response.json();
         setOrders(data.orders);
       } catch (err) {
-        setError("Impossible de charger les commandes");
+        const message =
+        err instanceof Error ? err.message : "Erreur inconnue";
+
+        setError(`Impossible de charger les commandes : ${message}`);
       } finally {
         setLoading(false);
       }
