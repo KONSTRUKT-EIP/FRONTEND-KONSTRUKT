@@ -6,6 +6,9 @@ import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
 import { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
 import ReportsChart from "../../Components/Dashboard/ReportGraph/ReportGraph";
+import {
+  CreateOrderPayload,
+} from "../../Components/Dashboard/RecentOrders/ModalOrder";
 
 const chantierNames: Record<string, string> = {
   "1": "Tour Horizon",
@@ -78,7 +81,7 @@ export default function DashboardArmature() {
   const endDate = "2026-02-11";
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const handleCreateOrder = async (payload: Omit<Order, "id">) => {
+  const handleCreateOrder = async (payload: CreateOrderPayload) => {
     try {
       const token = localStorage.getItem("access_token");
       const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
@@ -109,7 +112,7 @@ export default function DashboardArmature() {
         const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
         const [summaryRes, ordersRes] = await Promise.all([
           fetch(`http://localhost:3000/dashboard/armature/summary?${params}`, { headers: authHeaders }),
-          fetch(`http://localhost:3000/dashboard/armature/orders/recent?${params}`, { headers: authHeaders }),
+          fetch(  `http://localhost:3000/dashboard/armature/orders/site/${encodeURIComponent(id ?? "")}`, { headers: authHeaders }),
         ]);
         if (!summaryRes.ok)
           throw new Error(`Erreur ${summaryRes.status}`);
@@ -217,7 +220,7 @@ export default function DashboardArmature() {
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
           <Suspense fallback={<div>Chargement des commandes...</div>}>
-            <RecentOrders orders={orders} onCreateOrder={handleCreateOrder} />
+            <RecentOrders siteId={id ?? ""} orders={orders} onCreateOrder={handleCreateOrder} />
           </Suspense>
         </div>
         <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">

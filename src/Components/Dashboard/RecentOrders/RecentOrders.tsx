@@ -5,16 +5,18 @@ import CreateOrderModal, { CreateOrderPayload } from "./ModalOrder";
 const columns = ["nb commande", "Nom du produit", "Prix unit.", "Quantité", "Total"];
 
 interface RecentOrdersProps {
+  siteId: string;
   orders: Order[];
   onCreateOrder?: (payload: CreateOrderPayload) => Promise<void>;
 }
 
-export default function RecentOrders({ orders, onCreateOrder }: RecentOrdersProps) {
+export default function RecentOrders({ siteId, orders, onCreateOrder }: RecentOrdersProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <>
       <CreateOrderModal
           isOpen={isModalOpen}
+          siteId={siteId}
           onClose={() => setIsModalOpen(false)}
           onSubmit={async (payload) => {
             await onCreateOrder?.(payload);
