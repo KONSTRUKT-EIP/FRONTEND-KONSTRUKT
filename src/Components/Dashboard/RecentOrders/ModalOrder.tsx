@@ -1,13 +1,20 @@
 import React, { useState } from "react";
-import { Order } from "./OrderRow";
 import { Field } from "../../Tools/Input/Input";
 
-export type CreateOrderPayload = Omit<Order, "id">;
+export type CreateOrderPayload = {
+  siteId: string;
+  productName: string;
+  productIcon?: string;
+  price: number;
+  totalOrder: number;
+  total: number;
+};
 
 interface CreateOrderModalProps {
   isOpen: boolean;
+  siteId: string;
   onClose: () => void;
-  onSubmit: (_payload: Omit<Order, "id">) => void;
+  onSubmit: (payload: CreateOrderPayload) => Promise<void>;
 }
 
 const emptyForm = {
@@ -18,7 +25,7 @@ const emptyForm = {
   total: "",
 };
 
-export default function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModalProps) {
+export default function CreateOrderModal({ isOpen, siteId,onClose, onSubmit }: CreateOrderModalProps) {
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
 
@@ -29,20 +36,48 @@ export default function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOr
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    await onSubmit({
-      productName: form.productName,
-      productIcon: form.productIcon || undefined,
-      price: Number(form.price),
-      totalOrder: Number(form.totalOrder),
-      total: Number(form.total),
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log('[handleSubmit] Début de la soumission');
+  console.log('[handleSubmit] Form data brut:', form);
+  if (!siteId) {
+    console.error("Aucun siteId fourni");
+    return;
+  }
+  setLoading(true);
+
+  const payload = {
+    siteId,
+    productName: form.productName,
+    productIcon: form.productIcon || undefined,
+    price: Number(form.price),
+    totalOrder: Number(form.totalOrder),
+    total: Number(form.total),
+  };
+
+  console.log('[handleSubmit] Payload envoyé à onSubmit:', payload);
+
+  // Vérif des valeurs numériques (NaN fréquent avec Number() sur un champ vide)
+  if (Number.isNaN(payload.price) || Number.isNaN(payload.totalOrder) || Number.isNaN(payload.total)) {
+    console.warn('[handleSubmit] Attention: une valeur numérique est NaN', {
+      price: payload.price,
+      totalOrder: payload.totalOrder,
+      total: payload.total,
     });
+  }
+
+  try {
+    await onSubmit(payload);
+    console.log('[handleSubmit] onSubmit terminé avec succès');
+  } catch (error) {
+    console.error('[handleSubmit] Erreur pendant onSubmit:', error);
+  } finally {
     setForm(emptyForm);
     setLoading(false);
     onClose();
-  };
+    console.log('[handleSubmit] Fin: form réinitialisé, loading=false, modal fermée');
+  }
+};
 
   return (
     <>
