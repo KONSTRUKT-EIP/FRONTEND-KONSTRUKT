@@ -17,6 +17,12 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({ isOpen, onClose, siteId
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const resetForm = () => {
+    setSelectedUserId('');
+    setSelectedRole('WORKER');
+    setError(null);
+  };
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -57,17 +63,23 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({ isOpen, onClose, siteId
 
   useEffect(() => {
     if (isOpen) {
-      loadData();
+      const timeoutId = window.setTimeout(() => {
+        void loadData();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     } else {
-      resetForm();
+      const timeoutId = window.setTimeout(() => {
+        resetForm();
+        setUsers([]);
+        setTeams([]);
+        setSelectedTeamId('');
+        setLoading(false);
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
   }, [isOpen, loadData]);
-
-  useEffect(() => {
-    if (teams.length > 0 && !selectedTeamId) {
-      setSelectedTeamId(teams[0].id);
-    }
-  }, [teams, selectedTeamId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,12 +106,6 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({ isOpen, onClose, siteId
     } finally {
       setLoading(false);
     }
-  };
-
-  const resetForm = () => {
-    setSelectedUserId('');
-    setSelectedRole('WORKER');
-    setError(null);
   };
 
   if (!isOpen) return null;

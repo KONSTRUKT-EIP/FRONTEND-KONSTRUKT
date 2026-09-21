@@ -73,7 +73,11 @@ export default function JobsiteHub() {
   }, [id]);
 
   useEffect(() => {
-    fetchStats();
+    const timeoutId = window.setTimeout(() => {
+      void fetchStats();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [fetchStats]);
 
   useEffect(() => {
