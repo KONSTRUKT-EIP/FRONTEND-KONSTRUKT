@@ -41,10 +41,6 @@ export default function Planning() {
   ]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadWeekPlanning();
-  }, []);
-
   const loadWeekPlanning = async () => {
     try {
       setLoading(true);
@@ -88,6 +84,14 @@ export default function Planning() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadWeekPlanning();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const handleCreateTask = async (payload: CreateTaskPayload) => {
     try {

@@ -104,12 +104,6 @@ const HomePage: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      loadDashboardData();
-    }
-  }, [isLoggedIn]);
-
   const loadDashboardData = async () => {
     try {
       setLoading(true);
@@ -125,6 +119,16 @@ const HomePage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const timeoutId = window.setTimeout(() => {
+        void loadDashboardData();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [isLoggedIn]);
 
   if (isLoggedIn) {
     const today = new Date();

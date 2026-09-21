@@ -65,12 +65,6 @@ export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTas
   const [zones, setZones] = useState<SiteZone[]>([]);
   const [loadingData, setLoadingData] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadUsersAndZones();
-    }
-  }, [isOpen]);
-
   const loadUsersAndZones = async () => {
     setLoadingData(true);
     try {
@@ -133,6 +127,16 @@ export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTas
       setLoadingData(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      const timeoutId = window.setTimeout(() => {
+        void loadUsersAndZones();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
