@@ -9,16 +9,18 @@ interface AttendanceCardProps {
   specialite: string;
   status: AttendanceStatus;
   onStatusChange?: (status: AttendanceStatus) => void;
+  onOpenHoursModal?: () => void;
   editable?: boolean;
 }
 
-const AttendanceCard: React.FC<AttendanceCardProps> = ({ 
-  initials, 
-  color, 
-  name, 
-  specialite, 
+const AttendanceCard: React.FC<AttendanceCardProps> = ({
+  initials,
+  color,
+  name,
+  specialite,
   status,
   onStatusChange,
+  onOpenHoursModal,
   editable = true,
 }) => (
   <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition">
@@ -32,12 +34,29 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
       <p className="text-lg font-semibold text-gray-800 truncate">{name}</p>
       <p className="text-base font-medium text-gray-800">{specialite}</p>
     </div>
-    {editable && onStatusChange ? (
-      <AttendanceStatusSelector
-        currentStatus={status}
-        onStatusChange={onStatusChange}
-      />
-    ) : (
+
+    {editable && (
+      <div className="flex items-center gap-2">
+        {onOpenHoursModal && (
+          <button
+            type="button"
+            onClick={onOpenHoursModal}
+            className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-600 hover:bg-orange-100 transition"
+          >
+            Heures
+          </button>
+        )}
+
+        {onStatusChange ? (
+          <AttendanceStatusSelector
+            currentStatus={status}
+            onStatusChange={onStatusChange}
+          />
+        ) : null}
+      </div>
+    )}
+
+    {!editable && (
       <span className={`px-4 py-1.5 rounded-full text-base font-semibold ${
         status === 'present' ? 'bg-green-100 text-green-600' :
         status === 'absent' ? 'bg-red-100 text-red-500' :

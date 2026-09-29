@@ -43,6 +43,10 @@ export interface AttendanceWeek {
   days: string[];
   dates: string[];
   attendances: Record<string, string[]>;
+  workforceHours: Record<
+    string,
+    { normalHours: number; overtimeHours: number }[]
+  >;
 }
 
 export interface Team {
@@ -84,10 +88,10 @@ export const teamService = {
   },
 
   async getAttendanceWeek(siteId: string, startDate?: string): Promise<AttendanceWeek> {
-    const url = startDate 
+    const url = startDate
       ? `${API_BASE}/teams/site/${siteId}/attendance-week?startDate=${startDate}`
       : `${API_BASE}/teams/site/${siteId}/attendance-week`;
-    
+
     const response = await fetch(url, {
       headers: getAuthHeaders(),
     });
@@ -127,7 +131,7 @@ export const teamService = {
 
   async createTeam(siteId: string, name: string, leaderId?: string): Promise<Team> {
     const payload = { siteId, name, leaderId };
-    
+
     const response = await fetch(`${API_BASE}/teams`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -179,6 +183,45 @@ export const teamService = {
       console.error('Full error details:', JSON.stringify(error, null, 2));
       const errorMsg = Array.isArray(error.message) ? error.message.join(', ') : error.message;
       throw new Error(errorMsg || 'Failed to update attendance');
+    }
+  },
+
+  async saveWorkforceHours(
+    siteId: string,
+    teamId: string,
+    userId: string,
+    date: string,
+    normalHours: number,
+    overtimeHours: number,
+  ): Promise<void> {
+    if (!isValidUUID(siteId)) {
+      throw new Error(`Invalid siteId format: ${siteId}`);
+    }
+    if (!isValidUUID(userId)) {
+      throw new Error(`Invalid userId format: ${userId}`);
+    }
+    if (!isValidUUID(teamId)) {
+      throw new Error(`Invalid teamId format: ${teamId}`);
+    }
+
+    const response = await fetch(`${API_BASE}/teams/site/${siteId}/workforce-hours`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        teamId,
+        userId,
+        date,
+        normalHours,
+        overtimeHours,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      const errorMsg = Array.isArray(error.message)
+        ? error.message.join(', ')
+        : error.message;
+      throw new Error(errorMsg || 'Failed to save workforce hours');
     }
   },
 };

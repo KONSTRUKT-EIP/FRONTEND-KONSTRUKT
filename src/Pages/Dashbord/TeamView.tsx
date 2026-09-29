@@ -13,6 +13,7 @@ import {
   AttendanceWeek,
 } from "../../services/teamService";
 import AddMemberModal from "../../Components/Dashboard/Modal/AddMemberModal";
+import ModalHoursTeam from "../Team/ModalHours";
 
 export default function TeamView() {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +31,7 @@ export default function TeamView() {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedWorkerForHours, setSelectedWorkerForHours] = useState<TeamMember | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!siteUUID) {
@@ -247,6 +249,7 @@ export default function TeamView() {
                     specialite={worker.specialite}
                     status={dayStatus}
                     editable={true}
+                    onOpenHoursModal={() => setSelectedWorkerForHours(worker)}
                     onStatusChange={async (newStatus) => {
                       try {
                         const selectedDate = attendanceWeek?.dates[selectedDay];
@@ -320,6 +323,32 @@ export default function TeamView() {
           onClose={() => setIsAddMemberModalOpen(false)}
           siteId={siteUUID}
           onSuccess={handleAddMemberSuccess}
+        />
+      )}
+
+      {siteUUID && selectedWorkerForHours && attendanceWeek?.dates[selectedDay] && (
+        <ModalHoursTeam
+          worker={selectedWorkerForHours}
+          siteId={siteUUID}
+          date={attendanceWeek.dates[selectedDay]}
+          initialNormalHours={attendanceWeek.workforceHours[selectedWorkerForHours.id]?.[selectedDay]?.normalHours ?? 0}
+          initialOvertimeHours={attendanceWeek.workforceHours[selectedWorkerForHours.id]?.[selectedDay]?.overtimeHours ?? 0}
+          onSaved={(normalHours, overtimeHours) => {
+            setAttendanceWeek((prev) => {
+              if (!prev) return prev;
+              const currentHours = prev.workforceHours[selectedWorkerForHours.id] ?? [];
+              const updatedHours = [...currentHours];
+              updatedHours[selectedDay] = { normalHours, overtimeHours };
+              return {
+                ...prev,
+                workforceHours: {
+                  ...prev.workforceHours,
+                  [selectedWorkerForHours.id]: updatedHours,
+                },
+              };
+            });
+          }}
+          onClose={() => setSelectedWorkerForHours(null)}
         />
       )}
     </div>
