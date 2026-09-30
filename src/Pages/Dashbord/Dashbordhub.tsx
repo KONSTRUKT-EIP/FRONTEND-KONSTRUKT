@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardCard from "../../Components/Dashboard/DashbordCard/DashbordCard";
 import React, { useEffect, useState, useCallback } from 'react';
-import { teamService, TeamStats } from '../../services/teamService';
+import { teamService, TeamStats, ATTENDANCE_UPDATED_EVENT } from '../../services/teamService';
 
 const dashboards = [
   { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
@@ -90,6 +90,20 @@ export default function JobsiteHub() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchStats]);
+
+  useEffect(() => {
+    const handleAttendanceUpdate = () => {
+      void fetchStats();
+    };
+
+    window.addEventListener(ATTENDANCE_UPDATED_EVENT, handleAttendanceUpdate);
+    return () => {
+      window.removeEventListener(
+        ATTENDANCE_UPDATED_EVENT,
+        handleAttendanceUpdate,
+      );
     };
   }, [fetchStats]);
 

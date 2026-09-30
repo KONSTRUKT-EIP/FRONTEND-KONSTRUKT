@@ -11,6 +11,7 @@ import {
   teamService,
   TeamMember,
   AttendanceWeek,
+  ATTENDANCE_UPDATED_EVENT,
 } from "../../services/teamService";
 import AddMemberModal from "../../Components/Dashboard/Modal/AddMemberModal";
 
@@ -31,7 +32,7 @@ export default function TeamView() {
   const [search, setSearch] = useState("");
   const [selectedDay, setSelectedDay] = useState(0);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (preserveSelectedDay = false) => {
     if (!siteUUID) {
       setError("ID de chantier invalide");
       setLoading(false);
@@ -49,8 +50,10 @@ export default function TeamView() {
       setWorkers(membersData);
       setAttendanceWeek(attendanceData);
 
-      if (attendanceData.days.length > 0) {
+      if (attendanceData.days.length > 0 && !preserveSelectedDay) {
         setSelectedDay(attendanceData.days.length - 1);
+      } else if (attendanceData.days.length > 0) {
+        setSelectedDay((current) => Math.min(current, attendanceData.days.length - 1));
       }
 
       setError(null);
@@ -68,6 +71,20 @@ export default function TeamView() {
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
+  }, [fetchData]);
+
+  useEffect(() => {
+    const handleAttendanceUpdate = () => {
+      void fetchData(true);
+    };
+
+    window.addEventListener(ATTENDANCE_UPDATED_EVENT, handleAttendanceUpdate);
+    return () => {
+      window.removeEventListener(
+        ATTENDANCE_UPDATED_EVENT,
+        handleAttendanceUpdate,
+      );
+    };
   }, [fetchData]);
 
   const handleAddMemberSuccess = () => {
@@ -91,6 +108,25 @@ export default function TeamView() {
       w.name.toLowerCase().includes(search.toLowerCase()) ||
       w.specialite.toLowerCase().includes(search.toLowerCase())
   );
+
+  const getDisplayStatus = (workerId: string, fallbackStatus: string) => {
+    const attendanceStatus = attendanceWeek?.attendances[workerId]?.[selectedDay];
+
+    switch (attendanceStatus) {
+      case 'present':
+        return 'Présent';
+      case 'absent':
+        return 'Absent';
+      case 'retard':
+        return 'En retard';
+      case 'conge':
+        return 'En congé';
+      case 'en-attente':
+        return 'En attente';
+      default:
+        return fallbackStatus || 'En attente';
+    }
+  };
 
   const attendanceDays = attendanceWeek?.days ?? [];
 
@@ -202,7 +238,7 @@ export default function TeamView() {
                         name: worker.name,
                         email: worker.email,
                         dateDebut: worker.dateDebut,
-                        status: worker.status,
+                        status: getDisplayStatus(worker.id, worker.status),
                         starred: worker.starred,
                         initials: worker.initials,
                         color: worker.color,
@@ -270,19 +306,7 @@ export default function TeamView() {
                           newStatus
                         );
 
-                        setAttendanceWeek((prev) => {
-                          if (!prev) return prev;
-
-                          return {
-                            ...prev,
-                            attendances: {
-                              ...prev.attendances,
-                              [worker.id]: prev.attendances[worker.id].map((s, i) =>
-                                i === selectedDay ? newStatus : s
-                              ),
-                            },
-                          };
-                        });
+                        void fetchData(true);
                       } catch (err) {
                         console.error("Erreur lors de la mise à jour du statut:", err);
                         alert("Impossible de mettre à jour le statut");

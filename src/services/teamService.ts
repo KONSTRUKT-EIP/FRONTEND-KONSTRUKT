@@ -13,6 +13,8 @@ const isValidUUID = (uuid: string): boolean => {
   return uuidRegex.test(uuid);
 };
 
+export const ATTENDANCE_UPDATED_EVENT = 'attendance-updated';
+
 export interface TeamStats {
   total: number;
   complete: number;
@@ -180,5 +182,11 @@ export const teamService = {
       const errorMsg = Array.isArray(error.message) ? error.message.join(', ') : error.message;
       throw new Error(errorMsg || 'Failed to update attendance');
     }
+
+    window.dispatchEvent(
+      new CustomEvent(ATTENDANCE_UPDATED_EVENT, {
+        detail: { teamId, userId, date, status },
+      }),
+    );
   },
 };
