@@ -108,13 +108,17 @@ export default function JobsiteHub() {
   }, [fetchStats]);
 
   const total = stats?.total ?? 0;
+  const totalEmployees = stats?.totalEmployees ?? 0;
   const complete = stats?.complete ?? 0;
   const enCours = stats?.enCours ?? 0;
   const retards = stats?.retards ?? 0;
   const annule = stats?.annule ?? 0;
-  const pctPresents = stats?.pctPresents ?? 0;
-  const pctAbsents = stats?.pctAbsents ?? 0;
-  const pctEnCours = stats?.pctEnCours ?? 0;
+  const enAttente = stats?.enAttente ?? 0;
+  const pctPresents = totalEmployees > 0 ? Math.round((complete / totalEmployees) * 100) : 0;
+  const pctRetards = totalEmployees > 0 ? Math.round((retards / totalEmployees) * 100) : 0;
+  const pctAbsents = totalEmployees > 0 ? Math.round((annule / totalEmployees) * 100) : 0;
+  const pctEnAttente = totalEmployees > 0 ? Math.round((enAttente / totalEmployees) * 100) : 0;
+  const pctSurSite = totalEmployees > 0 ? Math.round((enCours / totalEmployees) * 100) : 0;
 
   return (
     <main className="min-h-screen bg-gray-100 p-8" role="main">
@@ -198,54 +202,68 @@ export default function JobsiteHub() {
               percentage={pctPresents}
               color="#10b981"
               label="Présents"
-              sublabel={`${complete} / ${total} travailleurs`}
+              sublabel={`${complete} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
-              percentage={pctEnCours}
+              percentage={pctRetards}
               color="#f97316"
               label="Retards"
-              sublabel={`${retards} / ${total} travailleurs`}
+              sublabel={`${retards} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
               percentage={pctAbsents}
               color="#f43f5e"
               label="Absents/Congés"
-              sublabel={`${annule} / ${total} travailleurs`}
+              sublabel={`${annule} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
-              percentage={enCours > 0 ? Math.round((enCours / Math.max(complete, 1)) * 100) : 0}
+              percentage={pctSurSite}
               color="#6366f1"
               label="Sur site"
-              sublabel={`${enCours} / ${complete} présents`}
+              sublabel={`${enCours} / ${totalEmployees} travailleurs`}
+            />
+            <StatCircle
+              percentage={pctEnAttente}
+              color="#3b82f6"
+              label="En attente"
+              sublabel={`${enAttente} / ${totalEmployees} employés`}
             />
           </div>
 
           {/* Summary bars */}
           <div className="border-t border-gray-100 pt-4">
-            <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-widest">Présences du jour (dernier jour avec données)</h3>
+            <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-widest">Présences du chantier (dernier jour avec données)</h3>
             <div className="flex flex-col gap-3">
-              {[
-                { label: 'Présents',   count: complete,  color: 'bg-green-500' },
-                { label: 'Retards',    count: retards, color: 'bg-orange-400' },
-                { label: 'Absents',    count: annule, color: 'bg-red-400' },
-                { label: 'Sur site',   count: enCours, color: 'bg-blue-500' },
-              ].map(item => {
-                const percentage = total > 0 ? Math.round((item.count / total) * 100) : 0;
-                return (
-                <div key={item.label} className="flex items-center gap-3">
-                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.color}`}></span>
-                  <span className="text-sm text-gray-900 w-24 flex-shrink-0">{item.label}</span>
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    {item.count > 0 && (
-                      <div
-                        className={`h-2 rounded-full ${item.color}`}
-                        style={{ width: `${percentage}%`, transition: 'width 0.6s ease' }}
-                      />
-                    )}
-                  </div>
-                  <span className="text-sm font-medium text-gray-900 w-12 text-right">{item.count} / {total}</span>
-                </div>
-              );})}
+              {(() => {
+                const summaryTotal = totalEmployees > 0 ? totalEmployees : total;
+                return [
+                  { label: 'Présents', count: complete, color: 'bg-green-500' },
+                  { label: 'Retards', count: retards, color: 'bg-orange-400' },
+                  { label: 'Absents', count: annule, color: 'bg-red-400' },
+                  { label: 'En attente', count: enAttente, color: 'bg-blue-500' },
+                  { label: 'Sur site', count: enCours, color: 'bg-blue-500' },
+                ].map((item) => {
+                  const percentage =
+                    summaryTotal > 0 ? Math.round((item.count / summaryTotal) * 100) : 0;
+                  return (
+                    <div key={item.label} className="flex items-center gap-3">
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.color}`}></span>
+                      <span className="text-sm text-gray-900 w-24 flex-shrink-0">{item.label}</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        {item.count > 0 && (
+                          <div
+                            className={`h-2 rounded-full ${item.color}`}
+                            style={{ width: `${percentage}%`, transition: 'width 0.6s ease' }}
+                          />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 w-12 text-right">
+                        {item.count} / {summaryTotal}
+                      </span>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
           </>

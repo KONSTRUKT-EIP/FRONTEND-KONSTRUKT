@@ -66,7 +66,7 @@ const Worksites: React.FC = () => {
     fetchSites();
   }, []);
 
-  const handlePhotoChange = (id: string, url: string) => {
+  const handlePhotoChange = async (id: string, url: string) => {
     setChantiers(prev => prev.map(c => c.id === id ? { ...c, photo: url } : c));
   };
 

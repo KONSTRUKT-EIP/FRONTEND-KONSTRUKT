@@ -26,8 +26,11 @@ export default function ChantierCard({
     e.stopPropagation();
     const file = e.target.files?.[0];
     if (!file) return;
+
     const url = URL.createObjectURL(file);
     onPhotoChange(id, url);
+
+    e.target.value = '';
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {

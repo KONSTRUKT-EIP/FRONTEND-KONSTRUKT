@@ -17,6 +17,7 @@ export const ATTENDANCE_UPDATED_EVENT = 'attendance-updated';
 
 export interface TeamStats {
   total: number;
+  totalEmployees: number;
   complete: number;
   enCours: number;
   retards: number;
