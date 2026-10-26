@@ -6,7 +6,9 @@ import AttendanceBadge, {
   attendanceConfig,
 } from "../../Components/Dashboard/Attendance/AttendanceBadge";
 import AttendanceCard from "../../Components/Dashboard/Attendance/AttendanceCard";
-import AttendanceDaySelector from "../../Components/Dashboard/Attendance/AttendanceDaySelector";
+import AttendanceWeekNavigator, {
+  getDefaultAttendanceDate,
+} from "../../Components/Dashboard/Attendance/AttendanceWeekNavigator";
 import {
   teamService,
   TeamMember,
@@ -14,6 +16,14 @@ import {
   ATTENDANCE_UPDATED_EVENT,
 } from "../../services/teamService";
 import AddMemberModal from "../../Components/Dashboard/Modal/AddMemberModal";
+
+const getMonday = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() - ((date.getDay() + 6) % 7));
+
+const toDateKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate()
+  ).padStart(2, "0")}`;
 
 export default function TeamView() {
   const { id } = useParams<{ id: string }>();
@@ -30,9 +40,16 @@ export default function TeamView() {
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
-  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<Date>(getDefaultAttendanceDate);
+  const [loadedWeek, setLoadedWeek] = useState<string | null>(null);
 
-  const fetchData = useCallback(async (preserveSelectedDay = false) => {
+  const weekMonday = getMonday(selectedDate);
+  const weekStart = toDateKey(weekMonday);
+  const selectedDay = (selectedDate.getDay() + 6) % 7;
+  const isWeekLoaded = loadedWeek === weekStart;
+
+  // isCurrent permet d'ignorer la réponse d'une semaine qui n'est plus affichée
+  const fetchData = useCallback(async (isCurrent: () => boolean = () => true) => {
     if (!siteUUID) {
       setError("ID de chantier invalide");
       setLoading(false);
@@ -44,18 +61,14 @@ export default function TeamView() {
 
       const [membersData, attendanceData] = await Promise.all([
         teamService.getTeamMembersDetails(siteUUID),
-        teamService.getAttendanceWeek(siteUUID),
+        teamService.getAttendanceWeek(siteUUID, weekStart),
       ]);
+
+      if (!isCurrent()) return;
 
       setWorkers(membersData);
       setAttendanceWeek(attendanceData);
-
-      if (attendanceData.days.length > 0 && !preserveSelectedDay) {
-        setSelectedDay(attendanceData.days.length - 1);
-      } else if (attendanceData.days.length > 0) {
-        setSelectedDay((current) => Math.min(current, attendanceData.days.length - 1));
-      }
-
+      setLoadedWeek(weekStart);
       setError(null);
     } catch (err) {
       console.error("Erreur lors du chargement des données:", err);
@@ -63,19 +76,23 @@ export default function TeamView() {
     } finally {
       setLoading(false);
     }
-  }, [siteUUID]);
+  }, [siteUUID, weekStart]);
 
   useEffect(() => {
+    let active = true;
     const timeoutId = window.setTimeout(() => {
-      void fetchData();
+      void fetchData(() => active);
     }, 0);
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      active = false;
+      window.clearTimeout(timeoutId);
+    };
   }, [fetchData]);
 
   useEffect(() => {
     const handleAttendanceUpdate = () => {
-      void fetchData(true);
+      void fetchData();
     };
 
     window.addEventListener(ATTENDANCE_UPDATED_EVENT, handleAttendanceUpdate);
@@ -89,6 +106,41 @@ export default function TeamView() {
 
   const handleAddMemberSuccess = () => {
     fetchData();
+  };
+
+  const handleDeleteMembers = async () => {
+    if (checked.size === 0) return;
+
+    const confirmed = window.confirm(
+      `Êtes-vous sûr de vouloir supprimer ${checked.size} employé(s) du chantier ?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const teamIds = workers
+        .filter((w) => checked.has(w.id))
+        .map((w) => w.teamId);
+
+      // Remove duplicates
+      const uniqueTeamIds = [...new Set(teamIds)];
+
+      for (const teamId of uniqueTeamIds) {
+        const memberIds = workers
+          .filter((w) => w.teamId === teamId && checked.has(w.id))
+          .map((w) => w.id);
+
+        for (const memberId of memberIds) {
+          await teamService.removeMember(teamId, memberId);
+        }
+      }
+
+      setChecked(new Set());
+      await fetchData();
+    } catch (err) {
+      console.error("Erreur lors de la suppression des employés:", err);
+      alert("Impossible de supprimer les employés");
+    }
   };
 
   const toggleCheck = (wid: string) => {
@@ -128,7 +180,12 @@ export default function TeamView() {
     }
   };
 
-  const attendanceDays = attendanceWeek?.days ?? [];
+  const selectedDateLabel = selectedDate.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div className="min-h-screen bg-gray-100 p-8" aria-label="Page équipe">
@@ -162,7 +219,7 @@ export default function TeamView() {
       </div>
 
       {/* Loading & Error States */}
-      {loading && (
+      {loading && !attendanceWeek && (
         <div className="flex items-center justify-center py-8">
           <div className="text-gray-500">Chargement...</div>
         </div>
@@ -174,7 +231,7 @@ export default function TeamView() {
         </div>
       )}
 
-      {!loading && !error && (
+      {attendanceWeek && !error && (
         <>
           {/* Workforce Table */}
           <div className="bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
@@ -260,16 +317,23 @@ export default function TeamView() {
 
           {/* Attendance Panel */}
           <div className="mt-6 bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">Présences</h2>
-              <AttendanceDaySelector
-                days={attendanceDays}
-                selectedDay={selectedDay}
-                onSelect={setSelectedDay}
-              />
-            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Présences</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <AttendanceWeekNavigator
+              weekMonday={weekMonday}
+              selectedDate={selectedDate}
+              onSelect={setSelectedDate}
+            />
+
+            <p className="text-base font-semibold text-gray-600 first-letter:uppercase">
+              {selectedDateLabel}
+            </p>
+
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 gap-3 transition-opacity ${
+                isWeekLoaded ? "" : "opacity-50"
+              }`}
+            >
               {workers.map((worker) => {
                 const dayStatus = (attendanceWeek?.attendances[worker.id]?.[selectedDay] ||
                   "absent") as AttendanceStatus;
@@ -282,12 +346,12 @@ export default function TeamView() {
                     name={worker.name}
                     specialite={worker.specialite}
                     status={dayStatus}
-                    editable={true}
+                    editable={isWeekLoaded}
                     onStatusChange={async (newStatus) => {
                       try {
-                        const selectedDate = attendanceWeek?.dates[selectedDay];
+                        const attendanceDate = attendanceWeek?.dates[selectedDay];
 
-                        if (!selectedDate) {
+                        if (!attendanceDate) {
                           alert("Date non disponible");
                           return;
                         }
@@ -302,11 +366,11 @@ export default function TeamView() {
                         await teamService.updateAttendance(
                           worker.teamId,
                           worker.id,
-                          selectedDate,
+                          attendanceDate,
                           newStatus
                         );
 
-                        void fetchData(true);
+                        void fetchData();
                       } catch (err) {
                         console.error("Erreur lors de la mise à jour du statut:", err);
                         alert("Impossible de mettre à jour le statut");

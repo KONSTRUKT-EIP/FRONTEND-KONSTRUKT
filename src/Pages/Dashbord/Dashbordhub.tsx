@@ -2,6 +2,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import DashboardCard from "../../Components/Dashboard/DashbordCard/DashbordCard";
 import React, { useEffect, useState, useCallback } from 'react';
 import { teamService, TeamStats, ATTENDANCE_UPDATED_EVENT } from '../../services/teamService';
+import { siteService, SiteDetails, SiteWeather } from '../../services/siteService';
+import SiteOverview from '../../Components/Dashboard/SiteOverview/SiteOverview';
 
 const dashboards = [
   { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
@@ -44,10 +46,54 @@ export default function JobsiteHub() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [chantierName, setChantierName] = useState<string>("Chantier");
-  
+
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [site, setSite] = useState<SiteDetails | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [weather, setWeather] = useState<SiteWeather | null>(null);
+  const [weatherError, setWeatherError] = useState(false);
+
+  // Infos, photo et météo du chantier : chargées une fois, indépendamment des stats
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    let createdUrl: string | null = null;
+
+    siteService
+      .getSite(id)
+      .then((data) => {
+        if (!active) return;
+        setSite(data);
+        setChantierName(data.name);
+      })
+      .catch((err) => console.error('Erreur lors du chargement du chantier:', err));
+
+    siteService
+      .getPhotoUrl(id)
+      .then((url) => {
+        createdUrl = url;
+        if (active) setPhotoUrl(url);
+      })
+      .catch((err) => console.error('Erreur lors du chargement de la photo:', err));
+
+    siteService
+      .getWeather(id)
+      .then((data) => {
+        if (active) setWeather(data);
+      })
+      .catch((err) => {
+        console.error('Erreur lors du chargement de la météo:', err);
+        if (active) setWeatherError(true);
+      });
+
+    return () => {
+      active = false;
+      if (createdUrl) URL.revokeObjectURL(createdUrl);
+    };
+  }, [id]);
 
   const fetchStats = useCallback(async () => {
     if (!id) {
@@ -136,12 +182,23 @@ export default function JobsiteHub() {
           <span className="text-gray-400">/</span>
           <span className="text-gray-900 font-semibold">{chantierName}</span>
         </nav>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{chantierName}</h1>
-        <p className="text-sm text-gray-700 mt-1">Sélectionne un dashboard</p>
+        {site ? (
+          <SiteOverview
+            site={site}
+            photoUrl={photoUrl}
+            weather={weather}
+            weatherError={weatherError}
+            totalEmployees={stats ? totalEmployees : null}
+            presents={complete}
+          />
+        ) : (
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{chantierName}</h1>
+        )}
       </div>
 
-      <div className="flex gap-8 items-start">
-        <div className="flex flex-col gap-3 max-w-2xl w-full flex-shrink-0">
+      <div className="flex flex-col xl:flex-row gap-8 items-start">
+        <div className="flex flex-col gap-3 w-full xl:max-w-2xl flex-shrink-0">
+          <h2 className="text-xl font-bold text-gray-900">Lots</h2>
           {dashboards.map((db) => (
             <DashboardCard
               key={db.id}
@@ -151,7 +208,7 @@ export default function JobsiteHub() {
           ))}
         </div>
 
-          <div className="flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-200 flex flex-col gap-6">
+          <div className="w-full flex-1 min-w-0 bg-white rounded-2xl shadow p-6 border border-gray-200 flex flex-col gap-6">
           <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Statistiques / {chantierName}</h2>
             <div className="flex items-center gap-2">

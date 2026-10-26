@@ -6,7 +6,8 @@ interface ChantierCardProps {
   location: string;
   responsible: string;
   photo?: string;
-  onPhotoChange: (id: string, url: string) => void;
+  photoUploading?: boolean;
+  onPhotoChange: (id: string, file: File) => void;
   onClick: () => void;
 }
 
@@ -16,6 +17,7 @@ export default function ChantierCard({
   location,
   responsible,
   photo,
+  photoUploading = false,
   onPhotoChange,
   onClick,
 }: ChantierCardProps) {
@@ -27,8 +29,7 @@ export default function ChantierCard({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
-    onPhotoChange(id, url);
+    onPhotoChange(id, file);
 
     e.target.value = '';
   };
@@ -61,10 +62,18 @@ export default function ChantierCard({
           <span className="text-5xl opacity-30">🏗️</span>
         )}
 
+        {photoUploading && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-sm font-medium text-gray-700">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+            Enregistrement…
+          </div>
+        )}
+
         {/* Upload button */}
         <button
           onClick={handleUploadClick}
-          className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-xs text-gray-600 font-medium px-3 py-1.5 rounded-lg shadow hover:bg-white transition-colors flex items-center gap-1.5"
+          disabled={photoUploading}
+          className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-xs text-gray-600 font-medium px-3 py-1.5 rounded-lg shadow hover:bg-white transition-colors flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-wait"
         >
           <span>📷</span> {photo ? "Changer" : "Ajouter photo"}
         </button>
