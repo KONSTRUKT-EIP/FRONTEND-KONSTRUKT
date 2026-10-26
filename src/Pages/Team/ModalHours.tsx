@@ -1,22 +1,54 @@
 import React, { useState } from 'react'
-import InputCard from '../../Components/Team/InputCard'
-import TeamHours from '../../Components/Team/HoursCard'
+import InputCard from '../../Components/Dashboard/Team/InputCard'
+import TeamHours from '../../Components/Dashboard/Team/HoursCard'
+import { teamService } from '../../services/teamService'
 interface Worker {
   id: string;
+  teamId: string;
   name: string;
-  // A voir
 }
 
 interface ModalHoursTeamProps {
   worker: Worker;
+  siteId: string;
+  date: string;
+  initialNormalHours: number;
+  initialOvertimeHours: number;
+  onSaved: (normalHours: number, overtimeHours: number) => void;
   onClose: () => void;
 }
 
-export default function ModalHoursTeam({ worker: _worker, onClose }: ModalHoursTeamProps) {
-  const [heuresJour, setHeuresJour] = useState();
-  const [heuresSup, setHeuresSup] = useState();
+export default function ModalHoursTeam({ worker, siteId, date, initialNormalHours, initialOvertimeHours, onSaved, onClose }: ModalHoursTeamProps) {
+  const [heuresJour, setHeuresJour] = useState<number | ''>(initialNormalHours || '');
+  const [heuresSup, setHeuresSup] = useState<number | ''>(initialOvertimeHours || '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const total = (heuresJour ?? 0 )+ (heuresSup ?? 0);
+  const normalHours = Number(heuresJour || 0);
+  const overtimeHours = Number(heuresSup || 0);
+  const total = normalHours + overtimeHours;
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+
+      await teamService.saveWorkforceHours(
+        siteId,
+        worker.teamId,
+        worker.id,
+        date,
+        normalHours,
+        overtimeHours,
+      );
+      onSaved(normalHours, overtimeHours);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -50,19 +82,30 @@ export default function ModalHoursTeam({ worker: _worker, onClose }: ModalHoursT
 
         <div className='flex py-5 gap-3'>
           <TeamHours title={"Total journée"} hours={total ?? 0} description={"Aujourd'hui"}/>
-          <TeamHours title={"Heures normales"} hours={heuresJour ?? 0} description={"temps saisi"}/>
-          <TeamHours title={"Heure sup"} hours={heuresSup ?? 0} description={"Ajoutées aujourd'hui"}/>
+          <TeamHours title={"Heures normales"} hours={normalHours} description={"temps saisi"}/>
+          <TeamHours title={"Heure sup"} hours={overtimeHours} description={"Ajoutées aujourd'hui"}/>
         </div>
+
+        {error && (
+          <div className='mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600'>
+            {error}
+          </div>
+        )}
 
         <div className='flex justify-end'>
           <button
             onClick={onClose}
             className='bg-gray-100 hover:bg-gray-200 rounded-full mx-4 p-5 text-xl font-bold'
+            disabled={saving}
           >
             Annuler
           </button>
-          <button onClick={onClose} className='bg-orange-500 hover:bg-orange-600 rounded-full mx-4 p-5 text-xl text-white font-bold'>
-            Enregistrer
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className='bg-orange-500 hover:bg-orange-600 rounded-full mx-4 p-5 text-xl text-white font-bold disabled:opacity-60'
+          >
+            {saving ? 'Enregistrement...' : 'Enregistrer'}
           </button>
         </div>
       </div>

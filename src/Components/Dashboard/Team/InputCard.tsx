@@ -1,19 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 interface InputCard {
   title: string;
   description: string;
-  value?: number;
-  onChange?: (value: number) => void;
+  value?: number | '';
+  onChange?: (value: number | '') => void;
 }
 
 const InputCard: React.FC<InputCard> = ({ title, description, value, onChange }) => {
-  const [hours, setHours] = useState(value);
-
-  const HandleChange = (input: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(input.target.value);
-    setHours(val);
-    onChange?.(val);
+  const handleChange = (input: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = input.target.value;
+    onChange?.(rawValue === '' ? '' : Number(rawValue));
   }
 
   return (
@@ -21,11 +18,11 @@ const InputCard: React.FC<InputCard> = ({ title, description, value, onChange })
       <span className='gap-2 py-2 mx-2'>{title}</span>
       <input
         type="number"
-        value={hours}
+        value={value ?? ''}
         min={0}
-        onChange={HandleChange}
+        onChange={handleChange}
         placeholder="0"
-        className='bg-white border border-gray-300 rounded-2xl px-4 py-4 text-xl font-bold'
+        className='bg-white border border-gray-300 rounded-2xl px-4 py-4 text-xl font-bold placeholder:text-gray-400'
       />
       <span className='gap-2 py-2 mx-2'>{description}</span>
     </div>

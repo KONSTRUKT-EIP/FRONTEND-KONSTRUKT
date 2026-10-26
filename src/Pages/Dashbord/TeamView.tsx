@@ -16,6 +16,7 @@ import {
   ATTENDANCE_UPDATED_EVENT,
 } from "../../services/teamService";
 import AddMemberModal from "../../Components/Dashboard/Modal/AddMemberModal";
+import ModalHoursTeam from "../Team/ModalHours";
 
 const getMonday = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate() - ((date.getDay() + 6) % 7));
@@ -40,8 +41,13 @@ export default function TeamView() {
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
+<<<<<<< HEAD
   const [selectedDate, setSelectedDate] = useState<Date>(getDefaultAttendanceDate);
   const [loadedWeek, setLoadedWeek] = useState<string | null>(null);
+=======
+  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedWorkerForHours, setSelectedWorkerForHours] = useState<TeamMember | null>(null);
+>>>>>>> 77ae3ac80a6db9bb1ddba0cfbecea94057f47781
 
   const weekMonday = getMonday(selectedDate);
   const weekStart = toDateKey(weekMonday);
@@ -346,7 +352,12 @@ export default function TeamView() {
                     name={worker.name}
                     specialite={worker.specialite}
                     status={dayStatus}
+<<<<<<< HEAD
                     editable={isWeekLoaded}
+=======
+                    editable={true}
+                    onOpenHoursModal={() => setSelectedWorkerForHours(worker)}
+>>>>>>> 77ae3ac80a6db9bb1ddba0cfbecea94057f47781
                     onStatusChange={async (newStatus) => {
                       try {
                         const attendanceDate = attendanceWeek?.dates[selectedDay];
@@ -408,6 +419,32 @@ export default function TeamView() {
           onClose={() => setIsAddMemberModalOpen(false)}
           siteId={siteUUID}
           onSuccess={handleAddMemberSuccess}
+        />
+      )}
+
+      {siteUUID && selectedWorkerForHours && attendanceWeek?.dates[selectedDay] && (
+        <ModalHoursTeam
+          worker={selectedWorkerForHours}
+          siteId={siteUUID}
+          date={attendanceWeek.dates[selectedDay]}
+          initialNormalHours={attendanceWeek.workforceHours[selectedWorkerForHours.id]?.[selectedDay]?.normalHours ?? 0}
+          initialOvertimeHours={attendanceWeek.workforceHours[selectedWorkerForHours.id]?.[selectedDay]?.overtimeHours ?? 0}
+          onSaved={(normalHours, overtimeHours) => {
+            setAttendanceWeek((prev) => {
+              if (!prev) return prev;
+              const currentHours = prev.workforceHours[selectedWorkerForHours.id] ?? [];
+              const updatedHours = [...currentHours];
+              updatedHours[selectedDay] = { normalHours, overtimeHours };
+              return {
+                ...prev,
+                workforceHours: {
+                  ...prev.workforceHours,
+                  [selectedWorkerForHours.id]: updatedHours,
+                },
+              };
+            });
+          }}
+          onClose={() => setSelectedWorkerForHours(null)}
         />
       )}
     </div>
