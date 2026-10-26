@@ -11,7 +11,34 @@ interface AttendanceCardProps {
   onStatusChange?: (status: AttendanceStatus) => void;
   onOpenHoursModal?: () => void;
   editable?: boolean;
+  hours?: { normalHours: number; overtimeHours: number };
 }
+
+const formatHours = (value: number) =>
+  `${value.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} h`;
+
+// Heures travaillées du jour, avec les heures sup si il y en a
+const HoursSummary: React.FC<{ normalHours: number; overtimeHours: number }> = ({
+  normalHours,
+  overtimeHours,
+}) => {
+  const total = normalHours + overtimeHours;
+  return (
+    <div
+      className="flex flex-col items-end leading-tight"
+      title={`${formatHours(normalHours)} normales · ${formatHours(overtimeHours)} sup.`}
+    >
+      <span className={`text-base font-bold ${total > 0 ? 'text-gray-800' : 'text-gray-400'}`}>
+        {formatHours(total)}
+      </span>
+      {overtimeHours > 0 && (
+        <span className="text-xs font-semibold text-orange-600">
+          dont {formatHours(overtimeHours)} sup.
+        </span>
+      )}
+    </div>
+  );
+};
 
 const AttendanceCard: React.FC<AttendanceCardProps> = ({
   initials,
@@ -22,6 +49,7 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
   onStatusChange,
   onOpenHoursModal,
   editable = true,
+  hours,
 }) => (
   <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition">
     <div
@@ -34,6 +62,8 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
       <p className="text-lg font-semibold text-gray-800 truncate">{name}</p>
       <p className="text-base font-medium text-gray-800">{specialite}</p>
     </div>
+
+    {hours && <HoursSummary {...hours} />}
 
     {editable && (
       <div className="flex items-center gap-2">
