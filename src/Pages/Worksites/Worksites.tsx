@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChantierCard from '../../Components/Dashboard/JobsitCard/JobsitCard';
 import type { Chantier } from '../Dashbord/JobsitList';
+import { useSitePhotos } from '../../hooks/useSitePhotos';
 
 const ORGANIZATION_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -13,6 +14,7 @@ interface SiteApi {
   address?: string;
   responsible?: string;
   manager?: string;
+  photo?: { updatedAt: string } | null;
 }
 
 const emptyForm = {
@@ -52,6 +54,7 @@ const Worksites: React.FC = () => {
             name: s.name,
             location: s.city ? `${s.city}${s.postalCode ? ', ' + s.postalCode : ''}` : (s.address ?? ''),
             responsible: s.responsible ?? s.manager ?? '',
+            hasPhoto: Boolean(s.photo),
           }));
           setChantiers(mapped);
         } else {
@@ -66,9 +69,7 @@ const Worksites: React.FC = () => {
     fetchSites();
   }, []);
 
-  const handlePhotoChange = (id: string, url: string) => {
-    setChantiers(prev => prev.map(c => c.id === id ? { ...c, photo: url } : c));
-  };
+  const { photos, uploading, uploadPhoto } = useSitePhotos(chantiers);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,7 +176,9 @@ const Worksites: React.FC = () => {
               <ChantierCard
                 key={chantier.id}
                 {...chantier}
-                onPhotoChange={handlePhotoChange}
+                photo={photos[chantier.id]}
+                photoUploading={uploading[chantier.id]}
+                onPhotoChange={uploadPhoto}
                 onClick={() => navigate(`/dashboard/${chantier.id}`)}
               />
             ))}

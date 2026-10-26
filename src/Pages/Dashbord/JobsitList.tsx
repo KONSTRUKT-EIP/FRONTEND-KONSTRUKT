@@ -2,13 +2,14 @@ import { useState, useEffect, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import ChantierCard from "../../Components/Dashboard/JobsitCard/JobsitCard";
 import React from 'react';
+import { useSitePhotos } from "../../hooks/useSitePhotos";
 
 export interface Chantier {
   id: string;
   name: string;
   location: string;
   responsible: string;
-  photo?: string;
+  hasPhoto?: boolean;
 }
 
 interface SiteApi {
@@ -19,6 +20,7 @@ interface SiteApi {
   address?: string;
   responsible?: string;
   manager?: string;
+  photo?: { updatedAt: string } | null;
 }
 
 export default function JobsitList() {
@@ -42,6 +44,7 @@ export default function JobsitList() {
             name: s.name,
             location: s.city ? `${s.city}${s.postalCode ? ', ' + s.postalCode : ''}` : (s.address ?? ''),
             responsible: s.responsible ?? s.manager ?? '',
+            hasPhoto: Boolean(s.photo),
           }));
           setChantiers(mapped);
         } else {
@@ -56,11 +59,7 @@ export default function JobsitList() {
     fetchSites();
   }, []);
 
-  const handlePhotoChange = (id: string, url: string) => {
-    setChantiers((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, photo: url } : c))
-    );
-  };
+  const { photos, uploading, uploadPhoto } = useSitePhotos(chantiers);
 
   return (
     <main className="min-h-screen bg-gray-100" role="main" aria-label="Liste des chantiers">
@@ -98,7 +97,9 @@ export default function JobsitList() {
                 <ChantierCard
                   key={chantier.id}
                   {...chantier}
-                  onPhotoChange={handlePhotoChange}
+                  photo={photos[chantier.id]}
+                  photoUploading={uploading[chantier.id]}
+                  onPhotoChange={uploadPhoto}
                   onClick={() => navigate(`/dashboard/${chantier.id}`)}
                 />
               ))}
