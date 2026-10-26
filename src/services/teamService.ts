@@ -119,6 +119,17 @@ export const teamService = {
     return Array.isArray(result) ? result : result.data || [];
   },
 
+  async removeMember(teamId: string, userId: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/teams/${teamId}/members/${userId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || 'Failed to remove member');
+    }
+  },
+
   async addMemberToTeam(teamId: string, userId: string, role?: string): Promise<AddMemberResponse> {
     const response = await fetch(`${API_BASE}/teams/${teamId}/members`, {
       method: 'POST',

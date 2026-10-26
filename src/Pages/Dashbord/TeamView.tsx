@@ -253,6 +253,15 @@ export default function TeamView() {
                   />
                 </div>
 
+                {checked.size > 0 && (
+                  <button
+                    onClick={handleDeleteMembers}
+                    className="flex items-center gap-1 px-5 py-2.5 bg-red-500 text-white text-base font-semibold rounded-full hover:bg-red-600 transition"
+                  >
+                    Supprimer ({checked.size})
+                  </button>
+                )}
+
                 <button
                   onClick={() => setIsAddMemberModalOpen(true)}
                   className="flex items-center gap-1 px-5 py-2.5 bg-orange-500 text-white text-base font-semibold rounded-full hover:bg-orange-600 transition"
