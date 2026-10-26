@@ -81,25 +81,23 @@ export default function DashboardArmature() {
   const endDate = "2026-02-11";
   const [orders, setOrders] = useState<Order[]>([]);
 
+  // Les erreurs sont remontées à la modale pour être affichées à l'utilisateur
   const handleCreateOrder = async (payload: CreateOrderPayload) => {
-    try {
-      const token = localStorage.getItem("access_token");
-      const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
-      console.log("send");
-      if (!res.ok)
-        throw new Error(`Erreur ${res.status}`);
-      const { orders: newOrders }: { orders: Order[] } = await res.json();
-      setOrders((prev) => [...prev, ...newOrders]);
-    } catch (err: unknown) {
-      console.error("Erreur création commande :", err);
+    const token = localStorage.getItem("access_token");
+    const res = await fetch("http://localhost:3000/dashboard/armature/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || `Erreur ${res.status}`);
     }
+    const { orders: newOrders }: { orders: Order[] } = await res.json();
+    setOrders((prev) => [...newOrders, ...prev]);
   };
 
   useEffect(() => {
