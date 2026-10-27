@@ -9,7 +9,8 @@ export function Field({
   required = false, 
   placeholder,
   min,
-  max
+  max,
+  step
 }: { 
   label: string; 
   name: string; 
@@ -20,6 +21,7 @@ export function Field({
   placeholder?: string;
   min?: string | number;
   max?: string | number;
+  step?: string | number;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -35,6 +37,7 @@ export function Field({
         placeholder={placeholder}
         min={min ?? (type === "number" ? 0 : undefined)}
         max={max}
+        step={step}
         className="border border-gray-200 rounded-lg px-3 py-2 text-base text-gray-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
       />
     </div>

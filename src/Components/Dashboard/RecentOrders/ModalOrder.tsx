@@ -22,15 +22,26 @@ const emptyForm = {
   productIcon: "",
   price: "",
   totalOrder: "",
-  total: "",
 };
 
 export default function CreateOrderModal({ isOpen, siteId,onClose, onSubmit }: CreateOrderModalProps) {
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen)
     return null;
+
+  const total = Number(form.price) * Number(form.totalOrder);
+  const formattedTotal = Number.isFinite(total)
+    ? total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })
+    : "—";
+
+  const handleClose = () => {
+    setForm(emptyForm);
+    setError(null);
+    onClose();
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -38,44 +49,35 @@ export default function CreateOrderModal({ isOpen, siteId,onClose, onSubmit }: C
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  console.log('[handleSubmit] Début de la soumission');
-  console.log('[handleSubmit] Form data brut:', form);
   if (!siteId) {
-    console.error("Aucun siteId fourni");
+    setError("Chantier introuvable, recharge la page.");
     return;
   }
-  setLoading(true);
 
   const payload = {
     siteId,
-    productName: form.productName,
+    productName: form.productName.trim(),
     productIcon: form.productIcon || undefined,
     price: Number(form.price),
     totalOrder: Number(form.totalOrder),
-    total: Number(form.total),
+    total,
   };
 
-  console.log('[handleSubmit] Payload envoyé à onSubmit:', payload);
-
-  // Vérif des valeurs numériques (NaN fréquent avec Number() sur un champ vide)
-  if (Number.isNaN(payload.price) || Number.isNaN(payload.totalOrder) || Number.isNaN(payload.total)) {
-    console.warn('[handleSubmit] Attention: une valeur numérique est NaN', {
-      price: payload.price,
-      totalOrder: payload.totalOrder,
-      total: payload.total,
-    });
+  if (!Number.isInteger(payload.totalOrder) || payload.totalOrder < 1) {
+    setError("La quantité doit être un nombre entier d'au moins 1.");
+    return;
   }
 
+  setLoading(true);
+  setError(null);
   try {
     await onSubmit(payload);
-    console.log('[handleSubmit] onSubmit terminé avec succès');
-  } catch (error) {
-    console.error('[handleSubmit] Erreur pendant onSubmit:', error);
+    handleClose();
+  } catch (err) {
+    // La modale reste ouverte pour que l'utilisateur puisse corriger sans tout ressaisir
+    setError(err instanceof Error ? err.message : "Impossible de créer la commande.");
   } finally {
-    setForm(emptyForm);
     setLoading(false);
-    onClose();
-    console.log('[handleSubmit] Fin: form réinitialisé, loading=false, modal fermée');
   }
 };
 
@@ -84,7 +86,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       {/* BackGround */}
       <div
         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Modal */}
@@ -94,9 +96,11 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Créer une commande</h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
+              aria-label="Fermer"
               className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
             >
+              ✕
             </button>
           </div>
 
@@ -105,16 +109,25 @@ const handleSubmit = async (e: React.FormEvent) => {
             <Field label="Nom du produit" name="productName" value={form.productName} onChange={handleChange} required />
             <Field label="Icône produit (URL)" name="productIcon" value={form.productIcon} onChange={handleChange} />
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Prix (€)" name="price" type="number" value={form.price} onChange={handleChange} required />
-              <Field label="Total Order" name="totalOrder" type="number" value={form.totalOrder} onChange={handleChange} required />
+              <Field label="Prix unitaire (€)" name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required />
+              <Field label="Quantité" name="totalOrder" type="number" min={1} step={1} value={form.totalOrder} onChange={handleChange} required />
             </div>
-            <Field label="Total (€)" name="total" type="number" value={form.total} onChange={handleChange} required />
+            <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
+              <span className="text-sm font-medium text-gray-600">Total</span>
+              <span className="text-lg font-bold text-gray-900">{formattedTotal}</span>
+            </div>
+
+            {error && (
+              <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                {error}
+              </p>
+            )}
 
             {/* Actions */}
             <div className="flex justify-end gap-3 mt-2">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-4 py-2 text-xl text-gray-500 hover:text-gray-700 transition-colors"
               >
                 Annuler
