@@ -55,6 +55,7 @@ export default function PlanReception() {
   const { id = '' } = useParams<{ id: string }>();
   const [siteName, setSiteName] = useState('Chargement du chantier…');
   const [records, setRecords] = useState<PlanReceptionRecord[]>([]);
+  const [currentTime, setCurrentTime] = useState(0);
   const [filter, setFilter] = useState<PlanFilter>('ALL');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -64,22 +65,42 @@ export default function PlanReception() {
   const [initialValues, setInitialValues] = useState<PlanReceptionFormValues | undefined>();
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
-  const loadData = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const [site, plans] = await Promise.all([siteService.getSite(id), planReceptionService.list(id)]);
-      setSiteName(site.name);
-      setRecords(plans);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Impossible de charger le suivi des plans.');
-    } finally {
-      setLoading(false);
-    }
+  const fetchPageData = useCallback(async () => {
+    const [site, plans] = await Promise.all([siteService.getSite(id), planReceptionService.list(id)]);
+    return { siteName: site.name, plans, currentTime: Date.now() };
   }, [id]);
 
-  useEffect(() => { void loadData(); }, [loadData]);
+  useEffect(() => {
+    let active = true;
+    fetchPageData()
+      .then(data => {
+        if (!active) return;
+        setSiteName(data.siteName);
+        setRecords(data.plans);
+        setCurrentTime(data.currentTime);
+        setError(null);
+      })
+      .catch(loadError => {
+        if (active) setError(loadError instanceof Error ? loadError.message : 'Impossible de charger le suivi des plans.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
+  }, [fetchPageData]);
+
+  const refreshData = () => {
+    setLoading(true);
+    fetchPageData()
+      .then(data => {
+        setSiteName(data.siteName);
+        setRecords(data.plans);
+        setCurrentTime(data.currentTime);
+        setError(null);
+      })
+      .catch(loadError => setError(loadError instanceof Error ? loadError.message : 'Impossible de charger le suivi des plans.'))
+      .finally(() => setLoading(false));
+  };
 
   const rows = useMemo(() => groupRecords(records), [records]);
   const visibleRows = useMemo(() => rows.filter(row => {
@@ -93,7 +114,7 @@ export default function PlanReception() {
   const toRework = records.filter(record => record.status === 'REVISION_REQUIRED');
   const upcomingCount = records.filter(record => record.status === 'DUE_WITHIN_14_DAYS').length;
   const nextPour = records
-    .filter(record => record.forDate && new Date(`${record.forDate}T00:00:00`).getTime() >= Date.now())
+    .filter(record => record.forDate && new Date(`${record.forDate}T00:00:00`).getTime() >= currentTime)
     .sort((left, right) => left.forDate.localeCompare(right.forDate))[0];
 
   const openNewModal = () => {
@@ -152,7 +173,7 @@ export default function PlanReception() {
             </div>
           </header>
 
-          {error && <section role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><span>{error}</span><button type="button" onClick={() => void loadData()} className="font-semibold underline">Réessayer</button></section>}
+          {error && <section role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><span>{error}</span><button type="button" onClick={refreshData} className="font-semibold underline">Réessayer</button></section>}
 
           <section aria-label="Indicateurs de réception" className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <KpiCard label="Plans reçus" value={String(receivedCount)} detail={`sur ${records.length} réception${records.length > 1 ? 's' : ''} enregistrée${records.length > 1 ? 's' : ''}`} accent="text-slate-900" badge={records.length ? `${Math.round(receivedCount / records.length * 100)} %` : '0 %'} />
@@ -168,12 +189,22 @@ export default function PlanReception() {
 
           <section className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
             <div><h2 className="text-xs font-bold text-slate-900">Suivi enregistré</h2><p className="mt-1 text-[10px] text-slate-600">Les réceptions sont enregistrées dans le tableau générique associé au chantier.</p></div>
-            <button type="button" onClick={() => void loadData()} className="rounded-md border border-slate-300 px-3 py-2 text-[10px] font-semibold text-slate-700 hover:bg-slate-50">Actualiser</button>
+            <button type="button" onClick={refreshData} className="rounded-md border border-slate-300 px-3 py-2 text-[10px] font-semibold text-slate-700 hover:bg-slate-50">Actualiser</button>
           </section>
         </div>
       </div>
 
-      <ReceptionFormModal open={modalOpen} siteName={siteName} initialValues={initialValues} isEditing={Boolean(editingRecordId)} saving={saving} onClose={() => setModalOpen(false)} onSubmit={handleSave} />
+      {modalOpen && initialValues && (
+        <ReceptionFormModal
+          key={editingRecordId ?? 'new-reception'}
+          siteName={siteName}
+          initialValues={initialValues}
+          isEditing={Boolean(editingRecordId)}
+          saving={saving}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleSave}
+        />
+      )}
     </main>
   );
 }

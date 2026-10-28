@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   EMPTY_RECEPTION_FORM,
   PLAN_STATUSES,
@@ -7,9 +7,8 @@ import {
 } from '../../../Pages/Worksites/planReception.types';
 
 interface ReceptionFormModalProps {
-  open: boolean;
   siteName: string;
-  initialValues?: PlanReceptionFormValues;
+  initialValues: PlanReceptionFormValues;
   isEditing: boolean;
   saving: boolean;
   onClose: () => void;
@@ -17,7 +16,6 @@ interface ReceptionFormModalProps {
 }
 
 export default function ReceptionFormModal({
-  open,
   siteName,
   initialValues,
   isEditing,
@@ -25,17 +23,8 @@ export default function ReceptionFormModal({
   onClose,
   onSubmit,
 }: ReceptionFormModalProps) {
-  const [values, setValues] = useState<PlanReceptionFormValues>(EMPTY_RECEPTION_FORM);
+  const [values, setValues] = useState<PlanReceptionFormValues>(() => initialValues ?? EMPTY_RECEPTION_FORM);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (open) {
-      setValues(initialValues ?? EMPTY_RECEPTION_FORM);
-      setError(null);
-    }
-  }, [open, initialValues]);
-
-  if (!open) return null;
 
   const update = <K extends keyof PlanReceptionFormValues>(key: K, value: PlanReceptionFormValues[K]) => {
     setValues(current => ({ ...current, [key]: value }));
