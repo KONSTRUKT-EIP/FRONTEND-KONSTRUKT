@@ -14,6 +14,7 @@ const DashboardArmature = lazy(() => import('./Pages/Dashbord/Dashbord'));
 const TeamView = lazy(() => import('./Pages/Dashbord/TeamView'));
 const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
 const JobsitHub = lazy(() => import("./Pages/Dashbord/Dashbordhub"));
+const PlanReception = lazy(() => import('./Pages/Worksites/PlanReception'));
 const About = lazy(() => import('./Pages/About/About'));
 const Pricing = lazy(() => import('./Pages/Pricing/Pricing'));
 
@@ -39,6 +40,7 @@ const App: React.FC = () => (
       {/* Routes protégées */}
       <Route path="/dashboard" element={<ProtectedRoute><JobsitList /></ProtectedRoute>} />
       <Route path="/dashboard/:id" element={<ProtectedRoute><JobsitHub /></ProtectedRoute>} />
+      <Route path="/dashboard/:id/reception-plans" element={<ProtectedRoute><PlanReception /></ProtectedRoute>} />
       <Route path="/dashboard/:id/equipe" element={<ProtectedRoute><TeamView /></ProtectedRoute>} />
       <Route path="/dashboard/:id/:dbId" element={<ProtectedRoute><DashboardArmature /></ProtectedRoute>} />
       <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
