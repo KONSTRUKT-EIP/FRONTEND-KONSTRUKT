@@ -15,6 +15,15 @@ const Administration: React.FC = () => {
 
         <section className="mt-8 grid gap-5 md:grid-cols-2" aria-label="Outils d’administration">
           <Link
+            to="/administration/users"
+            className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-orange-400 hover:shadow-md"
+          >
+            <span className="text-lg font-semibold text-gray-900">Utilisateurs</span>
+            <span className="mt-2 block text-sm text-gray-600">
+              Gérez les rôles, les accès et les affectations aux chantiers.
+            </span>
+          </Link>
+          <Link
             to="/administration/invitations"
             className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-orange-400 hover:shadow-md"
           >
