@@ -29,6 +29,7 @@ const Navbar: React.FC = () => {
               <NavLinkItem label="Météo & Alertes" to="/weather" />
               <NavLinkItem label="Chantiers" to="/worksites" />
               <NavLinkItem label="Planning" to="/planning" />
+              <NavLinkItem label="Administration" to="/administration" />
               <NavLinkItem label="Paramètres" to="/settings" />
             </>
           ) : (

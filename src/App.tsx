@@ -10,6 +10,7 @@ const Weather = lazy(() => import('./Pages/Weather/Weather'));
 const Worksites = lazy(() => import('./Pages/Worksites/Worksites'));
 const Planning = lazy(() => import('./Pages/Planning/Planning'));
 const Settings = lazy(() => import('./Pages/Settings/Settings'));
+const Administration = lazy(() => import('./Pages/Administration/Administration'));
 const DashboardArmature = lazy(() => import('./Pages/Dashbord/Dashbord'));
 const TeamView = lazy(() => import('./Pages/Dashbord/TeamView'));
 const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
@@ -48,8 +49,10 @@ const App: React.FC = () => (
       <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
       <Route path="/worksites" element={<ProtectedRoute><Worksites /></ProtectedRoute>} />
       <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
+      <Route path="/administration" element={<ProtectedRoute><Administration /></ProtectedRoute>} />
+      <Route path="/administration/invitations" element={<ProtectedRoute><InvitationAdministration /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="/settings/invitations" element={<ProtectedRoute><InvitationAdministration /></ProtectedRoute>} />
+      <Route path="/settings/invitations" element={<Navigate to="/administration/invitations" replace />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
