@@ -21,6 +21,12 @@ export type Invitation = {
   site: { id: string; name: string; city: string };
 };
 
+export type InvitationSite = {
+  id: string;
+  name: string;
+  city?: string;
+};
+
 function getHeaders() {
   const token = localStorage.getItem('access_token');
   return {
@@ -51,7 +57,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const invitationService = {
+  sites: () => request<InvitationSite[]>('/sites'),
   list: () => request<Invitation[]>('/invitations'),
+  create: (siteId: string, email: string, role: string) =>
+    request<{ invitation: Invitation }>(`/sites/${siteId}/invitations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, role }),
+    }),
   resend: (id: string) =>
     request<{ invitation: Invitation }>(`/invitations/${id}/resend`, {
       method: 'POST',

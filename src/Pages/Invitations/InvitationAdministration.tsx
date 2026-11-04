@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   invitationService,
   Invitation,
+  InvitationSite,
   InvitationStatus,
 } from '../../services/invitationService';
 
@@ -39,9 +40,15 @@ function formatDate(value: string | null) {
 
 export default function InvitationAdministration() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [sites, setSites] = useState<InvitationSite[]>([]);
+  const [email, setEmail] = useState('');
+  const [siteId, setSiteId] = useState('');
+  const [role, setRole] = useState('COLLABORATEUR');
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const [actionError, setActionError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [activeAction, setActiveAction] = useState('');
 
   const loadInvitations = async () => {
@@ -62,11 +69,50 @@ export default function InvitationAdministration() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      void loadInvitations();
+      void Promise.all([invitationService.list(), invitationService.sites()])
+        .then(([loadedInvitations, loadedSites]) => {
+          setInvitations(loadedInvitations);
+          setSites(loadedSites);
+          setSiteId((currentSiteId) => currentSiteId || loadedSites[0]?.id || '');
+        })
+        .catch((loadError: unknown) => {
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : 'Impossible de charger les invitations.',
+          );
+        })
+        .finally(() => setLoading(false));
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
   }, []);
+
+  const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!siteId) {
+      setActionError('Sélectionnez un chantier avant d’envoyer l’invitation.');
+      return;
+    }
+
+    setCreating(true);
+    setActionError('');
+    setSuccessMessage('');
+    try {
+      await invitationService.create(siteId, email, role);
+      setEmail('');
+      setSuccessMessage('Invitation envoyée avec succès.');
+      await loadInvitations();
+    } catch (createError) {
+      setActionError(
+        createError instanceof Error
+          ? createError.message
+          : 'Impossible d’envoyer l’invitation.',
+      );
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const runAction = async (id: string, action: 'resend' | 'cancel') => {
     if (action === 'cancel' && !window.confirm('Annuler cette invitation ?')) {
@@ -126,6 +172,65 @@ export default function InvitationAdministration() {
             {actionError}
           </div>
         )}
+        {successMessage && (
+          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800" role="status">
+            {successMessage}
+          </div>
+        )}
+
+        <section className="mb-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-slate-950">Inviter un collaborateur</h2>
+            <p className="mt-1 text-sm text-slate-500">Un email d’activation sera envoyé à cette adresse.</p>
+          </div>
+          <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
+            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+              Adresse e-mail
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="collaborateur@entreprise.fr"
+                className="rounded-lg border border-slate-300 px-3 py-2.5 font-normal outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+              Chantier
+              <select
+                required
+                value={siteId}
+                onChange={(event) => setSiteId(event.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+              >
+                <option value="">Sélectionner</option>
+                {sites.map((site) => (
+                  <option key={site.id} value={site.id}>{site.name}</option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+              Rôle
+              <select
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+              >
+                <option value="COLLABORATEUR">Collaborateur</option>
+                <option value="CHEF_PROJET">Chef de projet</option>
+                <option value="CONDUCTEUR_TRAVAUX">Conducteur de travaux</option>
+                <option value="CLIENT">Client</option>
+              </select>
+            </label>
+            <button
+              type="submit"
+              disabled={creating || loading || sites.length === 0}
+              className="rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {creating ? 'Envoi...' : 'Inviter'}
+            </button>
+          </form>
+        </section>
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-label="Liste des invitations">
           {loading ? (
