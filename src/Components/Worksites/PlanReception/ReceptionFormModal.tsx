@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   EMPTY_RECEPTION_FORM,
   PLAN_STATUSES,
@@ -13,6 +13,7 @@ interface ReceptionFormModalProps {
   saving: boolean;
   onClose: () => void;
   onSubmit: (values: PlanReceptionFormValues) => Promise<void>;
+  onDelete?: () => Promise<void>;
 }
 
 export default function ReceptionFormModal({
@@ -22,9 +23,24 @@ export default function ReceptionFormModal({
   saving,
   onClose,
   onSubmit,
+  onDelete,
 }: ReceptionFormModalProps) {
   const [values, setValues] = useState<PlanReceptionFormValues>(() => initialValues ?? EMPTY_RECEPTION_FORM);
   const [error, setError] = useState<string | null>(null);
+  const plannedDateInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) return;
+    const input = plannedDateInput.current;
+    if (!input) return;
+
+    input.focus();
+    try {
+      (input as HTMLInputElement & { showPicker?: () => void }).showPicker?.();
+    } catch {
+      // Some browsers only allow opening the native picker after direct interaction.
+    }
+  }, [isEditing]);
 
   const update = <K extends keyof PlanReceptionFormValues>(key: K, value: PlanReceptionFormValues[K]) => {
     setValues(current => ({ ...current, [key]: value }));
@@ -37,6 +53,15 @@ export default function ReceptionFormModal({
       await onSubmit(values);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Impossible d’enregistrer la réception.');
+    }
+  };
+
+  const handleDelete = async () => {
+    setError(null);
+    try {
+      await onDelete?.();
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Impossible de supprimer cette réception.');
     }
   };
 
@@ -64,7 +89,7 @@ export default function ReceptionFormModal({
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-medium text-slate-700 sm:col-span-2">
               Élément / zone
-                <input required autoFocus disabled={saving} value={values.elementName} onChange={event => update('elementName', event.target.value)} placeholder="Ex. Fondations Bât A" className={inputClass} />
+                <input required disabled={saving} value={values.elementName} onChange={event => update('elementName', event.target.value)} placeholder="Ex. Fondations Bât A" className={inputClass} />
             </label>
             <label className="text-sm font-medium text-slate-700">
               Type de plan
@@ -74,7 +99,7 @@ export default function ReceptionFormModal({
             </label>
             <label className="text-sm font-medium text-slate-700">
               Date de réception / échéance
-              <input required type="date" disabled={saving} value={values.plannedDate} onChange={event => update('plannedDate', event.target.value)} className={inputClass} />
+              <input ref={plannedDateInput} required type="date" disabled={saving} value={values.plannedDate} onChange={event => update('plannedDate', event.target.value)} className={inputClass} />
             </label>
             <label className="text-sm font-medium text-slate-700">
               Statut
@@ -92,11 +117,18 @@ export default function ReceptionFormModal({
             </label>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
+          <div className="flex flex-wrap justify-between gap-3 border-t border-slate-100 pt-5">
+            <div>
+              {isEditing && onDelete && (
+                <button type="button" disabled={saving} onClick={handleDelete} className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50">Supprimer</button>
+              )}
+            </div>
+            <div className="flex gap-3">
             <button type="button" disabled={saving} onClick={onClose} className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">Annuler</button>
             <button type="submit" disabled={saving} className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 disabled:cursor-wait disabled:opacity-60">
               {saving ? 'Enregistrement…' : isEditing ? 'Enregistrer les modifications' : 'Ajouter le plan'}
             </button>
+            </div>
           </div>
         </form>
       </section>

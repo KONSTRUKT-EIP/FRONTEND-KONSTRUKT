@@ -156,4 +156,15 @@ export const planReceptionService = {
     if (!record) throw new Error('Le backend a renvoyé une réception de plan invalide.');
     return record;
   },
+
+  async delete(recordId: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/dashboard/tables/rows/${recordId}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null) as { message?: string } | null;
+      throw new Error(payload?.message || `Erreur API (${response.status})`);
+    }
+  },
 };

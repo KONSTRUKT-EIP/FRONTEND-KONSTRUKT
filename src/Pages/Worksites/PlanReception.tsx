@@ -4,6 +4,7 @@ import KpiCard from '../../Components/Planning/PlanReception/KpiCard';
 import SiteSectionNav from '../../Components/Dashboard/SiteSectionNav';
 import PlanReceptionTable from '../../Components/Worksites/PlanReception/PlanReceptionTable';
 import PlanReceptionToolbar from '../../Components/Worksites/PlanReception/PlanReceptionToolbar';
+import PlanReceptionChart from '../../Components/Worksites/PlanReception/PlanReceptionChart';
 import ReceptionFormModal from '../../Components/Worksites/PlanReception/ReceptionFormModal';
 import { planReceptionService } from '../../services/planReceptionService';
 import { siteService } from '../../services/siteService';
@@ -56,6 +57,7 @@ export default function PlanReception() {
   const [siteName, setSiteName] = useState('Chargement du chantier…');
   const [records, setRecords] = useState<PlanReceptionRecord[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
+  const [view, setView] = useState<'CHART' | 'TABLE'>('TABLE');
   const [filter, setFilter] = useState<PlanFilter>('ALL');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -152,6 +154,19 @@ export default function PlanReception() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!editingRecordId) return;
+    if (!window.confirm('Supprimer définitivement cette réception de plan ?')) return;
+    setSaving(true);
+    try {
+      await planReceptionService.delete(editingRecordId);
+      setRecords(current => current.filter(record => record.id !== editingRecordId));
+      setModalOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-375 flex-col gap-5 lg:flex-row lg:items-start">
@@ -161,7 +176,7 @@ export default function PlanReception() {
             <div>
               <nav aria-label="Fil d’Ariane" className="mb-2 flex items-center gap-2 text-xs text-slate-500">
                 <Link to="/dashboard" className="hover:text-blue-700">Tous les chantiers</Link>
-                <span>/</span><span>{siteName}</span><span>/</span>
+                <span>/</span><Link to={`/dashboard/${id}`} className="hover:text-blue-700">{siteName}</Link><span>/</span>
                 <span className="font-semibold text-slate-800">Réception des plans</span>
               </nav>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">Réception des plans</h1>
@@ -169,7 +184,6 @@ export default function PlanReception() {
             </div>
             <div className="flex gap-2">
               <button type="button" onClick={openNewModal} className="rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-800"><span aria-hidden="true" className="mr-1">＋</span> Déclarer une réception</button>
-              <button type="button" onClick={() => window.print()} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50">↓ <span className="ml-1">Exporter</span></button>
             </div>
           </header>
 
@@ -184,13 +198,9 @@ export default function PlanReception() {
 
           {toRework.length > 0 && <section aria-label="Alertes de plans" className="mb-4 rounded-lg border border-orange-300 bg-orange-50 px-4 py-3 text-xs text-orange-900"><p className="font-semibold"><span className="mr-2" aria-hidden="true">⚠</span>{toRework.length} plan{toRework.length > 1 ? 's' : ''} à reprendre</p>{toRework.map(record => <p key={record.id} className="mt-1 pl-5">{record.elementName} — {record.planType} ({formatDate(record.plannedDate)})</p>)}</section>}
 
-          <PlanReceptionToolbar filter={filter} search={search} onFilterChange={setFilter} onSearchChange={setSearch} />
-          {loading ? <div className="rounded-xl border border-slate-200 bg-white py-16 text-center text-sm text-slate-500">Chargement du suivi des plans…</div> : <PlanReceptionTable rows={visibleRows} totalRows={rows.length} onEdit={openEditModal} />}
+          <PlanReceptionToolbar view={view} onViewChange={setView} filter={filter} search={search} onFilterChange={setFilter} onSearchChange={setSearch} />
+          {loading ? <div className="rounded-xl border border-slate-200 bg-white py-16 text-center text-sm text-slate-500">Chargement du suivi des plans…</div> : view === 'CHART' ? <PlanReceptionChart records={records} /> : <PlanReceptionTable rows={visibleRows} totalRows={rows.length} onEdit={openEditModal} />}
 
-          <section className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <div><h2 className="text-xs font-bold text-slate-900">Suivi enregistré</h2><p className="mt-1 text-[10px] text-slate-600">Les réceptions sont enregistrées dans le tableau générique associé au chantier.</p></div>
-            <button type="button" onClick={refreshData} className="rounded-md border border-slate-300 px-3 py-2 text-[10px] font-semibold text-slate-700 hover:bg-slate-50">Actualiser</button>
-          </section>
         </div>
       </div>
 
@@ -203,6 +213,7 @@ export default function PlanReception() {
           saving={saving}
           onClose={() => setModalOpen(false)}
           onSubmit={handleSave}
+          onDelete={editingRecordId ? handleDelete : undefined}
         />
       )}
     </main>

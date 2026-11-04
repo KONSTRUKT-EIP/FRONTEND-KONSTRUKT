@@ -2,7 +2,7 @@
 
 ## Objectif
 
-La page **Réception des plans** suit, pour chaque chantier, les réceptions et les échéances des plans. Elle permet de consulter les indicateurs, rechercher et filtrer le tableau, ajouter une réception et modifier une réception en cliquant sur sa cellule.
+La page **Réception des plans** suit, pour chaque chantier, les réceptions et les échéances des plans. Elle permet de consulter les indicateurs, basculer entre le tableau et un graphique des réceptions par statut, rechercher et filtrer le tableau, ajouter une réception et modifier une réception en cliquant sur sa cellule. Cliquer sur une cellule vide du tableau ouvre le formulaire d’ajout avec le calendrier de date de réception ouvert automatiquement lorsque le navigateur le permet. Le nom du chantier dans le fil d’Ariane ramène à sa page d’ensemble.
 
 La navigation du chantier est assurée par `SiteSectionNav`. La route de la page est `/dashboard/:id/reception-plans`, où `id` correspond à l’UUID du chantier.
 
@@ -12,14 +12,23 @@ La navigation du chantier est assurée par `SiteSectionNav`. La route de la page
 | --- | --- |
 | `src/Pages/Worksites/PlanReception.tsx` | Orchestration de la page : chargement, regroupement, filtres, calcul des KPI, gestion des erreurs et des modales. |
 | `src/Pages/Worksites/planReception.types.ts` | Types métier, valeurs d’enum, valeurs du formulaire et filtres. Les identifiants sont en anglais. |
-| `src/Components/Worksites/PlanReception/PlanReceptionTable.tsx` | Tableau des plans, légende des statuts, compteurs et interaction de modification des cellules. |
-| `src/Components/Worksites/PlanReception/ReceptionFormModal.tsx` | Formulaire partagé pour créer ou modifier une réception, validation HTML et affichage des erreurs API. |
-| `src/Components/Worksites/PlanReception/PlanReceptionToolbar.tsx` | Recherche et filtres par statut. |
+| `src/Components/Worksites/PlanReception/PlanReceptionTable.tsx` | Tableau des plans, légende des statuts, compteurs et interaction sur les cellules. Une cellule vide lance l’ajout du type de plan correspondant ; une cellule remplie lance sa modification. |
+| `src/Components/Worksites/PlanReception/PlanReceptionChart.tsx` | Graphique horizontal des réceptions comptées par statut. |
+| `src/Components/Worksites/PlanReception/ReceptionFormModal.tsx` | Formulaire partagé pour créer ou modifier une réception, validation HTML et affichage des erreurs API. En création, il met le focus sur la date et tente d’ouvrir le calendrier natif. |
+| `src/Components/Worksites/PlanReception/PlanReceptionToolbar.tsx` | Bascule entre les vues graphique et tableau ; recherche et filtres par statut dans la vue tableau. |
 | `src/Components/Planning/PlanReception/KpiCard.tsx` | Carte KPI réutilisée par la page. |
 | `src/Components/Dashboard/SiteSectionNav.tsx` | Navigation entre la vue d’ensemble du chantier, la réception des plans et l’équipe. |
 | `src/services/planReceptionService.ts` | Appels HTTP, sérialisation des données, lecture des réponses et persistance via les tableaux génériques. |
 
 `PlanRow` est un modèle d’affichage qui regroupe les réceptions ayant le même `elementName`. Chaque plan reste une ligne indépendante en base et conserve son propre identifiant.
+
+## Utilisation de la page
+
+- **Vue graphique** affiche un graphique horizontal avec le nombre de réceptions pour les statuts « Reçu », « À reprendre », « Sous 14 j » et « À venir ». Les nombres sont calculés à partir des réceptions chargées pour le chantier.
+- **Vue tableau** affiche les plans par élément et type. Les filtres de statut et la recherche s’appliquent à cette vue.
+- Cliquer sur une cellule vide préremplit l’élément et le type de plan dans le formulaire d’ajout. Le calendrier du champ « Date de réception / échéance » s’ouvre automatiquement si le navigateur autorise l’ouverture programmée du sélecteur natif ; sinon, le champ reçoit le focus et l’utilisateur peut ouvrir le calendrier depuis le champ.
+- Cliquer sur une cellule contenant déjà une réception ouvre le formulaire de modification.
+- La page ne propose pas d’export ni de filtre « Tous les bâtiments » ; le suivi est limité au chantier courant.
 
 ## Contrat métier en anglais
 
