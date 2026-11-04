@@ -1,4 +1,5 @@
 import React from 'react';
+import { Star } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 
 export interface Worker {
@@ -61,7 +62,10 @@ const WorkerRow: React.FC<WorkerRowProps> = ({ worker, checked, onCheck }) => (
       <StatusBadge status={worker.status} />
     </td>
     <td className="py-3 px-3 text-center">
-      <span className={`text-xl cursor-pointer ${worker.starred ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-400'} transition`}>★</span>
+      <Star
+        className={`w-5 h-5 inline-block cursor-pointer transition ${worker.starred ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 hover:text-yellow-400'}`}
+        aria-label={worker.starred ? 'Favori' : 'Ajouter aux favoris'}
+      />
     </td>
     <td className="py-3 px-3 text-center text-base text-gray-600 cursor-pointer hover:text-gray-800 font-bold">···</td>
   </tr>

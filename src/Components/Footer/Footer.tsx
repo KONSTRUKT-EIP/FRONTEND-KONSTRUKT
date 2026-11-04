@@ -33,7 +33,7 @@ const Footer: React.FC = () => {
   const { isLoggedIn } = useAuth();
 
   return (
-  <footer className="w-full bg-gray-900 text-white mt-auto min-h-[220px]">
+  <footer className="theme-keep w-full bg-gray-900 text-white mt-auto min-h-[220px]">
     <div className="max-w-7xl mx-auto px-10 pt-14 pb-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
         <div className="lg:col-span-2 flex flex-col gap-4 min-h-[120px]">

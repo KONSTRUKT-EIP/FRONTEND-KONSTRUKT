@@ -6,6 +6,16 @@ import { Action } from "../../Components/Planning/Action/ActionItem";
 import CreateTaskModal, { CreateTaskPayload } from "../../Components/Planning/Modal/CreateTaskModal";
 import TaskDetailModal from "../../Components/Planning/Modal/TaskDetailModal";
 import React, { useState, useEffect } from 'react';
+import {
+  AlarmClock,
+  Cloud,
+  CloudRain,
+  CloudSun,
+  ClipboardList,
+  Moon,
+  Sun,
+  TriangleAlert,
+} from 'lucide-react';
 
 const today = new Date();
 const getDateISO = (offset: number) => {
@@ -19,13 +29,13 @@ const getDateISO = (offset: number) => {
 
 // Données météo en dur (pourra être remplacé par un appel API plus tard)
 const weather = [
-  { date: getDateISO(0), label: "Beau",     icon: "☀️" },
-  { date: getDateISO(1), label: "Variable", icon: "🌤️" },
-  { date: getDateISO(2), label: "Nuageux",  icon: "☁️" },
-  { date: getDateISO(3), label: "Pluie",    icon: "🌧️" },
-  { date: getDateISO(4), label: "Variable", icon: "⛅" },
-  { date: getDateISO(5), label: "Accalmie", icon: "🌥️" },
-  { date: getDateISO(6), label: "Repos",    icon: "🌙" },
+  { date: getDateISO(0), label: "Beau",     icon: Sun },
+  { date: getDateISO(1), label: "Variable", icon: CloudSun },
+  { date: getDateISO(2), label: "Nuageux",  icon: Cloud },
+  { date: getDateISO(3), label: "Pluie",    icon: CloudRain },
+  { date: getDateISO(4), label: "Variable", icon: CloudSun },
+  { date: getDateISO(5), label: "Accalmie", icon: Cloud },
+  { date: getDateISO(6), label: "Repos",    icon: Moon },
 ];
 
 export default function Planning() {
@@ -35,9 +45,9 @@ export default function Planning() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [actions, setActions] = useState<Action[]>([]);
   const [stats, setStats] = useState([
-    { icon: "📋", iconBg: "bg-gray-100",  label: "Tâches cette semaine", value: 0 },
-    { icon: "⏰", iconBg: "bg-red-50",    label: "Tâches en retard",     value: 0 },
-    { icon: "⚠️", iconBg: "bg-yellow-50", label: "À risque météo",       value: 0 },
+    { icon: ClipboardList, iconBg: "bg-gray-100 text-gray-600",  label: "Tâches cette semaine", value: 0 },
+    { icon: AlarmClock,    iconBg: "bg-red-50 text-red-600",     label: "Tâches en retard",     value: 0 },
+    { icon: TriangleAlert, iconBg: "bg-yellow-50 text-yellow-600", label: "À risque météo",       value: 0 },
   ]);
   const [loading, setLoading] = useState(true);
 
@@ -73,9 +83,9 @@ export default function Planning() {
       
       if (data.stats) {
         setStats([
-          { icon: "📋", iconBg: "bg-gray-100",  label: "Tâches cette semaine", value: data.stats.tasksThisWeek || 0 },
-          { icon: "⏰", iconBg: "bg-red-50",    label: "Tâches en retard",     value: data.stats.tasksLate || 0 },
-          { icon: "⚠️", iconBg: "bg-yellow-50", label: "À risque météo",       value: data.stats.tasksWeatherRisk || 0 },
+          { icon: ClipboardList, iconBg: "bg-gray-100 text-gray-600",  label: "Tâches cette semaine", value: data.stats.tasksThisWeek || 0 },
+          { icon: AlarmClock,    iconBg: "bg-red-50 text-red-600",     label: "Tâches en retard",     value: data.stats.tasksLate || 0 },
+          { icon: TriangleAlert, iconBg: "bg-yellow-50 text-yellow-600", label: "À risque météo",       value: data.stats.tasksWeatherRisk || 0 },
         ]);
       }
     } catch (error) {

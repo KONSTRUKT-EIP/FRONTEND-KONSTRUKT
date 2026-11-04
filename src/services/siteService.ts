@@ -58,10 +58,32 @@ export interface SiteWeather {
     temperatureMax: number;
     temperatureMin: number;
     precipitationProbability: number;
+    weatherCode: number;
   }[];
 }
 
+// Photos déjà chargées pendant la navigation, partagées par toutes les pages.
+// La version (date de mise à jour) permet au navigateur de garder l'image en cache.
+const photoCache = new Map<string, { version?: string; url: Promise<string | null> }>();
+
+const releasePhoto = (siteId: string) => {
+  const cached = photoCache.get(siteId);
+  if (!cached) return;
+  photoCache.delete(siteId);
+  void cached.url.then((url) => url && URL.revokeObjectURL(url)).catch(() => undefined);
+};
+
+export type SiteListItem = SiteDetails & { photo?: { updatedAt: string } | null };
+
 export const siteService = {
+  async getSites(): Promise<SiteListItem[]> {
+    const response = await fetch(`${API_BASE}/sites`, {
+      headers: getAuthHeader(),
+    });
+    if (!response.ok) throw new Error('Failed to fetch sites');
+    return response.json();
+  },
+
   async getSite(siteId: string): Promise<SiteDetails> {
     const response = await fetch(`${API_BASE}/sites/${siteId}`, {
       headers: getAuthHeader(),
@@ -78,17 +100,29 @@ export const siteService = {
     return response.json();
   },
 
-  // Renvoie une URL locale (blob:) utilisable dans un <img>, ou null si le chantier n'a pas de photo
-  async getPhotoUrl(siteId: string): Promise<string | null> {
-    const response = await fetch(`${API_BASE}/sites/${siteId}/photo`, {
-      headers: getAuthHeader(),
-    });
-    if (response.status === 404) return null;
-    if (!response.ok) throw new Error('Failed to fetch site photo');
-    return URL.createObjectURL(await response.blob());
+  // Renvoie une URL locale (blob:) de la photo, ou null si le chantier n'en a pas
+  getPhotoUrl(siteId: string, version?: string): Promise<string | null> {
+    const cached = photoCache.get(siteId);
+    if (cached && (!version || !cached.version || cached.version === version)) {
+      return cached.url;
+    }
+    releasePhoto(siteId);
+
+    const query = version ? `?v=${encodeURIComponent(version)}` : '';
+    const url = fetch(`${API_BASE}/sites/${siteId}/photo${query}`, { headers: getAuthHeader() }).then(
+      async (response) => {
+        if (response.status === 404) return null;
+        if (!response.ok) throw new Error('Failed to fetch site photo');
+        return URL.createObjectURL(await response.blob());
+      },
+    );
+    // En cas d'erreur, on oublie l'entrée pour pouvoir réessayer plus tard
+    url.catch(() => photoCache.delete(siteId));
+    photoCache.set(siteId, { version, url });
+    return url;
   },
 
-  async uploadPhoto(siteId: string, file: File): Promise<Blob> {
+  async uploadPhoto(siteId: string, file: File): Promise<string> {
     const image = await compressImage(file);
     const formData = new FormData();
     formData.append('photo', image, 'photo.jpg');
@@ -102,6 +136,12 @@ export const siteService = {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.message || 'Failed to upload site photo');
     }
-    return image;
+
+    // La nouvelle photo remplace l'ancienne dans le cache, sans la retélécharger
+    const { updatedAt }: { updatedAt?: string } = await response.json().catch(() => ({}));
+    releasePhoto(siteId);
+    const url = URL.createObjectURL(image);
+    photoCache.set(siteId, { version: updatedAt, url: Promise.resolve(url) });
+    return url;
   },
 };

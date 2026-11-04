@@ -1,4 +1,5 @@
 import React from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 
 import TaskCard, { Task } from "./TaskCard";
@@ -6,7 +7,7 @@ import TaskCard, { Task } from "./TaskCard";
 interface DayColumnProps {
   date: Date;
   weather: string;
-  weatherIcon: string;
+  weatherIcon: LucideIcon;
   tasks: Task[];
   isToday: boolean;
   onTaskClick?: (taskId: string) => void;
@@ -32,7 +33,7 @@ const parseTimeToMinutes = (time?: string): number | null => {
   return timeMap[time.toUpperCase()] || null;
 };
 
-export default function DayColumn({ date, weather, weatherIcon, tasks, isToday, onTaskClick, showTimeLabels = false }: DayColumnProps) {
+export default function DayColumn({ date, weather, weatherIcon: WeatherIcon, tasks, isToday, onTaskClick, showTimeLabels = false }: DayColumnProps) {
   const dayName = Days[date.getDay()];
   const dayNum = date.getDate();
   const HOUR_HEIGHT = 60;
@@ -62,7 +63,7 @@ export default function DayColumn({ date, weather, weatherIcon, tasks, isToday, 
           {String(dayNum).padStart(2, "0")}
         </p>
         <p className="text-sm text-gray-600 flex items-center justify-center gap-1.5">
-          <span className="text-lg" aria-hidden="true">{weatherIcon}</span> 
+          <WeatherIcon className="w-4 h-4 text-gray-500" aria-hidden="true" />
           <span aria-label={`Météo: ${weather}`}>{weather}</span>
         </p>
       </div>

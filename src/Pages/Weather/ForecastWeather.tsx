@@ -1,4 +1,5 @@
 import React from 'react';
+import { Moon, Sunrise, Umbrella, Wind } from 'lucide-react';
 
 interface ForecastDay {
   date: string;
@@ -69,11 +70,11 @@ const ForecastWeather = ({ data }: ForecastWeatherProps) => {
 
                 <div className="space-y-2">
                   <div className={`flex items-center justify-center gap-2 text-base ${isToday ? 'text-blue-100' : 'text-gray-700'}`}>
-                    <span className="text-xl" aria-label="Humidité">💧</span>
+                    <Umbrella className="w-5 h-5" aria-label="Probabilité de pluie" />
                     <span className="font-semibold">{day.precipitationProbability ?? 0}%</span>
                   </div>
                   <div className={`flex items-center justify-center gap-2 text-base ${isToday ? 'text-blue-100' : 'text-gray-600'}`}>
-                    <span className="text-xl" aria-label="Vent">🌬️</span>
+                    <Wind className="w-5 h-5" aria-label="Vent" />
                     <span className="font-semibold">{day.windSpeedMax ?? 'N/A'} km/h</span>
                   </div>
                 </div>
@@ -85,11 +86,11 @@ const ForecastWeather = ({ data }: ForecastWeatherProps) => {
                   : 'border-t border-gray-300 text-gray-500'
               }`}>
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-lg" aria-label="Lever du soleil">☀️</span>
+                  <Sunrise className="w-4 h-4" aria-label="Lever du soleil" />
                   <span className="font-medium">{formatTime(day.sunrise)}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-lg" aria-label="Coucher du soleil">🌙</span>
+                  <Moon className="w-4 h-4" aria-label="Coucher du soleil" />
                   <span className="font-medium">{formatTime(day.sunset)}</span>
                 </div>
               </div>

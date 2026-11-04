@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
@@ -98,8 +99,9 @@ const Signup: React.FC = () => {
               type="button"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-500 text-xl focus:outline-none"
               onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
             >
-              {showPassword ? "🙈" : "👁"}
+              {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -119,8 +121,9 @@ const Signup: React.FC = () => {
               type="button"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-500 text-xl focus:outline-none"
               onClick={() => setShowConfirmPassword((prev) => !prev)}
+              aria-label={showConfirmPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
             >
-              {showConfirmPassword ? "🙈" : "👁"}
+              {showConfirmPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
             </button>
           </div>
         </div>

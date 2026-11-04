@@ -1,15 +1,22 @@
 import { useState, useEffect, Suspense } from "react";
+import { TriangleAlert } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import ChantierCard from "../../Components/Dashboard/JobsitCard/JobsitCard";
 import React from 'react';
 import { useSitePhotos } from "../../hooks/useSitePhotos";
+import type { SiteStatus } from "../../services/siteService";
+import SiteListToolbar, { filterAndSortSites, SiteSortKey } from "../../Components/Dashboard/SiteListToolbar/SiteListToolbar";
 
 export interface Chantier {
   id: string;
   name: string;
   location: string;
-  responsible: string;
+  status?: SiteStatus;
+  startDate?: string;
+  endDate?: string | null;
+  progressPct?: number | null;
   hasPhoto?: boolean;
+  photoVersion?: string;
 }
 
 interface SiteApi {
@@ -18,8 +25,10 @@ interface SiteApi {
   city?: string;
   postalCode?: string;
   address?: string;
-  responsible?: string;
-  manager?: string;
+  status?: SiteStatus;
+  startDate?: string;
+  endDate?: string | null;
+  progressPct?: number | null;
   photo?: { updatedAt: string } | null;
 }
 
@@ -43,8 +52,12 @@ export default function JobsitList() {
             id: String(s.id),
             name: s.name,
             location: s.city ? `${s.city}${s.postalCode ? ', ' + s.postalCode : ''}` : (s.address ?? ''),
-            responsible: s.responsible ?? s.manager ?? '',
+            status: s.status,
+            startDate: s.startDate,
+            endDate: s.endDate,
+            progressPct: s.progressPct ?? null,
             hasPhoto: Boolean(s.photo),
+            photoVersion: s.photo?.updatedAt,
           }));
           setChantiers(mapped);
         } else {
@@ -60,6 +73,9 @@ export default function JobsitList() {
   }, []);
 
   const { photos, uploading, uploadPhoto } = useSitePhotos(chantiers);
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SiteSortKey>("name-asc");
+  const visibleChantiers = filterAndSortSites(chantiers, search, sortKey);
 
   return (
     <main className="min-h-screen bg-gray-100" role="main" aria-label="Liste des chantiers">
@@ -79,7 +95,16 @@ export default function JobsitList() {
       </div>
 
       {/* Card */}
-      <div className="w-full px-20 py-8">
+      <div className="w-full px-20 py-8 flex flex-col gap-6">
+        {!fetchLoading && !fetchError && (
+          <SiteListToolbar
+            search={search}
+            onSearchChange={setSearch}
+            sortKey={sortKey}
+            onSortChange={setSortKey}
+            resultCount={visibleChantiers.length}
+          />
+        )}
         {fetchLoading ? (
           <div className="flex flex-col items-center justify-center py-24 text-gray-400">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500 mb-4"></div>
@@ -87,13 +112,18 @@ export default function JobsitList() {
           </div>
         ) : fetchError ? (
           <div className="flex flex-col items-center justify-center py-24 text-red-400">
-            <span className="text-5xl mb-4">⚠️</span>
+            <TriangleAlert className="w-12 h-12 mb-4" strokeWidth={1.5} aria-hidden="true" />
             <p className="text-lg font-semibold">{fetchError}</p>
           </div>
+        ) : visibleChantiers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
+            <p className="text-lg font-semibold">Aucun chantier trouvé</p>
+            <p className="text-sm mt-1">Essayez un autre nom ou une autre ville.</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-4 gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
             <Suspense fallback={<div>Chargement...</div>}>
-              {chantiers.map((chantier) => (
+              {visibleChantiers.map((chantier) => (
                 <ChantierCard
                   key={chantier.id}
                   {...chantier}

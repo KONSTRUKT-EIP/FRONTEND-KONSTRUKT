@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { X } from "lucide-react";
 import { Field } from "../../Tools/Input/Input";
 
 export type CreateOrderPayload = {
@@ -100,7 +101,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               aria-label="Fermer"
               className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
             >
-              ✕
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
 
