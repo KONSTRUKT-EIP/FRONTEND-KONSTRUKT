@@ -16,6 +16,8 @@ const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
 const JobsitHub = lazy(() => import("./Pages/Dashbord/Dashbordhub"));
 const About = lazy(() => import('./Pages/About/About'));
 const Pricing = lazy(() => import('./Pages/Pricing/Pricing'));
+const AcceptInvitation = lazy(() => import('./Pages/Invitations/AcceptInvitation'));
+const InvitationAdministration = lazy(() => import('./Pages/Invitations/InvitationAdministration'));
 
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -35,6 +37,7 @@ const App: React.FC = () => (
       <Route path="/signup" element={<SignUp />} />
       <Route path="/about" element={<About />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       {/* Routes protégées */}
       <Route path="/dashboard" element={<ProtectedRoute><JobsitList /></ProtectedRoute>} />
@@ -46,6 +49,7 @@ const App: React.FC = () => (
       <Route path="/worksites" element={<ProtectedRoute><Worksites /></ProtectedRoute>} />
       <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/settings/invitations" element={<ProtectedRoute><InvitationAdministration /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
