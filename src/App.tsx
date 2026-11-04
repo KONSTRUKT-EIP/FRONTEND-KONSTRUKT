@@ -10,6 +10,7 @@ const Weather = lazy(() => import('./Pages/Weather/Weather'));
 const Worksites = lazy(() => import('./Pages/Worksites/Worksites'));
 const Planning = lazy(() => import('./Pages/Planning/Planning'));
 const Settings = lazy(() => import('./Pages/Settings/Settings'));
+const Administration = lazy(() => import('./Pages/Administration/Administration'));
 const DashboardArmature = lazy(() => import('./Pages/Dashbord/Dashbord'));
 const TeamView = lazy(() => import('./Pages/Dashbord/TeamView'));
 const JobsitList = lazy(() => import("./Pages/Dashbord/JobsitList"));
@@ -17,6 +18,9 @@ const JobsitHub = lazy(() => import("./Pages/Dashbord/Dashbordhub"));
 const PlanReception = lazy(() => import('./Pages/Worksites/PlanReception'));
 const About = lazy(() => import('./Pages/About/About'));
 const Pricing = lazy(() => import('./Pages/Pricing/Pricing'));
+const AcceptInvitation = lazy(() => import('./Pages/Invitations/AcceptInvitation'));
+const InvitationAdministration = lazy(() => import('./Pages/Invitations/InvitationAdministration'));
+const UserAdministration = lazy(() => import('./Pages/Administration/UserAdministration'));
 
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -36,6 +40,7 @@ const App: React.FC = () => (
       <Route path="/signup" element={<SignUp />} />
       <Route path="/about" element={<About />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       {/* Routes protégées */}
       <Route path="/dashboard" element={<ProtectedRoute><JobsitList /></ProtectedRoute>} />
@@ -47,7 +52,11 @@ const App: React.FC = () => (
       <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
       <Route path="/worksites" element={<ProtectedRoute><Worksites /></ProtectedRoute>} />
       <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
+      <Route path="/administration" element={<ProtectedRoute><Administration /></ProtectedRoute>} />
+      <Route path="/administration/users" element={<ProtectedRoute><UserAdministration /></ProtectedRoute>} />
+      <Route path="/administration/invitations" element={<ProtectedRoute><InvitationAdministration /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/settings/invitations" element={<Navigate to="/administration/invitations" replace />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
