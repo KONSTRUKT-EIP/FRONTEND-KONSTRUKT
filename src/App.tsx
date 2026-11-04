@@ -19,6 +19,7 @@ const About = lazy(() => import('./Pages/About/About'));
 const Pricing = lazy(() => import('./Pages/Pricing/Pricing'));
 const AcceptInvitation = lazy(() => import('./Pages/Invitations/AcceptInvitation'));
 const InvitationAdministration = lazy(() => import('./Pages/Invitations/InvitationAdministration'));
+const UserAdministration = lazy(() => import('./Pages/Administration/UserAdministration'));
 
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -50,6 +51,7 @@ const App: React.FC = () => (
       <Route path="/worksites" element={<ProtectedRoute><Worksites /></ProtectedRoute>} />
       <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
       <Route path="/administration" element={<ProtectedRoute><Administration /></ProtectedRoute>} />
+      <Route path="/administration/users" element={<ProtectedRoute><UserAdministration /></ProtectedRoute>} />
       <Route path="/administration/invitations" element={<ProtectedRoute><InvitationAdministration /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/settings/invitations" element={<Navigate to="/administration/invitations" replace />} />
