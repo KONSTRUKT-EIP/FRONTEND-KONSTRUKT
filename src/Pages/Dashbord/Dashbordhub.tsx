@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { teamService, TeamStats, ATTENDANCE_UPDATED_EVENT } from '../../services/teamService';
 import { siteService, SiteDetails, SiteWeather } from '../../services/siteService';
 import SiteOverview from '../../Components/Dashboard/SiteOverview/SiteOverview';
+import SiteSectionNav from '../../Components/Dashboard/SiteSectionNav';
 
 const dashboards = [
   { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
@@ -196,7 +197,9 @@ export default function JobsiteHub() {
         )}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-8 items-start">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <SiteSectionNav siteId={id ?? ''} />
+        <div className="flex min-w-0 flex-1 flex-col gap-8 xl:flex-row xl:items-start">
         <div className="flex flex-col gap-3 w-full xl:max-w-2xl flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900">Lots</h2>
           {dashboards.map((db) => (
@@ -326,6 +329,7 @@ export default function JobsiteHub() {
           </>
           )}
         </div>
+      </div>
       </div>
     </main>
   );
