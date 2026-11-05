@@ -4,16 +4,16 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { teamService, TeamStats, ATTENDANCE_UPDATED_EVENT } from '../../services/teamService';
 import { siteService, SiteDetails, SiteWeather } from '../../services/siteService';
 import SiteOverview from '../../Components/Dashboard/SiteOverview/SiteOverview';
+import { LOT_DASHBOARDS, computeLotMetrics } from '../../mocks/lotDashboards';
 import SiteSectionNav from '../../Components/Dashboard/SiteSectionNav';
 
-const dashboards = [
-  { id: "armature",   label: "Armature",    description: "Voiles, planchers, poutres", progress: 72 },
-  { id: "beton",      label: "Béton",       description: "Coulage, dosage, résistance", progress: 45 },
-  { id: "charpente",  label: "Charpente",   description: "Structure bois et métal",    progress: 60 },
-  { id: "electricite",label: "Électricité", description: "Câblage, tableaux, prises",  progress: 30 },
-  { id: "plomberie",  label: "Plomberie",   description: "Réseaux eau, évacuations",   progress: 55 },
-  { id: "finitions",  label: "Finitions",   description: "Peinture, revêtements",      progress: 10 },
-];
+// Lots du chantier (données de démo) : l'avancement correspond à la quantité livrée sur le prévu
+const dashboards = LOT_DASHBOARDS.map((lot) => ({
+  id: lot.id,
+  label: lot.label,
+  description: lot.description,
+  progress: computeLotMetrics(lot).progressPct,
+}));
 
 const StatCircle: React.FC<{ percentage: number; color: string; label: string; sublabel?: string }> = ({ percentage, color, label, sublabel }) => {
   const radius = 40;
@@ -23,14 +23,14 @@ const StatCircle: React.FC<{ percentage: number; color: string; label: string; s
         <div className="flex flex-col items-center gap-2">
       <div className="relative w-24 h-24">
         <svg width="96" height="96" className="-rotate-90" viewBox="0 0 96 96">
-          <circle cx="48" cy="48" r={radius} fill="none" stroke="#f3f4f6" strokeWidth="10" />
+          <circle cx="48" cy="48" r={radius} fill="none" style={{ stroke: "var(--color-gray-200, #e5e7eb)" }} strokeWidth="10" />
           <circle
             cx="48" cy="48" r={radius} fill="none"
-            stroke={color} strokeWidth="10"
+            strokeWidth="10"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+            style={{ stroke: color, transition: 'stroke-dashoffset 0.6s ease' }}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -61,7 +61,6 @@ export default function JobsiteHub() {
   useEffect(() => {
     if (!id) return;
     let active = true;
-    let createdUrl: string | null = null;
 
     siteService
       .getSite(id)
@@ -75,7 +74,6 @@ export default function JobsiteHub() {
     siteService
       .getPhotoUrl(id)
       .then((url) => {
-        createdUrl = url;
         if (active) setPhotoUrl(url);
       })
       .catch((err) => console.error('Erreur lors du chargement de la photo:', err));
@@ -92,7 +90,6 @@ export default function JobsiteHub() {
 
     return () => {
       active = false;
-      if (createdUrl) URL.revokeObjectURL(createdUrl);
     };
   }, [id]);
 
@@ -107,9 +104,6 @@ export default function JobsiteHub() {
       setLoading(true);
       const data = await teamService.getTeamStats(id);
       setStats(data);
-      if (data.site?.name) {
-        setChantierName(data.site.name);
-      }
       setError(null);
     } catch (err) {
       console.error('Erreur lors du chargement des statistiques:', err);
@@ -260,31 +254,31 @@ export default function JobsiteHub() {
           <div className="flex flex-wrap justify-around gap-6 py-2">
             <StatCircle
               percentage={pctPresents}
-              color="#10b981"
+              color="var(--color-emerald-500, #10b981)"
               label="Présents"
               sublabel={`${complete} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
               percentage={pctRetards}
-              color="#f97316"
+              color="var(--color-orange-500, #f97316)"
               label="Retards"
               sublabel={`${retards} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
               percentage={pctAbsents}
-              color="#f43f5e"
+              color="var(--color-rose-500, #f43f5e)"
               label="Absents/Congés"
               sublabel={`${annule} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
               percentage={pctSurSite}
-              color="#6366f1"
+              color="var(--color-indigo-500, #6366f1)"
               label="Sur site"
               sublabel={`${enCours} / ${totalEmployees} travailleurs`}
             />
             <StatCircle
               percentage={pctEnAttente}
-              color="#3b82f6"
+              color="var(--color-blue-500, #3b82f6)"
               label="En attente"
               sublabel={`${enAttente} / ${totalEmployees} employés`}
             />

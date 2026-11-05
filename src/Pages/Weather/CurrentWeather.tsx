@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloudRain, Compass, Droplets, MapPin, Wind } from 'lucide-react';
 
 interface CurrentWeatherData {
   current: {
@@ -65,28 +66,28 @@ const CurrentWeather = ({ data }: CurrentWeatherProps) => {
           </div>
         </div>
         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
-          <div className="text-green-600 text-4xl mb-2" aria-label="Humidité">💧</div>
+          <Droplets className="text-green-600 w-9 h-9 mb-2" aria-hidden="true" />
           <div className="text-base text-gray-600 mb-2">Humidité</div>
           <div className="text-4xl font-bold text-gray-800">{current.humidity ?? 'N/A'}%</div>
         </div>
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
-          <div className="text-blue-600 text-4xl mb-2">🌬️</div>
+          <Wind className="text-blue-600 w-9 h-9 mb-2" aria-hidden="true" />
           <div className="text-base text-gray-600 mb-2">Vent</div>
           <div className="text-4xl font-bold text-gray-800">{current.windSpeed ?? 'N/A'} km/h</div>
         </div>
         <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-6">
-          <div className="text-cyan-600 text-4xl mb-2">🌧️</div>
+          <CloudRain className="text-cyan-600 w-9 h-9 mb-2" aria-hidden="true" />
           <div className="text-base text-gray-600 mb-2">Précipitations</div>
           <div className="text-4xl font-bold text-gray-800">{current.precipitation ?? 0} mm</div>
         </div>
         <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6">
-          <div className="text-indigo-600 text-4xl mb-2">🧭</div>
+          <Compass className="text-indigo-600 w-9 h-9 mb-2" aria-hidden="true" />
           <div className="text-base text-gray-600 mb-2">Direction</div>
           <div className="text-4xl font-bold text-gray-800">{current.windDirection ?? 'N/A'}°</div>
         </div>
       </div>
-      <div className="text-base text-gray-500 mt-6 pt-6 border-t border-gray-200">
-        📍 {latitude.toFixed(2)}, {longitude.toFixed(2)} • {timezone}
+      <div className="text-base text-gray-500 mt-6 pt-6 border-t border-gray-200 flex items-center gap-1.5">
+        <MapPin className="w-4 h-4" aria-hidden="true" /> {latitude.toFixed(2)}, {longitude.toFixed(2)} • {timezone}
       </div>
     </div>
   );

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Building2, TriangleAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ChantierCard from '../../Components/Dashboard/JobsitCard/JobsitCard';
 import type { Chantier } from '../Dashbord/JobsitList';
 import { useSitePhotos } from '../../hooks/useSitePhotos';
+import type { SiteStatus } from '../../services/siteService';
+import SiteListToolbar, { filterAndSortSites, SiteSortKey } from '../../Components/Dashboard/SiteListToolbar/SiteListToolbar';
 
 const ORGANIZATION_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -12,8 +15,10 @@ interface SiteApi {
   city?: string;
   postalCode?: string;
   address?: string;
-  responsible?: string;
-  manager?: string;
+  status?: SiteStatus;
+  startDate?: string;
+  endDate?: string | null;
+  progressPct?: number | null;
   photo?: { updatedAt: string } | null;
 }
 
@@ -36,6 +41,7 @@ const Worksites: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [search, setSearch] = useState('');
+  const [sortKey, setSortKey] = useState<SiteSortKey>('name-asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,8 +59,12 @@ const Worksites: React.FC = () => {
             id: String(s.id),
             name: s.name,
             location: s.city ? `${s.city}${s.postalCode ? ', ' + s.postalCode : ''}` : (s.address ?? ''),
-            responsible: s.responsible ?? s.manager ?? '',
+            status: s.status,
+            startDate: s.startDate,
+            endDate: s.endDate,
+            progressPct: s.progressPct ?? null,
             hasPhoto: Boolean(s.photo),
+            photoVersion: s.photo?.updatedAt,
           }));
           setChantiers(mapped);
         } else {
@@ -100,7 +110,10 @@ const Worksites: React.FC = () => {
           id: String(data.id ?? Date.now()),
           name: data.name ?? form.name,
           location: `${form.city}, ${form.postalCode}`,
-          responsible: '',
+          status: data.status,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          progressPct: null,
         };
         setChantiers(prev => [...prev, newChantier]);
         setForm(emptyForm);
@@ -115,11 +128,7 @@ const Worksites: React.FC = () => {
     }
   };
 
-  const filtered = chantiers.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.location.toLowerCase().includes(search.toLowerCase()) ||
-    c.responsible.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = filterAndSortSites(chantiers, search, sortKey);
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -141,14 +150,14 @@ const Worksites: React.FC = () => {
         </div>
       </div>
 
-      {/* Search */}
+      {/* Recherche et tri */}
       <div className="px-20 pt-8 pb-2">
-        <input
-          type="text"
-          placeholder="Rechercher un chantier, lieu ou responsable…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full max-w-md bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder-gray-400"
+        <SiteListToolbar
+          search={search}
+          onSearchChange={setSearch}
+          sortKey={sortKey}
+          onSortChange={setSortKey}
+          resultCount={filtered.length}
         />
       </div>
 
@@ -161,12 +170,12 @@ const Worksites: React.FC = () => {
           </div>
         ) : fetchError ? (
           <div className="flex flex-col items-center justify-center py-24 text-red-400">
-            <span className="text-5xl mb-4">⚠️</span>
+            <TriangleAlert className="w-12 h-12 mb-4" strokeWidth={1.5} aria-hidden="true" />
             <p className="text-lg font-semibold">{fetchError}</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-            <span className="text-6xl mb-4">🏗️</span>
+            <Building2 className="w-14 h-14 mb-4" strokeWidth={1.5} aria-hidden="true" />
             <p className="text-lg font-semibold">Aucun chantier trouvé</p>
             <p className="text-sm mt-1">Essayez un autre terme ou créez un nouveau chantier.</p>
           </div>

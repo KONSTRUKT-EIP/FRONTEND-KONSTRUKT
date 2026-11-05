@@ -37,6 +37,7 @@ export default function RecentOrders({ siteId, orders, onCreateOrder }: RecentOr
         </div>
 
         {/* Table */}
+        <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr>
@@ -56,6 +57,7 @@ export default function RecentOrders({ siteId, orders, onCreateOrder }: RecentOr
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </>
   );

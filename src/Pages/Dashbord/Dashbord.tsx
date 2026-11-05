@@ -1,85 +1,83 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card } from "../../Components/Dashboard/Card/Card";
-import ViewFilters, { Filter } from "../../Components/Dashboard/ViewFilters/ViewFilters";
+import { ArrowRight, Download, FlaskConical } from "lucide-react";
 import RecentOrders from "../../Components/Dashboard/RecentOrders/RecentOrders";
 import { Order } from "../../Components/Dashboard/RecentOrders/OrderRow";
-import { ChartSerie } from "../../Components/Dashboard/ReportGraph/ReportGraph";
-import ReportsChart from "../../Components/Dashboard/ReportGraph/ReportGraph";
-import {
-  CreateOrderPayload,
-} from "../../Components/Dashboard/RecentOrders/ModalOrder";
+import { CreateOrderPayload } from "../../Components/Dashboard/RecentOrders/ModalOrder";
+import { siteService } from "../../services/siteService";
+import { computeLotMetrics, getLotDashboard, LotDashboard, LotMetrics } from "../../mocks/lotDashboards";
+import LotKpiCards from "../../Components/Lot/LotKpiCards";
+import PlanComparison from "../../Components/Lot/PlanComparison";
+import PlanTrackingTable, { formatDelivery } from "../../Components/Lot/PlanTrackingTable";
+import { formatDate, planStatusConfig } from "../../Components/Lot/format";
 
-const chantierNames: Record<string, string> = {
-  "1": "Tour Horizon",
-  "2": "R\u00e9sidence Les Pins",
-  "3": "Pont Sud",
-  "4": "Centre Commercial",
-  "5": "Immeuble Lumi\u00e8re",
-  "6": "Stade Municipal",
+// Export du suivi des plans au format CSV (s'ouvre directement dans Excel)
+const exportPlansCsv = (lot: LotDashboard, metrics: LotMetrics) => {
+  const number = (value: number | null) =>
+    value === null ? "" : value.toLocaleString("fr-FR", { maximumFractionDigits: 2, useGrouping: false });
+  const header = [
+    "Plan", "Niveau", "N°", "Indice",
+    `Prévu (${lot.unit})`, `Réel (${lot.unit})`, `Écart (${lot.unit})`,
+    "Montant prévu (€)", "Montant réel (€)", "Envoi ST", "Livraison", "Statut",
+  ];
+  const rows = metrics.plans.map(({ plan, plannedAmount, actualAmount, gap }) => [
+    plan.name, plan.level, plan.number, plan.index,
+    number(plan.planned), number(plan.actual), number(gap),
+    number(plannedAmount), number(actualAmount),
+    formatDate(plan.sentDate), formatDelivery(plan), planStatusConfig[plan.status].label,
+  ]);
+  const csv = [header, ...rows]
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
+    .join("\r\n");
+
+  // Le BOM permet à Excel de lire correctement les accents
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `suivi-plans-${lot.id}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
-const chartData = [
-  { time: "10am", voiles: 58, planchers: 30 },
-  { time: "11am", voiles: 42, planchers: 45 },
-  { time: "12am", voiles: 60, planchers: 58 },
-  { time: "01am", voiles: 35, planchers: 38 },
-  { time: "02am", voiles: 50, planchers: 20 },
-  { time: "03am", voiles: 45, planchers: 15 },
-  { time: "04am", voiles: 30, planchers: 35 },
-  { time: "05am", voiles: 38, planchers: 38 },
-  { time: "06am", voiles: 65, planchers: 62 },
-  { time: "07am", voiles: 72, planchers: 68 },
-];
-const chartSeries: ChartSerie[] = [
-  { key: "voiles",    color: "#818CF8", label: "Voiles"    },
-  { key: "planchers", color: "#C084FC", label: "Planchers" },
-];
-
-
-const filters: Filter[] = [
-  { id: "voiles",         label: "Voiles",         color: "#818CF8" },
-  { id: "planchers",      label: "Planchers",      color: "#C084FC" },
-  { id: "poutres",        label: "Poutres",        color: "#60A5FA" },
-  { id: "superstructure", label: "Superstructure", color: "#D1D5DB" },
-];
-
-// const orders: Order[] = [
-//   { id: "#876364", productName: "Voiles",    price: 98,  totalOrder: 325, total: 32000 },
-//   { id: "#876368", productName: "Planchers", price: 471, totalOrder: 53,  total: 25000 },
-//   { id: "#876412", productName: "Poutres",   price: 163, totalOrder: 78,  total: 12750 },
-//   { id: "#876621", productName: "Acier",     price: 200, totalOrder: 10,  total: 2000  },
-// ];
-
-
-  interface ApiCategory {
-  id: number;
-  name: string;
-  progress: number;
-  spent: number;
-}
-
-interface ApiRes {
-  globalProgress: number;
-  globalSpent: number;
-  categories: ApiCategory[];
-}
-
-export default function DashboardArmature() {
-  const { id } = useParams<{ id: string }>();
+export default function DashboardLot() {
+  const { id, dbId } = useParams<{ id: string; dbId: string }>();
   const navigate = useNavigate();
-  const chantierName = chantierNames[id ?? ""] ?? "Chantier";
-  const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>(
-    Object.fromEntries(filters.map((f) => [f.id, f.id !== "superstructure"]))
-  );
-  const [summaryData, setSummaryData] = useState<ApiRes | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  // const [startDate, _setStartDate] = useState("2025-12-22");
-  // const [endDate, _setEndDate] = useState("2026-02-11");
-  const startDate = "2025-12-22";
-  const endDate = "2026-02-11";
+  const lot = getLotDashboard(dbId);
+  const metrics = useMemo(() => (lot ? computeLotMetrics(lot) : null), [lot]);
+
+  const [chantierName, setChantierName] = useState("Chantier");
   const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+
+    siteService
+      .getSite(id)
+      .then((site) => {
+        if (active) setChantierName(site.name);
+      })
+      .catch((err) => console.error("Erreur lors du chargement du chantier:", err));
+
+    const token = localStorage.getItem("access_token");
+    fetch(`http://localhost:3000/dashboard/armature/orders/site/${encodeURIComponent(id)}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Erreur ${res.status}`);
+        const data: { orders: Order[] } = await res.json();
+        if (active) setOrders(data.orders);
+      })
+      .catch((err: Error) => {
+        if (active) setOrdersError(err.message);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
 
   // Les erreurs sont remontées à la modale pour être affichées à l'utilisateur
   const handleCreateOrder = async (payload: CreateOrderPayload) => {
@@ -100,130 +98,95 @@ export default function DashboardArmature() {
     setOrders((prev) => [...newOrders, ...prev]);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = new URLSearchParams({ startDate, endDate });
-        const token = localStorage.getItem("access_token");
-        const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-        const [summaryRes, ordersRes] = await Promise.all([
-          fetch(`http://localhost:3000/dashboard/armature/summary?${params}`, { headers: authHeaders }),
-          fetch(  `http://localhost:3000/dashboard/armature/orders/site/${encodeURIComponent(id ?? "")}`, { headers: authHeaders }),
-        ]);
-        if (!summaryRes.ok)
-          throw new Error(`Erreur ${summaryRes.status}`);
-        if (!ordersRes.ok)
-          throw new Error(`Erreur ${ordersRes.status}`);
-        const dataSummary: ApiRes = await summaryRes.json();
-        const ordersData: { orders: Order[] } = await ordersRes.json();
-        setSummaryData(dataSummary);
-        setOrders(ordersData.orders);
-      } catch (err: unknown) {
-        setError((err as Error).message ?? "Unknown Error")
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+  const breadcrumb = (
+    <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+      >
+        Tous les chantiers
+      </button>
+      <span className="text-gray-400">/</span>
+      <button
+        onClick={() => navigate(`/dashboard/${id}`)}
+        className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+      >
+        {chantierName}
+      </button>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-900 font-semibold">{lot?.label ?? "Lot"}</span>
+    </nav>
+  );
 
-  }, [startDate, endDate, id]);
-
-  const cards = summaryData?
-      summaryData.categories.map((cat) => ({
-        name: cat.name,
-        percentage: cat.progress,
-        spent: cat.spent,
-      })): [];
-
-  const _handleFilterChange = (id: string, checked: boolean) => {
-    setActiveFilters((prev) => ({ ...prev, [id]: checked }));
-  };
+  if (!lot || !metrics) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-8" role="main">
+        {breadcrumb}
+        <div className="mt-8 bg-white rounded-2xl shadow-sm p-8 text-center">
+          <p className="text-lg font-semibold text-gray-900">Ce lot n'existe pas.</p>
+          <button
+            onClick={() => navigate(`/dashboard/${id}`)}
+            className="mt-4 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-colors"
+          >
+            Retour au chantier
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8" role="main">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <nav className="mb-2 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-            <span>
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
-              >
-                Tous les chantiers
-              </button>
-            </span>
-            <span className="text-gray-400">/</span>
-            <span>
-              <button
-                onClick={() => navigate(`/dashboard/${id}`)}
-                className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
-              >
-                {chantierName}
-              </button>
-            </span>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Armature</span>
-          </nav>
+    <div className="min-h-screen bg-gray-100 p-8 flex flex-col gap-6" role="main">
+      {/* En-tête */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          {breadcrumb}
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Dashboard / Armature
+            {lot.title} — Prévisionnel vs Réel
           </h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Sous-traitant {lot.subcontractor} · {lot.marketLabel}{" "}
+            {lot.marketAmount.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })} ·{" "}
+            {lot.marketQuantity.toLocaleString("fr-FR")} {lot.unit} ·{" "}
+            {lot.unitPrice.toLocaleString("fr-FR")} €/{lot.unit}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold"
+            title="Ces indicateurs utilisent des données fictives en attendant le branchement au back"
+          >
+            <FlaskConical className="w-4 h-4" aria-hidden="true" /> Données de démo
+          </span>
+          <button
+            onClick={() => exportPlansCsv(lot, metrics)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 text-sm font-semibold transition-colors"
+          >
+            <Download className="w-4 h-4" aria-hidden="true" /> Exporter Excel
+          </button>
+          <button
+            onClick={() => navigate(`/dashboard/${id}/equipe`)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-colors"
+          >
+            Voir l'équipe <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </button>
         </div>
       </div>
 
-      {/* Cards */}
-      {loading && (
-        <div className="flex gap-4 mb-6">
-          {[0,1,2,3].map((i) => (
-            <div key={i} className="flex-1 bg-white rounded-2xl p-6 shadow-sm animate-pulse h-24" />
-          ))}
-        </div>
-      )}
+      <LotKpiCards lot={lot} metrics={metrics} />
 
-      {error && (
-        <div className="mb-6 bg-red-600 border border-red-300 text-white text-base font-semibold rounded-xl px-4 py-3">
-          Impossible de charger les données : {error}
-        </div>
-      )}
+      <PlanComparison lot={lot} metrics={metrics} />
 
-      {!loading && !error && (
-        <Suspense fallback={<div>Chargement...</div>}>
-          <div className="flex gap-4 mb-6">
-            {cards.map((card) => (
-              <Card key={card.name} {...card} />
-            ))}
-          </div>
-        </Suspense>
-      )}
+      <PlanTrackingTable lot={lot} metrics={metrics} />
 
-
-      {/* Middle row: Graph + Filters */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="col-span-2">
-          <Suspense fallback={<div>Chargement du graphique...</div>}>
-            <ReportsChart data={chartData} series={chartSeries} activeFilters={activeFilters}/>
-          </Suspense>
-        </div>
-
-        <div className="col-span-1">
-          <Suspense fallback={<div>Chargement des filtres...</div>}>
-            <ViewFilters filters={filters} />
-          </Suspense>
-        </div>
-      </div>
-
-      {/* Bottom row: Orders */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <Suspense fallback={<div>Chargement des commandes...</div>}>
-            <RecentOrders siteId={id ?? ""} orders={orders} onCreateOrder={handleCreateOrder} />
-          </Suspense>
-        </div>
-        <div className="col-span-1 bg-white rounded-2xl p-6 shadow-sm flex items-center justify-center">
-          <span className="text-sm text-gray-800">Analytics (à venir)</span>
-        </div>
+      {/* Commandes réelles du chantier (branchées sur le back) */}
+      <div>
+        {ordersError && (
+          <p className="mb-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            Impossible de charger les commandes : {ordersError}
+          </p>
+        )}
+        <RecentOrders siteId={id ?? ""} orders={orders} onCreateOrder={handleCreateOrder} />
       </div>
     </div>
   );

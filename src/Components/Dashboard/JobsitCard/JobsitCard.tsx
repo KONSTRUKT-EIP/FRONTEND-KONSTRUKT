@@ -1,10 +1,14 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { Building2, CalendarCheck, CalendarDays, Camera, MapPin } from "lucide-react";
 
 interface ChantierCardProps {
   id: string;
   name: string;
   location: string;
-  responsible: string;
+  startDate?: string;
+  endDate?: string | null;
+  // Avancement des travaux (moyenne des tâches), null si aucune tâche n'est suivie
+  progressPct?: number | null;
   photo?: string;
   photoUploading?: boolean;
   onPhotoChange: (id: string, file: File) => void;
@@ -15,7 +19,9 @@ export default function ChantierCard({
   id,
   name,
   location,
-  responsible,
+  startDate,
+  endDate,
+  progressPct = null,
   photo,
   photoUploading = false,
   onPhotoChange,
@@ -23,6 +29,12 @@ export default function ChantierCard({
 }: ChantierCardProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const blockingRef = useRef(false);
+
+  const formatDate = (value: string) =>
+    new Date(value).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+  // Tant que le chantier n'a pas commencé, la date de début est une date prévue
+  const [now] = useState(() => Date.now());
+  const notStartedYet = startDate ? new Date(startDate).getTime() > now : false;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
@@ -59,7 +71,7 @@ export default function ChantierCard({
         {photo ? (
           <img src={photo} alt={name} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-5xl opacity-30">🏗️</span>
+          <Building2 className="w-14 h-14 text-indigo-300" strokeWidth={1.5} aria-hidden="true" />
         )}
 
         {photoUploading && (
@@ -75,7 +87,7 @@ export default function ChantierCard({
           disabled={photoUploading}
           className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-xs text-gray-600 font-medium px-3 py-1.5 rounded-lg shadow hover:bg-white transition-colors flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-wait"
         >
-          <span>📷</span> {photo ? "Changer" : "Ajouter photo"}
+          <Camera className="w-3.5 h-3.5" aria-hidden="true" /> {photo ? "Changer" : "Ajouter photo"}
         </button>
 
         <input
@@ -89,22 +101,53 @@ export default function ChantierCard({
       </div>
 
       {/* Infos */}
-      <div className="px-6 py-8 flex flex-col gap-3 flex-1">
+      <div className="px-6 py-6 flex flex-col gap-3 flex-1">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">{name}</h2>
           <p className="text-lg text-gray-900 flex items-center gap-1 mt-1 font-semibold">
-            <span>📍</span> {location}
+            <MapPin className="w-5 h-5 text-gray-500 shrink-0" aria-hidden="true" /> {location}
           </p>
         </div>
 
-        {/* Responsible */}
-        <div className="flex items-center gap-3 mt-auto pt-3 border-t border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-            <span className="text-lg font-semibold text-indigo-600">
-              {responsible.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+        {/* Dates prévues et avancement des travaux */}
+        <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-3">
+          {startDate && (
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <span className="font-medium text-gray-600 flex items-center gap-1.5">
+                <CalendarDays className="w-4 h-4 text-gray-400 shrink-0" aria-hidden="true" />
+                {notStartedYet ? "Début prévu" : "Début"}
+              </span>
+              <span className="font-semibold text-gray-900 whitespace-nowrap">{formatDate(startDate)}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2 text-sm">
+            <span className="font-medium text-gray-600 flex items-center gap-1.5">
+              <CalendarCheck className="w-4 h-4 text-gray-400 shrink-0" aria-hidden="true" /> Fin prévue
+            </span>
+            <span className="font-semibold text-gray-900 whitespace-nowrap">
+              {endDate ? formatDate(endDate) : "Non définie"}
             </span>
           </div>
-          <span className="text-lg text-gray-900 font-bold">{responsible}</span>
+          <div>
+            <div className="flex items-center justify-between text-sm mb-1.5">
+              <span className="font-medium text-gray-600">Avancement des travaux</span>
+              <span className="font-bold text-gray-900">{progressPct === null ? "—" : `${progressPct} %`}</span>
+            </div>
+            <div
+              className="h-2 rounded-full bg-gray-100 overflow-hidden"
+              role="progressbar"
+              aria-label="Avancement des travaux"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progressPct ?? undefined}
+            >
+              <div
+                className={`h-full rounded-full ${progressPct === 100 ? "bg-green-500" : "bg-orange-500"}`}
+                style={{ width: `${progressPct ?? 0}%`, transition: "width 0.6s ease" }}
+              />
+            </div>
+            {progressPct === null && <p className="text-xs text-gray-400 mt-1">Aucune tâche suivie pour le moment</p>}
+          </div>
         </div>
       </div>
     </div>

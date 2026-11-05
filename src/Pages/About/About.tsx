@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChartColumn, Globe, Handshake, HardHat, Lock, Zap } from 'lucide-react';
 
 const About: React.FC = () => {
   return (
@@ -29,15 +30,17 @@ const About: React.FC = () => {
         <h2 className="text-4xl font-extrabold text-gray-800 mb-10 text-center">Nos valeurs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {[
-            { icon: "🏗️", title: "Conçu pour le terrain", desc: "Pensé avec de vrais professionnels du bâtiment. Chaque fonctionnalité résout un vrai problème." },
-            { icon: "⚡", title: "Rapide & fiable", desc: "Données en temps réel et mises à jour instantanées pour que votre équipe soit toujours synchronisée." },
-            { icon: "🔒", title: "Sécurisé par défaut", desc: "Vos données sont chiffrées et protégées. Nous prenons la sécurité au sérieux pour vous." },
-            { icon: "🌍", title: "Conçu pour grandir", desc: "D'un chantier à des centaines — KONSTRUKT évolue avec votre entreprise." },
-            { icon: "🤝", title: "Client avant tout", desc: "Nous écoutons nos utilisateurs et livrons les fonctionnalités qui comptent. Votre retour guide notre feuille de route." },
-            { icon: "📊", title: "Orienté données", desc: "Prenez de meilleures décisions grâce à des analyses et rapports clairs sur vos projets." },
-          ].map(({ icon, title, desc }) => (
+            { icon: HardHat, title: "Conçu pour le terrain", desc: "Pensé avec de vrais professionnels du bâtiment. Chaque fonctionnalité résout un vrai problème." },
+            { icon: Zap, title: "Rapide & fiable", desc: "Données en temps réel et mises à jour instantanées pour que votre équipe soit toujours synchronisée." },
+            { icon: Lock, title: "Sécurisé par défaut", desc: "Vos données sont chiffrées et protégées. Nous prenons la sécurité au sérieux pour vous." },
+            { icon: Globe, title: "Conçu pour grandir", desc: "D'un chantier à des centaines — KONSTRUKT évolue avec votre entreprise." },
+            { icon: Handshake, title: "Client avant tout", desc: "Nous écoutons nos utilisateurs et livrons les fonctionnalités qui comptent. Votre retour guide notre feuille de route." },
+            { icon: ChartColumn, title: "Orienté données", desc: "Prenez de meilleures décisions grâce à des analyses et rapports clairs sur vos projets." },
+          ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="bg-white rounded-2xl shadow p-8 border border-gray-100 flex flex-col gap-3">
-              <span className="text-4xl">{icon}</span>
+              <span className="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
+                <Icon className="w-6 h-6" aria-hidden="true" />
+              </span>
               <h3 className="text-xl font-bold text-gray-800">{title}</h3>
               <p className="text-gray-500 text-base">{desc}</p>
             </div>

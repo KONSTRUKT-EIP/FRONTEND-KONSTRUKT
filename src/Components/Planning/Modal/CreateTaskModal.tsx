@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { CalendarDays } from "lucide-react";
 import { Field } from "../../Tools/Input/Input";
 
 export interface CreateTaskPayload {
@@ -264,7 +265,7 @@ export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTas
 
             {/* Calendrier: Date, Heure début, Heure fin */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">📅 Planification</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5"><CalendarDays className="w-4 h-4" aria-hidden="true" /> Planification</h3>
               <div className="grid grid-cols-3 gap-4">
                 <Field 
                   label="Date" 

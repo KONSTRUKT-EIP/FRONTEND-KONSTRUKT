@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CloudSun, type LucideIcon } from "lucide-react";
 import DayColumn from "./DayColum";
 import { Task } from "./TaskCard";
 import React from 'react';
@@ -6,7 +7,7 @@ import React from 'react';
 interface WeatherDay {
     date: string;
     label: string;
-    icon: string;
+    icon: LucideIcon;
 }
 
 interface WeekCalendarCard {
@@ -78,7 +79,7 @@ export default function WeekCalendar({ tasks, weather = [], onTaskClick, onCreat
     const now = () => setWeekStart(getMonday(new Date()));
     const getWeather = (date: Date) => {
         const convert = convertDate(date);
-        return weather.find((w) => w.date === convert) ?? { label: "—", icon: "🌤️" };
+        return weather.find((w) => w.date === convert) ?? { label: "—", icon: CloudSun };
     };
 
     const getTasksForDay = (date: Date) => {
