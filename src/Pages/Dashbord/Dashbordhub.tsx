@@ -4,11 +4,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { teamService, TeamStats, ATTENDANCE_UPDATED_EVENT } from '../../services/teamService';
 import { siteService, SiteDetails, SiteWeather } from '../../services/siteService';
 import SiteOverview from '../../Components/Dashboard/SiteOverview/SiteOverview';
-<<<<<<< HEAD
 import { LOT_DASHBOARDS, computeLotMetrics } from '../../mocks/lotDashboards';
-=======
 import SiteSectionNav from '../../Components/Dashboard/SiteSectionNav';
->>>>>>> 32bcfbe505429540ccc2416149276bfb3617af31
 
 // Lots du chantier (données de démo) : l'avancement correspond à la quantité livrée sur le prévu
 const dashboards = LOT_DASHBOARDS.map((lot) => ({
