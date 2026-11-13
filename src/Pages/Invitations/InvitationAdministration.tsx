@@ -7,7 +7,6 @@ import {
 } from '../../services/invitationService';
 
 const roleLabels: Record<string, string> = {
-  ADMIN: 'Administrateur',
   CHEF_PROJET: 'Chef de projet',
   CONDUCTEUR_TRAVAUX: 'Conducteur de travaux',
   COLLABORATEUR: 'Collaborateur',
