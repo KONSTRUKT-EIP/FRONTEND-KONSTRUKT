@@ -14,7 +14,8 @@ export type CurrentUser = {
 };
 
 export const roleLabels: Record<UserRole, string> = {
-  ADMIN: 'Administrateur',
+  OWNER: 'Propriétaire',
+  ADMIN_ORGANIZATION: "Administrateur d'organisation",
   CHEF_PROJET: 'Chef de projet',
   CONDUCTEUR_TRAVAUX: 'Conducteur de travaux',
   COLLABORATEUR: 'Collaborateur',

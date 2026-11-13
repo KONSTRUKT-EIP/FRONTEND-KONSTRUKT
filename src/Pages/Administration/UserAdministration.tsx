@@ -5,17 +5,11 @@ import {
   UserRole,
   UserSiteAssignment,
 } from '../../services/userAdministrationService';
-
-const roleLabels: Record<UserRole, string> = {
-  ADMIN: 'Administrateur',
-  CHEF_PROJET: 'Chef de projet',
-  CONDUCTEUR_TRAVAUX: 'Conducteur de travaux',
-  COLLABORATEUR: 'Collaborateur',
-  CLIENT: 'Client',
-};
+import { roleLabels } from '../../services/accountService';
 
 const managedRoles: UserRole[] = [
-  'ADMIN',
+  'OWNER',
+  'ADMIN_ORGANIZATION',
   'CHEF_PROJET',
   'CONDUCTEUR_TRAVAUX',
   'COLLABORATEUR',
