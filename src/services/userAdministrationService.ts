@@ -1,8 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
 export type UserRole =
-  | 'OWNER'
-  | 'ADMIN_ORGANIZATION'
+  | 'ADMIN'
   | 'CHEF_PROJET'
   | 'CONDUCTEUR_TRAVAUX'
   | 'COLLABORATEUR'
